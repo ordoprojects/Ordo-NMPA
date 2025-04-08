@@ -1,0 +1,117 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "src/assets/fonts/Avenir Next LT Pro Bold.ttf",
+      "sha1": "ac8ad64356a006a6e701d70c3bbf3f6011f91c98"
+    },
+    {
+      "path": "src/assets/fonts/Avenir-Regular.ttf",
+      "sha1": "ea4f74d433612d9d044576534d3a3d8709412ed6"
+    },
+    {
+      "path": "src/assets/fonts/AvenirNextCyr-Bold.ttf",
+      "sha1": "c9a55027184e56afc9eede1c2cd21ad3c6217cbf"
+    },
+    {
+      "path": "src/assets/fonts/AvenirNextCyr-Demi.ttf",
+      "sha1": "a15428daf6c7711fa849ada35a487d2b751f8a05"
+    },
+    {
+      "path": "src/assets/fonts/AvenirNextCyr-Medium.ttf",
+      "sha1": "0c8483b3dc6a252958b36658338954150714129d"
+    },
+    {
+      "path": "src/assets/fonts/AvenirNextCyr-Thin.ttf",
+      "sha1": "a8424c9aa111861addf6f3ec2a1fa50be6ed0050"
+    },
+    {
+      "path": "src/assets/fonts/AvenirNextLTPro-Bold.otf",
+      "sha1": "ac8ad64356a006a6e701d70c3bbf3f6011f91c98"
+    },
+    {
+      "path": "src/assets/fonts/AvenirNextLTPro-It.otf",
+      "sha1": "602fc8cdb3bd9e5fe83b6ea19e0762a394f287f3"
+    },
+    {
+      "path": "src/assets/fonts/AvenirNextLTPro-Regular.otf",
+      "sha1": "5431b8a80300b8dd7014f2f1d05c66b3f0d89f38"
+    },
+    {
+      "path": "src/assets/fonts/Lato-Bold.ttf",
+      "sha1": "542498221d97bee5bdbccf86ee8890bf8e8005c9"
+    },
+    {
+      "path": "src/assets/fonts/Lato-Regular.ttf",
+      "sha1": "e923c72eda5e50a87e18ff5c71e9ef4b3b6455a3"
+    },
+    {
+      "path": "src/assets/fonts/Manrope-SemiBold.otf",
+      "sha1": "4b7f87ad46d80629cead7b8ee0008d01641e4a91"
+    },
+    {
+      "path": "src/assets/fonts/Poppins-Black.ttf",
+      "sha1": "645e04c53c6b5b35bce654a811ebce16af8aa721"
+    },
+    {
+      "path": "src/assets/fonts/Poppins-Bold.ttf",
+      "sha1": "875cf0cecd647bcf22e79d633d868c1b1ec98dfa"
+    },
+    {
+      "path": "src/assets/fonts/Poppins-ExtraBold.ttf",
+      "sha1": "4b5c0750f073abd576413a0898d3b95adaf199c8"
+    },
+    {
+      "path": "src/assets/fonts/Poppins-Italic.ttf",
+      "sha1": "8853c7193c21b71acb6054a2d8243147fb283360"
+    },
+    {
+      "path": "src/assets/fonts/Poppins-Light.ttf",
+      "sha1": "e247a92158e112f8bf7b638c8d95381d66b00dbb"
+    },
+    {
+      "path": "src/assets/fonts/Poppins-Regular.ttf",
+      "sha1": "fdd3002e7d814ee47c1c1b8487c72c6bbb3a2d00"
+    },
+    {
+      "path": "src/assets/fonts/Poppins-SemiBold.ttf",
+      "sha1": "8a4ace9392d06bcb7f8ea2f5169b07e4c383a90d"
+    },
+    {
+      "path": "src/assets/fonts/Poppins-Thin.ttf",
+      "sha1": "561e8929100d5e1b8e6bba314ef1e59c22906eba"
+    },
+    {
+      "path": "src/assets/fonts/ProximaNova-Black.ttf",
+      "sha1": "06bc0c03d3318c8041dc11d8328df77fcf9e239e"
+    },
+    {
+      "path": "src/assets/fonts/ProximaNova-Bold.ttf",
+      "sha1": "3fad2ff85c3159423e245558b5b46f43cd6b8066"
+    },
+    {
+      "path": "src/assets/fonts/ProximaNova-Extrabld.ttf",
+      "sha1": "682f30d56ad4ee7529b29d22c1e0e7e885ab4a15"
+    },
+    {
+      "path": "src/assets/fonts/ProximaNova-Light.ttf",
+      "sha1": "bade8208624b7f80cfaf2d0e12c388f9d2ce0527"
+    },
+    {
+      "path": "src/assets/fonts/ProximaNova-Regular.ttf",
+      "sha1": "7d28c679ed2943488669bf2474534b8155d80e2b"
+    },
+    {
+      "path": "src/assets/fonts/ProximaNova-Semibold.ttf",
+      "sha1": "5de28f387ea88553d195d1978286d43c33231969"
+    },
+    {
+      "path": "src/assets/fonts/ProximaNovaT-Thin.ttf",
+      "sha1": "2b537123cd4ae6c81e9fd518c614fdb5bfef39b6"
+    },
+    {
+      "path": "src/assets/fonts/Satoshi-Medium.ttf",
+      "sha1": "e4539f4688c865204a879dc3253d3547f0444818"
+    }
+  ]
+}

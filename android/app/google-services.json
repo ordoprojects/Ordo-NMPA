@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "744955728713",
+    "project_id": "ordo-erp-2b58d",
+    "storage_bucket": "ordo-erp-2b58d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:744955728713:android:7bddb22c47c10b52e2c098",
+        "android_client_info": {
+          "package_name": "com.ordo.gsi"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCpq8ceGS3aJARDNYW3s9w3rIonUJhnEvA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:744955728713:android:6fac0eebafc4cbdee2c098",
+        "android_client_info": {
+          "package_name": "com.ordoerp.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCpq8ceGS3aJARDNYW3s9w3rIonUJhnEvA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

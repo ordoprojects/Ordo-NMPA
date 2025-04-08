@@ -1,0 +1,23 @@
+//colors changed
+export default {
+    white: '#fff',
+    black: '#000',
+    lightgreen: '#009387',
+    red: '#FF0000',
+    grey: '#f2f2f2',
+    darkBlue: '#05375a',
+    darkgrey: '#666666',
+    lightGrey: '#c0bcbc',
+    ExtraDarkgrey:'#999999',
+    // primary: "#50001D",
+    // primary: "#4b0482",
+    primary: "#4b0482",
+    // linearColors: ["#4b0482", "#480237", "#160142"],
+    location: [0.003, 0.14, 0.9],
+    ButtonsLocation: [0.1, 0.9, 1],
+    // location: [0.3, 0.6, 0.9],
+    // linearColors: ['#C14761', '#6F40AC', '#6F40AC',],
+    linearColors: ['#4b0482', '#7A21E2', '#7A21E2',],
+    start: { x: 0, y: 0 },
+    end: { x: 0, y: 1 },
+}
