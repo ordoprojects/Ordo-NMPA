@@ -2515,6 +2515,14 @@ onPress={() => {
    
     {/* ORDO GSI APP B_418 | 08-Apr-2025 | Sahana  */}
     {/* Fixed issues by adding ft and inches for ppgl */}
+    <Text style={{
+      fontSize: 14,
+      fontWeight: 'bold',
+      textAlign: 'center',
+      textAlignVertical: 'center',
+      color: 'black',
+      width: 100, // Same as TextInput width
+    }}>{selectedItemName === "BASE PLATE" ? "LENGTH": "FT"}</Text>
 
     <Text style={{
       fontSize: 14,
@@ -2523,16 +2531,9 @@ onPress={() => {
       textAlignVertical: 'center',
       color: 'black',
       width: 100, // Same as TextInput width
-    }}>{selectedItemName === "BASE PLATE" ? "WIDTH": "FT"}</Text>
+    }}>{selectedItemName === "BASE PLATE" ? "WIDTH": "INCHES"}</Text>
 
-<Text style={{
-      fontSize: 14,
-      fontWeight: 'bold',
-      textAlign: 'center',
-      textAlignVertical: 'center',
-      color: 'black',
-      width: 100, // Same as TextInput width
-    }}>{selectedItemName === "BASE PLATE" ? "LENGTH": "INCHES"}</Text>
+
 
     {selectedItemName === "BASE PLATE" && (
       <Text style={{
@@ -2566,23 +2567,26 @@ onPress={() => {
         width: '100%',
         gap: 10,
       }}>
-        <TextInput
+
+     <TextInput
           style={{ borderWidth: 1, padding: 5, width: 100, textAlign: 'center' }}
-          value={item?.height_inch}
+          value={selectedItemName === "BASE PLATE" ? item?.height_inch :item?.width_ft}
           placeholder="0.00"
-          onChangeText={(text) => handleInputChange1(index, 'height_inch', text)}
+          onChangeText={(text) => handleInputChange1(index, 'width_ft', text)}
           keyboardType="number-pad"
           returnKeyType="done"
         />
 
         <TextInput
           style={{ borderWidth: 1, padding: 5, width: 100, textAlign: 'center' }}
-          value={item?.width_ft}
+          value={selectedItemName === "BASE PLATE" ? item?.width_ft :item?.height_inch}
           placeholder="0.00"
-          onChangeText={(text) => handleInputChange1(index, 'width_ft', text)}
+          onChangeText={(text) => handleInputChange1(index, 'height_inch', text)}
           keyboardType="number-pad"
           returnKeyType="done"
         />
+
+     
 
         {selectedItemName === "BASE PLATE" && (
           <TextInput

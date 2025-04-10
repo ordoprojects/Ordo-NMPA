@@ -157,7 +157,7 @@ const DriverOrdersReview = ({ route, text, navigation }) => {
       customer_id: Details[0]?.assigne_to,
     });
     
-    console.log('=====================raw===============');
+    console.log('=====================driver raw===============');
     console.log(raw);
     console.log('======================================');
 

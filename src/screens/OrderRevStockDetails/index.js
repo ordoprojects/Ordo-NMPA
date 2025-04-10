@@ -766,7 +766,7 @@ const handleInputChange = (index, field, value) => {
 
   //Production Stock Selection API for BASE PLATE
   const FetchDataforBasePlate = async (id) => {
-
+console.log("idddddddddddddd ",id)
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     myHeaders.append("Authorization", `Bearer ${userData.token}`);
@@ -2537,6 +2537,7 @@ const saveStockData = (status) => {
       },
   ]);
 };
+
 
   //API to save the Dimension Data PPGL
   const saveStockDataPPGL = (status) => {

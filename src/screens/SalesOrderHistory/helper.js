@@ -1,5 +1,5 @@
 export const fetchDataForStatus = async (status, limit, offset, userData ,searchtext) => {
-console.log("🚀 ~ fetchDataForStatus ~ userData:", userData)
+console.log("🚀 ~ fetchDataForStatus ~ userData:", userData, status)
 
     var myHeaders = new Headers();
     myHeaders.append("Authorization", `Bearer ${userData?.token}`);

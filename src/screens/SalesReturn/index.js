@@ -84,6 +84,8 @@ const SalesReturn = ({ navigation, route }) => {
   const searchbarRef = useRef(null);
   const [cartSearch, setCartSearch] = useState("");
   const [screen, setScreen] = useState("");
+  const [selectedItemUOM, setSelectedItemUOM] = useState([]);
+  const [baseUOM, setBaseUOM] = useState('');
 
 
 
@@ -513,6 +515,7 @@ const removeProductFromCart = (item) => {
     }, [cartData])
 
      const addProduct = (item) => {
+      console.log('Selected item:', item);
     if (selectedItem.find((product) => product.product_id === item.id)) {
       // Remove the product from selectedItem
       setselectedItems((prevselectedItems) =>
@@ -529,6 +532,8 @@ const removeProductFromCart = (item) => {
               // qty:'',
               // total_weight:'',
               // uom:'',
+              unit_of_measure:item.unit_of_measure,
+              uom_list:item.uom_list,
               id: item.id,
               name: item.name,
           },
@@ -1468,7 +1473,7 @@ console.log("added",addedItems)
     }
   }, [cartData, cartSearch]);
 
-console.log("dfghjnkml",cartSearch,filteredCartData);
+console.log("selectedItem",selectedItem);
 
 
 
@@ -2008,20 +2013,27 @@ console.log("dfghjnkml",cartSearch,filteredCartData);
                         </View>
                     </>
                 ) : (
+                  
                     <FlatList
                         showsVerticalScrollIndicator={false}
                         data={selectedItem}
                         keyboardShouldPersistTaps='handled'
 
                         renderItem={({ item, index }) =>
+                          
                              <TouchableOpacity 
   style={styles.elementsView}
   onPress={() => {
     setModalVisible1(true);
     setSelectedItemName(item?.name);
      setSelectedItemId(item?.id);
+     setBaseUOM(item?.unit_of_measure);
+     setSelectedItemUOM(item?.uom_list)
   }}
 >
+{/* 
+      // ORDO GSI APP_832 | 09-Apr-2025 | Sahana 
+      // Fixed an issue  based on the product you select, it fetches the UOM (Unit of Measurement) options specific to that product from API and displays in the dropdown option*/}
                 <View
                   style={{ flexDirection: "row", justifyContent: "center" }}
                 >
@@ -2212,7 +2224,7 @@ console.log("dfghjnkml",cartSearch,filteredCartData);
             />
             <Dropdown
               style={{flex:2, marginRight: 5, borderWidth: 1, borderColor: '#ccc', backgroundColor: '#fff', padding: 2 ,height:38}}
-              data={getDropdownData(index)}
+              data={selectedItemUOM}
               placeholderStyle={{ fontSize: 14, color: '#888' }}
               selectedTextStyle={{ fontSize: 14 ,color:'black'}}
               itemTextStyle={{ fontSize: 14 ,color:'black'}}
@@ -2220,7 +2232,7 @@ console.log("dfghjnkml",cartSearch,filteredCartData);
               labelField="label"
               valueField="id"
               placeholder="Select option"
-              value={item.uom}
+              value={item?.uom}
               onChange={(dropdownItem) => handleDropdownChangeAdd(dropdownItem, index)}
             />
             <MaskedTextInput

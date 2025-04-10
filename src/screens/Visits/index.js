@@ -3139,7 +3139,7 @@ console.log("user id", userData.id)
                         fontFamily: "AvenirNextCyr-Medium",
                       }}
                     >
-                      © 2024 PrimeSophic Technologies. All rights Reserved
+                      © 2025 inteliTech Solutions. All rights Reserved
                     </Title>
                     {/* <View style={styles.infoRow}>
                   <Text style={styles.label1}>Company Name :</Text>

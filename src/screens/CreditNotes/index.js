@@ -72,6 +72,7 @@ const CreditNotes = ({ navigation }) => {
   };
 
 
+
   const checkPermission = async () => {
     let PermissionDenied = await cameraPermission();
     if (PermissionDenied) {
@@ -498,10 +499,28 @@ const CreditNotes = ({ navigation }) => {
                     </Text>
                   </View>
 
-
-
-
                   <View
+                    style={{
+                      flexDirection: "row",
+                      // justifyContent: "flex-start",
+                      borderBottomColor: "#D9D9D9",
+                      borderBottomWidth: 1,
+                      paddingBottom: "5%",
+                      paddingVertical: "3%",
+                    }}
+                  >
+                    <Text style={{ ...styles.text, width: '20%' }}>Amount : </Text>
+
+                    <Text style={{ ...styles.text, width: '80%' }}>
+                      {selectedPayment?.amount}
+                    </Text>
+                  </View>
+
+
+
+
+
+                  {/* <View
                     style={{
                       flexDirection: "row",
                       // justifyContent: "space-between",
@@ -517,7 +536,7 @@ const CreditNotes = ({ navigation }) => {
                       source={{ uri: selectedPayment?.reference_document_id }}
                       style={styles.imgStyle}
                     />
-                  </View>
+                  </View> */}
                 </View>
 
               </>

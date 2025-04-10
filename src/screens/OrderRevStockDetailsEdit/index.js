@@ -859,6 +859,8 @@ const handleQuantityChange = (item, action) => {
         `https://gsidev.ordosolution.com/api/soorder_edit_v2/${orderDetails.id}/`,
         requestOptions
       );
+
+      console.log("orderDetails.id",orderDetails.id)
       
       const result = await response.json();
       console.log("🚀 ~ EditOrderDetails ~ result:", result)
@@ -868,7 +870,7 @@ const handleQuantityChange = (item, action) => {
         setIsUpdating(false);
       } else {
         console.log('Success response from API:', result);
-        Alert.alert("successful", `Order ${orderDetails.name} Edited Successfully`, [
+        Alert.alert("Successful", `Order ${orderDetails.name} Edited Successfully`, [
           {
             text: 'OK',
             onPress: () => {

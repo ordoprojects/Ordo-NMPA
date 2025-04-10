@@ -513,8 +513,10 @@ const InvoiceDetails = ({ navigation, route }) => {
                         </Text>
 
                         <Text style={{ ...styles.text }}>
-                          {item?.transaction_date}
-                        </Text>
+  {item?.transaction_date
+    ? item.transaction_date.split("-").reverse().join("-")
+    : ""}
+</Text>
                       </View>
                     </View>
                   )}

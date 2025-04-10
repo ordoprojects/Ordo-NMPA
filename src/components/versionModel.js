@@ -56,7 +56,7 @@ const VersionModel = ({ modalVisible, closeModal }) => {
             </TouchableOpacity>
           </View>
         
-          <Text style={styles.versionText11}> © 2024 PrimeSophic Technologies. All rights Reserve</Text>
+          <Text style={styles.versionText11}> © 2025 inteliTech Solutions. All rights Reserve</Text>
 
            <TouchableOpacity
               style={styles.graycircle1} onPress={closeModal}>

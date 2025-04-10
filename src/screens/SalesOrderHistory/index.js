@@ -185,7 +185,7 @@ const SalesOrderHistory = ({ navigation ,route}) => {
           setCompletedArray(deliveredResult.results);
           setFilteredCompletedArray(deliveredResult.results);
           setCompletedTotalCount(deliveredResult.total_count);
-        } else if (screenName === "Cancel") {
+        } else if (screenName === "Canceled") {
           cancelResult = await fetchDataForStatus("Cancel", 10, 0, userData, search);
           setCancelledArray(cancelResult.results);
           setFilteredCancelledArray(cancelResult.results);

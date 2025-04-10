@@ -488,7 +488,7 @@ const Login = ({ navigation }) => {
               color: "black",
             }}
           >
-            © 2024 PrimeSophic Technologies. All rights Reserved
+            © 2025 inteliTech Solutions. All rights Reserved
           </Text>
         </View>
       </View>
