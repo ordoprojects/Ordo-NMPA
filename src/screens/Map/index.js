@@ -250,7 +250,7 @@ const Map = ({ navigation, route }) => {
             redirect: 'follow'
         };
 
-        await fetch("https://gsi.ordosolution.com/set_account_details.php", requestOptions)
+        await fetch("https://gsidev.ordosolution.com/set_account_details.php", requestOptions)
             .then(response => response.json())
             .then(async result => {
 
@@ -332,7 +332,7 @@ const Map = ({ navigation, route }) => {
             redirect: 'follow'
         };
 
-        fetch("https://gsi.ordosolution.com/get_approved_deviations.php", requestOptions)
+        fetch("https://gsidev.ordosolution.com/get_approved_deviations.php", requestOptions)
             .then(response => response.json())
             .then(async result => {
                 setDeviatedDealers(result);
@@ -362,7 +362,7 @@ const Map = ({ navigation, route }) => {
             redirect: 'follow'
         };
 
-        fetch("https://gsi.ordosolution.com/get_accounts_for_dealer.php", requestOptions)
+        fetch("https://gsidev.ordosolution.com/get_accounts_for_dealer.php", requestOptions)
             .then(response => response.json())
             .then(async result => {
                 activeDealer.current = result;
@@ -541,7 +541,7 @@ const Map = ({ navigation, route }) => {
                 redirect: 'follow'
             };
 
-            fetch("https://gsi.ordosolution.com/set_deviate_plan.php", requestOptions)
+            fetch("https://gsidev.ordosolution.com/set_deviate_plan.php", requestOptions)
                 .then(response => response.json())
                 .then(result => {
                     if (result.status == '203') {

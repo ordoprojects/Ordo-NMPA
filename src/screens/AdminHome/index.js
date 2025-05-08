@@ -137,7 +137,7 @@ const AdminHome = ({ navigation }) => {
       redirect: "follow",
     };
 
-    fetch("https://gsi.ordosolution.com/get_recommended.php", requestOptions)
+    fetch("https://gsidev.ordosolution.com/get_recommended.php", requestOptions)
       .then((response) => response.json())
       .then((result) => {
         const { product_list } = result;
@@ -209,7 +209,10 @@ const AdminHome = ({ navigation }) => {
       <View style={{ flexDirection: "row", gap: 10 }}>
         {item.product_image ? (
           <Image
-            source={{ uri: item.product_image }}
+            source={{uri: item.product_image.startsWith("http")
+          ? item.product_image
+          : `https://gsidev.ordosolution.com${item.product_image}`,
+      }}
             style={{ ...styles.image }}
           />
         ) : (

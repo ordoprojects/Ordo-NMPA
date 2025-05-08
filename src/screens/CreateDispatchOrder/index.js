@@ -420,7 +420,10 @@ const CreateDispatchOrder = ({ navigation, route }) => {
                             renderItem={({ item }) => (
                               <View style={styles.productItem}>
                                 <Image
-                                  source={{ uri: item.product_image }}
+                                  source={{uri: item.product_image.startsWith("http")
+          ? item.product_image
+          : `https://gsidev.ordosolution.com${item.product_image}`,
+      }}
                                   style={styles.productImage}
                                 />
                                 <View style={styles.productInfo}>

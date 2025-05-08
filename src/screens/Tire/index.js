@@ -23,80 +23,82 @@ import Toast from 'react-native-simple-toast';
 import { LoadingView } from "../../components/LoadingView";
 import { TextInput as TextInput1 } from "react-native-paper";
 import { ms, hs, vs } from "../../utils/Metrics";
-import Maintenance from "../Maintenance";
 
 
 
-const FuelUsage = ({ navigation, route }) => {
-
-  // const { vehicleID } = route?.params
+const Tire = ({ navigation, route }) => {
   const { details, screen } = route?.params || {};
 
   console.log("details",details,screen)
 
   const [driverDrop, setDriverDrop] = useState([]);
-  const [fuelDrop, setFuelDrop] = useState([]);
+  const [statusDrop, setStatusDrop] = useState([]);
+  const [positionDrop, setPositionDrop] = useState([]);
+
   const [vehicleDrop, setVehicleDrop] = useState([]);
 
   const [visible2, setVisible2] = React.useState(false);
+  const [visible3, setVisible3] = React.useState(false);
+  const [visible4, setVisible4] = React.useState(false);
+
   const { token, userData } = useContext(AuthContext);
-  const [fuelDate, setFuelDate] = useState("");
-  const [fuelStation, setFuelStation] = useState("");
-  const [costPerUnit, setCostPerUnit] = useState("");
-  const [quantity, setQuantity] = useState("");
-  const [totalCost, setTotalCost] = useState("");
-  const [billNo, setBillNo] = useState("");
-  const [odometerReading, setOdometerReading] = useState("");
+  const [date, setDate] = useState("");
+  const [inspectionDate, setInspectionDate] = useState("");
+  const [powderingDate, setPowderingDate] = useState("");
+
+  const [tyreNumber, setTyreNumber] = useState("");
+  const [brand, setBrand] = useState("");
   const [km, setKm] = useState("");
-  const [unit, setUnit] = useState("");
-  const [rate, setRate] = useState("");
-  const [pumpName, setPumpName] = useState("");
-  const [location, setLocationName] = useState("");
-  const [mileage, setMileage] = useState("");
-  const [fuelType, setFuelType] = useState([]);
+  const [lifePercentage, setLifePercentage] = useState('');
+  const [position,setPosition ] = useState('');
+  const [status,setStatus ] = useState('');
+
   const [driverType, setdriverType] = useState([]);
   const [isFocus2, setIsFocus2] = useState(false);
-  const [isFocus4, setIsFocus4] = useState(false);
+  const [isFocus1, setIsFocus1] = useState(false);
 
   const [isFocus3, setIsFocus3] = useState(false);
+  const [isFocus4, setIsFocus4] = useState(false);
+
   const [vehicleID, setVehicleId] = useState('');
   const [loading, setLoading] = useState(false);
 
 
   useEffect(() => {
-    driverDropdown();
-    fuelDropdown();
-    VehicleDropdown();
-  }, []);
-
-  useEffect(() => {
-  
     if (details) {
-      // Populate all fields with details
-      setFuelDate(formatDate(details?.fuel_date));  // format for input
-      setFuelStation(details.fuel_station || "");
-      setCostPerUnit(details.cost_per_unit?.toString() || "");
-      setQuantity(details.quantity?.toString() || "");
-      setTotalCost(details.total_cost?.toString() || "");
-      setBillNo(details.invoice_no || "");
-      setOdometerReading(details.odometer1?.toString() || "");
-      setKm(details.km?.toString() || "");
-      setUnit(details.unit?.toString() || "");
-      setRate(details.rate?.toString() || "");
-      setPumpName(details.pump_name || "");
-      setLocationName(details.location || "");
-      setMileage(details.mileage?.toString() || "");
-      setVehicleId(details?.veh_id);
-      setFuelType(details.fuel_type || "");
-      setdriverType(details?.dri_id);
+      // Dropdowns (set with IDs)
+      setdriverType(details?.driver_no?.id);          // Driver dropdown (value = ID)
+      setVehicleId(details?.vehicle?.id);        // Vehicle dropdown (value = ID)
+      setPosition(details?.position);                  // Position dropdown (value = string or ID depending on your data)
+      setStatus(details?.status);                      // Status dropdown (value = string or ID)
+  
+      // Text Inputs
+      setTyreNumber(details?.tyre_number || '');
+      setBrand(details?.brand || '');
+      setKm(details?.km?.toString() || '');
+      setLifePercentage(details?.life_percentage?.toString() || '');
+  
+      // Dates
+      setDate(formatDate(details?.date));                      // "YYYY-MM-DD" to "DD/MM/YYYY"
+      setInspectionDate(details?.inspection_date?.replace(/-/g, '/'));
+setPowderingDate(details?.powdering_date?.replace(/-/g, '/'));// Already in "DD-MM-YYYY"
     }
   }, [details]);
   
-const formatDate = (isoString) => {
+
+
+  const formatDate = (isoString) => {
     return isoString ? moment(isoString).format("DD/MM/YYYY") : '';
   };
 
+  useEffect(() => {
+    driverDropdown();
+    tyreDropdown();
+    VehicleDropdown();
+  }, []);
 
+
+//   date
   const onDismiss2 = React.useCallback(() => {
     setVisible2(false);
   }, [setVisible2]);
@@ -104,17 +106,40 @@ const formatDate = (isoString) => {
   const onChange2 = React.useCallback(({ date }) => {
     setVisible2(false);
     const EmStart = moment(date).format("DD/MM/YYYY");
-    setFuelDate(EmStart);
+    setDate(EmStart);
   }, []);
 
-  useEffect(() => {
-    if (quantity && costPerUnit && !isNaN(quantity) && !isNaN(costPerUnit)) {
-      const calculatedTotalCost = parseFloat(quantity) * parseFloat(costPerUnit);
-      setTotalCost(calculatedTotalCost.toFixed(2)); 
-    } else {
-      setTotalCost("");
-    }
-  }, [quantity, costPerUnit]);
+
+// inspection date
+  const onDismiss3 = React.useCallback(() => {
+    setVisible3(false);
+  }, [setVisible3]);
+
+  const onChange3 = React.useCallback(({ date }) => {
+    setVisible3(false);
+    const EmStart = moment(date).format("DD/MM/YYYY");
+    setInspectionDate(EmStart);
+  }, []);
+
+// powdering date
+  const onDismiss4 = React.useCallback(() => {
+    setVisible4(false);
+  }, [setVisible4]);
+
+  const onChange4 = React.useCallback(({ date }) => {
+    setVisible4(false);
+    const EmStart = moment(date).format("DD/MM/YYYY");
+    setPowderingDate(EmStart);
+  }, []);
+
+//   useEffect(() => {
+//     if (quantity && costPerUnit && !isNaN(quantity) && !isNaN(costPerUnit)) {
+//       const calculatedTotalCost = parseFloat(quantity) * parseFloat(costPerUnit);
+//       setTotalCost(calculatedTotalCost.toFixed(2)); 
+//     } else {
+//       setTotalCost("");
+//     }
+//   }, [quantity, costPerUnit]);
 
   const InputWithLabel2 = ({ title, value, onPress }) => {
     // const textColor = !value ? "#cecece" : "black";
@@ -134,6 +159,49 @@ const formatDate = (isoString) => {
       </View>
     );
   };
+
+// inspection date
+
+  const InputWithLabel3 = ({ title, value, onPress }) => {
+    // const textColor = !value ? "#cecece" : "black";
+    const textColor = Colors.primary
+    return (
+      <View>
+        {/* <Text style={styles.labelText}>{title}</Text> */}
+        <Pressable style={{ ...styles.inputContainer }} onPress={onPress}>
+          <Text style={{ ...styles.input2, color: textColor }}>
+            {value ? value : "Select Inspection Date"}
+          </Text>
+          <Image
+            style={{ width: 20, height: 20, marginRight: 15 }}
+            source={require("../../assets/images/calendar.png")}
+          ></Image>
+        </Pressable>
+      </View>
+    );
+  };
+
+
+//   powdering date 
+  const InputWithLabel4 = ({ title, value, onPress }) => {
+    // const textColor = !value ? "#cecece" : "black";
+    const textColor = Colors.primary
+    return (
+      <View>
+        {/* <Text style={styles.labelText}>{title}</Text> */}
+        <Pressable style={{ ...styles.inputContainer }} onPress={onPress}>
+          <Text style={{ ...styles.input2, color: textColor }}>
+            {value ? value : "Select Powdering Date"}
+          </Text>
+          <Image
+            style={{ width: 20, height: 20, marginRight: 15 }}
+            source={require("../../assets/images/calendar.png")}
+          ></Image>
+        </Pressable>
+      </View>
+    );
+  };
+
 
   const driverDropdown = async (id) => {
     var myHeaders = new Headers();
@@ -169,40 +237,41 @@ const formatDate = (isoString) => {
     }
   };
 
-  const fuelDropdown = async (id) => {
+  const tyreDropdown = async (id) => {
     var myHeaders = new Headers();
     myHeaders.append("Authorization", `Bearer ${userData.token}`);
-
-    var raw = "";
-
+  
     var requestOptions = {
       method: "GET",
       headers: myHeaders,
-      body: raw,
       redirect: "follow",
     };
-
+  
     try {
       const response = await fetch(
-        "https://gsidev.ordosolution.com/api/choices/",
+        "https://gsidev.ordosolution.com/api/tyre_choices/",
         requestOptions
       );
       const result = await response.json();
-      console.log("hkdgjhahsgfhjsf",result)
-      const fuelDrop = result.fuel_types.map((types) => {
-        return {
-          label: types.label,
-          value: types.value,
-        };
-      });
-
-      setFuelDrop(fuelDrop);
-      // console.log(result)
-
+      console.log("tyre", result);
+  
+      const positionDrop = result.position_choices.map((item) => ({
+        label: item.label,
+        value: item.value,
+      }));
+  
+      const statusDrop = result.status_choices.map((item) => ({
+        label: item.label,
+        value: item.value,
+      }));
+  
+      setPositionDrop(positionDrop);
+      setStatusDrop(statusDrop);
     } catch (error) {
       console.log("error", error);
     }
   };
+  
 
   const VehicleDropdown = async (id) => {
     var myHeaders = new Headers();
@@ -241,46 +310,42 @@ const formatDate = (isoString) => {
   };
 
   const handleSubmit = async () => {
-
-    if (!driverType || !vehicleID || !fuelDate || !fuelStation || !quantity || !costPerUnit || !totalCost || !fuelType || !rate || !pumpName || !location || !unit || !km || !odometerReading) {
+    // Validate required fields
+    if (  !vehicleID || !date || !inspectionDate ||!position || !km || !brand || !lifePercentage || !status || !tyreNumber) {
       Alert.alert('Error', 'Please fill in all required fields');
       return;
     }
-
-
+  
     setLoading(true);
+    
+    // Prepare the headers for the request
     var myHeaders = new Headers();
     myHeaders.append("Authorization", `Bearer ${userData.token}`);
     myHeaders.append("Content-Type", "application/json");
-    console.log("gfghgfgfgf", userData.token);
-
+  
+    // Prepare the request body with the form data
     var raw = JSON.stringify({
-      dri_id: driverType,
-      veh_id: vehicleID,
-      fuel_date: moment(fuelDate, "DD/MM/YYYY").format("YYYY-MM-DD"),
-      fuel_station: fuelStation,
-      quantity: quantity,
-      cost_per_unit: costPerUnit,
-      total_cost: totalCost,
-      fuel_type: fuelType,
-      odometer1:odometerReading,
-      km:km,
-      unit:unit,
-      rate:rate,
-      pump_name:pumpName,
-      location:location,
-      mileage:mileage,
-      invoice_no:billNo
+      driver: driverType,
+      vehicle_no: vehicleID,
+      date: moment(date, "DD/MM/YYYY").format("YYYY-MM-DD"),
+      inspection_date: moment(inspectionDate, "DD/MM/YYYY").format("YYYY-MM-DD"),
+      powdering_date: moment(powderingDate, "DD/MM/YYYY").format("YYYY-MM-DD"),
+      tyre_number: tyreNumber,
+      km: km,
+      brand: brand,
+      life_percentage: lifePercentage,
+      status: status,
+      position: position,
     });
-
+  
     console.log("raw",raw,details?.id)
     // Determine the URL and request method based on whether it's "edit" mode or not
-    let url = "https://gsidev.ordosolution.com/api/fuelusage/";
+    let url = "https://gsidev.ordosolution.com/api/tyre/";
     let method = "POST"; // Default is POST for creating a new tyre
   
     // If in "edit" mode, update the tyre using PUT
     if (screen === "edit" && details?.id) {
-      url = `https://gsidev.ordosolution.com/api/fuelusage/${details?.id}/`; // Update URL with the specific tyre id
+      url = `https://gsidev.ordosolution.com/api/tyre/${details?.id}/`; // Update URL with the specific tyre id
       method = "PUT"; // Change method to PUT for updating
     }
   
@@ -296,10 +361,10 @@ const formatDate = (isoString) => {
       const response = await fetch(url, requestOptions);
       const result = await response.json();
   
-      console.log("fuel Result:", result);
+      console.log("Tyre Result:", result);
   
       // Show a success message
-      Toast.show(`Fuel Usage data ${screen === "edit" ? "updated" : "added"} successfully`, Toast.LONG);
+      Toast.show(`Tyre data ${screen === "edit" ? "updated" : "added"} successfully`, Toast.LONG);
   
        // Navigate back accordingly
   if (screen === "edit") {
@@ -308,11 +373,13 @@ const formatDate = (isoString) => {
     navigation.goBack(); // Or just one screen if adding
   }
     } catch (error) {
-      console.log("error", error);
+      console.log("Error:", error);
+      // Handle the error gracefully, e.g., show an error message
+      Alert.alert('Error', 'Something went wrong, please try again later');
     }
     setLoading(false);
-
   };
+  
 
 
   return (
@@ -353,7 +420,7 @@ const formatDate = (isoString) => {
             color: "white",
           }}
         >
-          Fuel Usage
+          Tyre
         </Text>
         <View style={{ width: "6%" }} />
       </View>
@@ -371,23 +438,24 @@ const formatDate = (isoString) => {
         }}
       >
         <ScrollView showsHorizontalScrollIndicator={false}>
-          <View style={{marginTop:'3%'}}>
+          <View>
 
             {/* <Text style={styles.label}>Vehicle</Text> */}
-            <View>
-                 {(!isFocus4 && !vehicleID) ? (
-               <Text style={styles.label1}>
-                 Vehicle No.<Text style={{ color: 'red' }}>*</Text>
-               </Text>
-             ) : (
-               <Text style={[styles.label1, isFocus4 && { color: Colors.primary }]}>
-                 Vehicle No. <Text style={{ color: 'red' }}>*</Text>
-               </Text>
-             )}
-                     {/* <Text style={styles.label}>Vehicle</Text> */}
-                      <Dropdown
-                    
-                                  style={[styles.dropdown, isFocus4 && { borderColor: Colors.primary}]}
+            <View style={{marginTop:'3%'}}>
+
+                                      {(!isFocus1 && !vehicleID) ? (
+                                    <Text style={styles.label1}>
+                                      Vehicle No. <Text style={{ color: 'red' }}>*</Text>
+                                    </Text>
+                                  ) : (
+                                    <Text style={[styles.label1, isFocus1 && { color: Colors.primary }]}>
+                                      Vehicle No. <Text style={{ color: 'red' }}>*</Text>
+                                    </Text>
+                                  )}
+                                          {/* <Text style={styles.label}>Vehicle</Text> */}
+                                           <Dropdown
+                                         
+                                                       style={[styles.dropdown, isFocus1 && { borderColor: Colors.primary}]}
               containerStyle={styles.dropdownContainer}
               placeholderStyle={styles.placeholderStyle}
               searchPlaceholder="Search"
@@ -399,34 +467,32 @@ const formatDate = (isoString) => {
               maxHeight={400}
               labelField="label"
               valueField="value"
-              placeholder={!isFocus4 ? "Please select the vehicle" : "..."}
+              placeholder={!isFocus1 ? "Please select the vehicle" : "..."}
               //searchPlaceholder="Search..."
               value={vehicleID}
-              onFocus={() => setIsFocus4(true)}
-              onBlur={() => setIsFocus4(false)}
+              onFocus={() => setIsFocus1(true)}
+              onBlur={() => setIsFocus1(false)}
               onChange={(item) => {
                 setVehicleId(item.value);
-                setIsFocus4(false);
+                setIsFocus1(false);
               }}
             />
 </View>
 
 <View style={{marginTop:'3%'}}>
 
-            
-            {(!isFocus3 && !driverType) ? (
-      <Text style={styles.label1}>
-        Driver Name <Text style={{ color: 'red' }}>*</Text>
-      </Text>
-    ) : (
-      <Text style={[styles.label1, isFocus3 && { color: Colors.primary }]}>
-        Driver Name <Text style={{ color: 'red' }}>*</Text>
-      </Text>
-    )}
-          <Dropdown
-                         style={[styles.dropdown, isFocus3 && { borderColor: Colors.primary}]}
-         
-            
+            {/* <Text style={styles.label}>Driver Id</Text> */}
+                            {(!isFocus3 && !driverType) ? (
+                      <Text style={styles.label1}>
+                        Driver Name 
+                      </Text>
+                    ) : (
+                      <Text style={[styles.label1, isFocus3 && { color: Colors.primary }]}>
+                        Driver Name 
+                      </Text>
+                    )}
+                          <Dropdown
+                                         style={[styles.dropdown, isFocus3 && { borderColor: Colors.primary}]}
               containerStyle={styles.dropdownContainer}
               placeholderStyle={styles.placeholderStyle}
               searchPlaceholder="Search"
@@ -452,55 +518,18 @@ const formatDate = (isoString) => {
 
 <View style={{marginTop:'3%'}}>
 
-            
-            {(!isFocus2 && !fuelType) ? (
-      <Text style={styles.label1}>
-        Fuel Type <Text style={{ color: 'red' }}>*</Text>
-      </Text>
-    ) : (
-      <Text style={[styles.label1, isFocus2 && { color: Colors.primary }]}>
-        Fuel Type <Text style={{ color: 'red' }}>*</Text>
-      </Text>
-    )}
-          <Dropdown
-                         style={[styles.dropdown, isFocus2 && { borderColor: Colors.primary}]}
-              containerStyle={styles.dropdownContainer}
-              placeholderStyle={styles.placeholderStyle}
-              searchPlaceholder="Search"
-              selectedTextStyle={styles.selectedTextStyle}
-              itemTextStyle={styles.selectedTextStyle}
-              inputSearchStyle={styles.inputSearchStyle}
-              iconStyle={styles.iconStyle}
-              data={fuelDrop}
-              maxHeight={400}
-              labelField="label"
-              valueField="value"
-              placeholder={!isFocus2 ? "Please select your fuel type" : "..."}
-              //searchPlaceholder="Search..."
-              value={fuelType}
-              onFocus={() => setIsFocus2(true)}
-              onBlur={() => setIsFocus2(false)}
-              onChange={(item) => {
-                setFuelType(item.value);
-                setIsFocus2(false);
-              }}
-            />
-</View>
-
-<View style={{marginTop:'3%'}}>
-
-                {(!fuelDate) ? (
-          <Text style={styles.label1}>
-            Date <Text style={{ color: 'red' }}>*</Text>
-          </Text>
-        ) : (
-          <Text style={[styles.label1, { color: Colors.primary }]}>
-            Date <Text style={{ color: 'red' }}>*</Text>
-          </Text>
-        )}
+                     {(!date) ? (
+                                 <Text style={styles.label1}>
+                                   Date <Text style={{ color: 'red' }}>*</Text>
+                                 </Text>
+                               ) : (
+                                 <Text style={[styles.label1, { color: Colors.primary }]}>
+                                   Date <Text style={{ color: 'red' }}>*</Text>
+                                 </Text>
+                               )}
               <InputWithLabel2
-                title="Maintenance Date"
-                value={fuelDate}
+                title="Date"
+                value={date}
                 onPress={() => setVisible2(true)}
               />
 
@@ -514,7 +543,150 @@ const formatDate = (isoString) => {
                 label="Select date" // optional
                 animationType="slide" // optional, default is 'slide' on ios/android and 'none' on web
               />
+
+
             </View>
+
+
+            <View style={{marginTop:'3%'}}>
+
+                     {(!inspectionDate) ? (
+                                 <Text style={styles.label1}>
+                                   Inspection Date <Text style={{ color: 'red' }}>*</Text>
+                                 </Text>
+                               ) : (
+                                 <Text style={[styles.label1, { color: Colors.primary }]}>
+                                   Inspection Date <Text style={{ color: 'red' }}>*</Text>
+                                 </Text>
+                               )}
+              <InputWithLabel3
+                title="Inspection Date"
+                value={inspectionDate}
+                onPress={() => setVisible3(true)}
+              />
+
+              <DatePickerModal
+                mode="single"
+                visible={visible3}
+                onDismiss={onDismiss3}
+                // date={date}
+                onConfirm={onChange3}
+                saveLabel="Save" // optional
+                label="Select Inspection date" // optional
+                animationType="slide" // optional, default is 'slide' on ios/android and 'none' on web
+              />
+
+
+            </View>
+
+
+            <View style={{marginTop:'3%'}}>
+
+            {(!powderingDate) ? (
+                                 <Text style={styles.label1}>
+                                   Powdering Date 
+                                 </Text>
+                               ) : (
+                                 <Text style={[styles.label1, { color: Colors.primary }]}>
+                                   Powdering Date 
+                                 </Text>
+                               )}
+              <InputWithLabel4
+                title="Powdering Date"
+                value={powderingDate}
+                onPress={() => setVisible4(true)}
+              />
+
+              <DatePickerModal
+                mode="single"
+                visible={visible4}
+                onDismiss={onDismiss4}
+                // date={date}
+                onConfirm={onChange4}
+                saveLabel="Save" // optional
+                label="Select Powdering date" // optional
+                animationType="slide" // optional, default is 'slide' on ios/android and 'none' on web
+              />
+
+
+            </View>
+
+
+
+            <View style={{marginTop:'3%'}}>
+
+                   
+                   {(!isFocus2 && !position) ? (
+             <Text style={styles.label1}>
+               Position <Text style={{ color: 'red' }}>*</Text>
+             </Text>
+           ) : (
+             <Text style={[styles.label1, isFocus2 && { color: Colors.primary }]}>
+               Position <Text style={{ color: 'red' }}>*</Text>
+             </Text>
+           )}
+                 <Dropdown
+                                style={[styles.dropdown, isFocus2 && { borderColor: Colors.primary}]}
+              containerStyle={styles.dropdownContainer}
+              placeholderStyle={styles.placeholderStyle}
+              searchPlaceholder="Search"
+              selectedTextStyle={styles.selectedTextStyle}
+              itemTextStyle={styles.selectedTextStyle}
+              inputSearchStyle={styles.inputSearchStyle}
+              iconStyle={styles.iconStyle}
+              data={positionDrop}
+              maxHeight={400}
+              labelField="label"
+              valueField="value"
+              placeholder={!isFocus2 ? "Please select your position" : "..."}
+              //searchPlaceholder="Search..."
+              value={position}
+              onFocus={() => setIsFocus2(true)}
+              onBlur={() => setIsFocus2(false)}
+              onChange={(item) => {
+                setPosition(item.value);
+                setIsFocus2(false);
+              }}
+            />
+</View>
+
+
+
+<View style={{marginTop:'3%'}}>
+                   
+                   {(!isFocus4 && !status) ? (
+             <Text style={styles.label1}>
+               Status <Text style={{ color: 'red' }}>*</Text>
+             </Text>
+           ) : (
+             <Text style={[styles.label1, isFocus4 && { color: Colors.primary }]}>
+               Status <Text style={{ color: 'red' }}>*</Text>
+             </Text>
+           )}
+                 <Dropdown
+              style={[styles.dropdown, isFocus4 && { borderColor: Colors.primary}]}
+              containerStyle={styles.dropdownContainer}
+              placeholderStyle={styles.placeholderStyle}
+              searchPlaceholder="Search"
+              selectedTextStyle={styles.selectedTextStyle}
+              itemTextStyle={styles.selectedTextStyle}
+              inputSearchStyle={styles.inputSearchStyle}
+              iconStyle={styles.iconStyle}
+              data={statusDrop}
+              maxHeight={400}
+              labelField="label"
+              valueField="value"
+              placeholder={!isFocus4 ? "Please select your status" : "..."}
+              //searchPlaceholder="Search..."
+              value={status}
+              onFocus={() => setIsFocus4(true)}
+              onBlur={() => setIsFocus4(false)}
+              onChange={(item) => {
+                setStatus(item.value);
+                setIsFocus4(false);
+              }}
+            />
+</View>
             {/* <Text style={styles.label}>Fuel Station</Text> */}
             {/* <TextInput
               style={styles.textInput}
@@ -523,43 +695,29 @@ const formatDate = (isoString) => {
               value={fuelStation}
               onChangeText={(text) => setFuelStation(text)}
             /> */}
-
-<TextInput1
-              mode="outlined"
-              label="Bill No."
-              value={billNo}
-              theme={{ colors: { onSurfaceVariant: "#4b0482" } }}
-              activeOutlineColor="#4b0482"
-              outlineColor="#B6B4B4"
-              textColor="#4b0482"
-              onChangeText={(text) => setBillNo(text)}
-              returnKeyType="done"
-              blurOnSubmit={false}
-              outlineStyle={{ borderRadius: 10 }}
-              style={{ marginBottom: "5%", height: 55, backgroundColor: "white" }}
-            />
-
             <TextInput1
               mode="outlined"
-                    label={
-                              <Text>
-                                Fuel Station <Text style={{ color: 'red' }}>*</Text>
-                              </Text>
-                            }
-              value={fuelStation}
-              theme={{ colors: { onSurfaceVariant: "#4b0482" } }}
+                   label={
+                            <Text>
+                            Tyre Number <Text style={{ color: 'red' }}>*</Text>
+                            </Text>
+                           }
+              value={tyreNumber}
+              theme={{
+                colors: { onSurfaceVariant: "#4b0482" },
+                fonts: { labelLarge: { fontSize: 12 } }, // set label font size smaller
+              }}
               activeOutlineColor="#4b0482"
               outlineColor="#B6B4B4"
               textColor="#4b0482"
-              onChangeText={(text) => setFuelStation(text)}
+              onChangeText={(text) => setTyreNumber(text)}
               returnKeyType="done"
               blurOnSubmit={false}
               outlineStyle={{ borderRadius: 10 }}
               style={{ marginBottom: "5%", height: 55, backgroundColor: "white" }}
             />
             {/* <Text style={styles.label}>Fuel Type</Text> */}
-           
-
+ 
             {/* <Text style={styles.label}>Quantity</Text> */}
             {/* <TextInput
               style={styles.textInput}
@@ -570,17 +728,17 @@ const formatDate = (isoString) => {
             /> */}
             <TextInput1
               mode="outlined"
-                    label={
-                              <Text>
-                                Quantity <Text style={{ color: 'red' }}>*</Text>
-                              </Text>
-                            }
-              value={quantity}
+              label={
+                <Text>
+                KM <Text style={{ color: 'red' }}>*</Text>
+                </Text>
+               }
+              value={km}
               theme={{ colors: { onSurfaceVariant: "#4b0482" } }}
               activeOutlineColor="#4b0482"
               outlineColor="#B6B4B4"
               textColor="#4b0482"
-              onChangeText={(text) => setQuantity(text)}
+              onChangeText={(text) => setKm(text)}
               returnKeyType="done"
               blurOnSubmit={false}
               outlineStyle={{ borderRadius: 10 }}
@@ -597,17 +755,17 @@ const formatDate = (isoString) => {
             /> */}
             <TextInput1
               mode="outlined"
-                    label={
-                              <Text>
-                                Cost Per Unit <Text style={{ color: 'red' }}>*</Text>
-                              </Text>
-                            }
-              value={costPerUnit}
+              label={
+                <Text>
+                Brand <Text style={{ color: 'red' }}>*</Text>
+                </Text>
+               }
+              value={brand}
               theme={{ colors: { onSurfaceVariant: "#4b0482" } }}
               activeOutlineColor="#4b0482"
               outlineColor="#B6B4B4"
               textColor="#4b0482"
-              onChangeText={(text) => setCostPerUnit(text)}
+              onChangeText={(text) => setBrand(text)}
               returnKeyType="done"
               blurOnSubmit={false}
               outlineStyle={{ borderRadius: 10 }}
@@ -624,152 +782,24 @@ const formatDate = (isoString) => {
             /> */}
             <TextInput1
               mode="outlined"
-                    label={
-                              <Text>
-                                Total Amount <Text style={{ color: 'red' }}>*</Text>
-                              </Text>
-                            }
-              value={totalCost}
+              label={
+                <Text>
+                Life Percentage <Text style={{ color: 'red' }}>*</Text>
+                </Text>
+               }
+              value={lifePercentage}
               theme={{ colors: { onSurfaceVariant: "#4b0482" } }}
               activeOutlineColor="#4b0482"
               outlineColor="#B6B4B4"
               textColor="#4b0482"
-              onChangeText={(text) => setTotalCost(text)}
+              onChangeText={(text) => setLifePercentage(text)}
               returnKeyType="done"
               blurOnSubmit={false}
               outlineStyle={{ borderRadius: 10 }}
               style={{ marginBottom: "5%", height: 55, backgroundColor: "white" }}
             />
-
-<TextInput1
-              mode="outlined"
-                    label={
-                              <Text>
-                                Odometer Reading <Text style={{ color: 'red' }}>*</Text>
-                              </Text>
-                            }
-              value={odometerReading}
-              theme={{ colors: { onSurfaceVariant: "#4b0482" } }}
-              activeOutlineColor="#4b0482"
-              outlineColor="#B6B4B4"
-              textColor="#4b0482"
-              onChangeText={(text) => setOdometerReading(text)}
-              returnKeyType="done"
-              blurOnSubmit={false}
-              outlineStyle={{ borderRadius: 10 }}
-              style={{ marginBottom: "5%", height: 55, backgroundColor: "white" }}
-            />
-
-<TextInput1
-              mode="outlined"
-                    label={
-                              <Text>
-                                KM <Text style={{ color: 'red' }}>*</Text>
-                              </Text>
-                            }
-              value={km}
-              theme={{ colors: { onSurfaceVariant: "#4b0482" } }}
-              activeOutlineColor="#4b0482"
-              outlineColor="#B6B4B4"
-              textColor="#4b0482"
-              onChangeText={(text) => setKm(text)}
-              returnKeyType="done"
-              blurOnSubmit={false}
-              outlineStyle={{ borderRadius: 10 }}
-              style={{ marginBottom: "5%", height: 55, backgroundColor: "white" }}
-            />
-                   <TextInput1
-              mode="outlined"
-                    label={
-                              <Text>
-                                Unit <Text style={{ color: 'red' }}>*</Text>
-                              </Text>
-                            }
-              value={unit}
-              theme={{ colors: { onSurfaceVariant: "#4b0482" } }}
-              activeOutlineColor="#4b0482"
-              outlineColor="#B6B4B4"
-              textColor="#4b0482"
-              onChangeText={(text) => setUnit(text)}
-              returnKeyType="done"
-              blurOnSubmit={false}
-              outlineStyle={{ borderRadius: 10 }}
-              style={{ marginBottom: "5%", height: 55, backgroundColor: "white" }}
-            />
-
-<TextInput1
-              mode="outlined"
-                    label={
-                              <Text>
-                                Rate <Text style={{ color: 'red' }}>*</Text>
-                              </Text>
-                            }
-              value={rate}
-              theme={{ colors: { onSurfaceVariant: "#4b0482" } }}
-              activeOutlineColor="#4b0482"
-              outlineColor="#B6B4B4"
-              textColor="#4b0482"
-              onChangeText={(text) => setRate(text)}
-              returnKeyType="done"
-              blurOnSubmit={false}
-              outlineStyle={{ borderRadius: 10 }}
-              style={{ marginBottom: "5%", height: 55, backgroundColor: "white" }}
-            />
-
-<TextInput1
-              mode="outlined"
-                    label={
-                              <Text>
-                                Pump Name <Text style={{ color: 'red' }}>*</Text>
-                              </Text>
-                            }
-              value={pumpName}
-              theme={{ colors: { onSurfaceVariant: "#4b0482" } }}
-              activeOutlineColor="#4b0482"
-              outlineColor="#B6B4B4"
-              textColor="#4b0482"
-              onChangeText={(text) => setPumpName(text)}
-              returnKeyType="done"
-              blurOnSubmit={false}
-              outlineStyle={{ borderRadius: 10 }}
-              style={{ marginBottom: "5%", height: 55, backgroundColor: "white" }}
-            />
-       <TextInput1
-              mode="outlined"
-                    label={
-                              <Text>
-                                Location <Text style={{ color: 'red' }}>*</Text>
-                              </Text>
-                            }
-              value={location}
-              theme={{ colors: { onSurfaceVariant: "#4b0482" } }}
-              activeOutlineColor="#4b0482"
-              outlineColor="#B6B4B4"
-              textColor="#4b0482"
-              onChangeText={(text) => setLocationName(text)}
-              returnKeyType="done"
-              blurOnSubmit={false}
-              outlineStyle={{ borderRadius: 10 }}
-              style={{ marginBottom: "5%", height: 55, backgroundColor: "white" }}
-            />
-       <TextInput1
-              mode="outlined"
-              label="Mileage"
-              value={mileage}
-              theme={{ colors: { onSurfaceVariant: "#4b0482" } }}
-              activeOutlineColor="#4b0482"
-              outlineColor="#B6B4B4"
-              textColor="#4b0482"
-              onChangeText={(text) => setMileage(text)}
-              returnKeyType="done"
-              blurOnSubmit={false}
-              outlineStyle={{ borderRadius: 10 }}
-              style={{ marginBottom: "5%", height: 55, backgroundColor: "white" }}
-            />
-
 
           </View>
-
         </ScrollView>
         <LinearGradient
                     colors={Colors.linearColors}
@@ -894,17 +924,17 @@ const styles = StyleSheet.create({
     padding: 8,
     flex: 1,
   },
-  label1: {
-        position: 'absolute',
-        backgroundColor: 'white',
-        left: 4,
-        top: -10,
-        zIndex: 999,
-        paddingHorizontal: 8,
-        fontSize: 14,
-        fontFamily: 'AvenirNextCyr-Medium',
-        color: Colors.primary
-      },
+     label1: {
+       position: 'absolute',
+       backgroundColor: 'white',
+       left: 4,
+       top: -10,
+       zIndex: 999,
+       paddingHorizontal: 8,
+       fontSize: 14,
+       fontFamily: 'AvenirNextCyr-Medium',
+       color: Colors.primary
+     },
 });
 
-export default FuelUsage;
+export default Tire;

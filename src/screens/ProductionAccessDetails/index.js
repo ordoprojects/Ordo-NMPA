@@ -489,7 +489,10 @@ if (isEmptyDimension) {
               <Pressable style={{}}>
        {item.product_image && item.product_image.length > 0 ? (
          <Image
-           source={{ uri: item.product_image[0] }}
+           source={{uri: item.product_image.startsWith("http")
+          ? item.product_image
+          : `https://gsidev.ordosolution.com${item.product_image}`,
+      }}
            style={styles.imageView}
          />
        ) : (
@@ -684,7 +687,10 @@ if (isEmptyDimension) {
                 <Pressable>
                   {item.product_image && item.product_image.length > 0 ? (
                     <Image
-                      source={{ uri: item.product_image[0] }} 
+                      source={{uri: item.product_image.startsWith("http")
+          ? item.product_image
+          : `https://gsidev.ordosolution.com${item.product_image}`,
+      }} 
                       style={styles.imageView}
                     />
                   ) : (
@@ -866,7 +872,12 @@ if (isEmptyDimension) {
   <Modal visible={modalVisible3} transparent>
     <View style={styles.modalContainer1}>
       <View style={styles.modalContent11}>
-        <TouchableOpacity style={styles.closeIcon} onPress={() => setModalVisible3(false)}>
+        <TouchableOpacity style={{  position: 'absolute',
+    top: 5,
+    right: 10,
+    marginTop:10,
+    marginRight:10
+    }} onPress={() => setModalVisible3(false)}>
           <AntDesign name="close" color="black" size={25} />
         </TouchableOpacity>
 
@@ -1578,9 +1589,9 @@ const styles = StyleSheet.create({
         right: 0,
       }, closeIcon: {
         position: 'absolute',
-        top: 5,
-        right: 10,
-        padding: 5,
+        top: 20,
+        right: 15,
+        padding: 10,
       },checkboxContainer: {
         justifyContent: 'center', 
         alignItems: 'center', 

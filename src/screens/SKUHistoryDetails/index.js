@@ -76,7 +76,10 @@ const SKUHistoryDetails = ({ navigation, route }) => {
                     <View style={{ flex: 0.4, flexDirection: 'row', alignItems: 'center' }}>
                         <View style={{ flex: 0.4, justifyContent: 'center', alignItems: 'center' }}>
                             {/* <Image source={ {uri:productData[0].product_image}}/> */}
-                            <Image source={{ uri: item.product_image }} style={{ width: 60, height: 80, resizeMode: 'contain' }} />
+                            <Image source={{uri: item.product_image.startsWith("http")
+          ? item.product_image
+          : `https://gsidev.ordosolution.com${item.product_image}`,
+      }} style={{ width: 60, height: 80, resizeMode: 'contain' }} />
                         </View>
 
                         <View style={{ flex: 0.8 }}>

@@ -448,7 +448,10 @@ console.log("prod",selectedItem,item.id)
                           {item.product_image &&
                           item.product_image.length > 0 ? (
                             <Image
-                              source={{ uri: item.product_image[0] }} // Use the first image
+                              source={{uri: item.product_image.startsWith("http")
+          ? item.product_image
+          : `https://gsidev.ordosolution.com${item.product_image}`,
+      }} // Use the first image
                               style={styles.imageView}
                             />
                           ) : (
@@ -981,7 +984,10 @@ const handleQuantityChange = (item, action) => {
                                     <Pressable>
                                         {item.product_image && item.product_image.length > 0 ? (
                                             <Image
-                                                source={{ uri: item.product_image[0] }} // Use the first image
+                                                source={{uri: item.product_image.startsWith("http")
+          ? item.product_image
+          : `https://gsidev.ordosolution.com${item.product_image}`,
+      }} // Use the first image
                                                 style={styles.imageView}
                                             />
                                         ) : (
@@ -1097,7 +1103,10 @@ const handleQuantityChange = (item, action) => {
                                     <Pressable>
                                         {item.product_image && item.product_image.length > 0 ? (
                                             <Image
-                                                source={{ uri: item.product_image[0] }} // Use the first image
+                                                source={{uri: item.product_image.startsWith("http")
+          ? item.product_image
+          : `https://gsidev.ordosolution.com${item.product_image}`,
+      }} // Use the first image
                                                 style={styles.imageView}
                                             />
                                         ) : (

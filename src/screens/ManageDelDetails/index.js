@@ -120,6 +120,8 @@ const ManageDelDetails = ({ navigation, route }) => {
       });
   };
 
+console.log("dimension data",dimensionData)
+
   const OpenDimention = (data) => {
     console.log("🚀 ~ OpenDimention ~ data:", data)
     setDimensionData(data);
@@ -1405,7 +1407,10 @@ const ManageDelDetails = ({ navigation, route }) => {
                       <Pressable>
                         {item.product_image && item.product_image.length > 0 ? (
                           <Image
-                            source={{ uri: item.product_image[0] }} 
+                            source={{uri: item.product_image.startsWith("http")
+          ? item.product_image
+          : `https://gsidev.ordosolution.com${item.product_image}`,
+      }} 
                             style={styles.imageView}
                           />
                         ) : (
@@ -2508,7 +2513,7 @@ const ManageDelDetails = ({ navigation, route }) => {
             renderItem={renderItem}
             // keyExtractor={(item ,index) => item.production_id.toString()}
           />
-        <TouchableOpacity style={{position:'absolute',top:10 ,right:10}} onPress={()=>{setMenuVisible1(false);}}>
+        <TouchableOpacity style={{position:'absolute',top:20 ,right:10}} onPress={()=>{setMenuVisible1(false);}}>
           <AntDesign name='close' size={28} color={`black`} />
         </TouchableOpacity>
       </View>

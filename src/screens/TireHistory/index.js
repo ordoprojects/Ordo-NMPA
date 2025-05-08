@@ -25,7 +25,7 @@ import { useFocusEffect } from "@react-navigation/native";
 
 
 
-const FuelHistory = ({ navigation }) => {
+const TireHistory = ({ navigation }) => {
     const [selectedSegment, setSelectedSegment] = useState("Maintenance");
     const [maintenanceData, setMaintenanceData] = useState([]);
     const [fuelData, setFuelData] = useState([]);
@@ -61,12 +61,12 @@ const FuelHistory = ({ navigation }) => {
             redirect: "follow",
         };
 
-        fetch("https://gsidev.ordosolution.com/api/fuelusage/", requestOptions)
+        fetch("https://gsidev.ordosolution.com/api/tyre/", requestOptions)
             .then((response) => response.json())
             .then(async (result) => {
                 setFuelData(result);
                 setOriginalFuelData(result);
-                console.log(result)
+                console.log("result",result)
                 setLoading(false);
             })
             .catch((error) => {
@@ -89,7 +89,7 @@ const FuelHistory = ({ navigation }) => {
             redirect: "follow",
         };
 
-        fetch("https://gsidev.ordosolution.com/api/maintainance/", requestOptions)
+        fetch("https://gsidev.ordosolution.com/api/tyre/", requestOptions)
             .then((response) => response.json())
             .then(async (result) => {
                 setMaintenanceData(result);
@@ -107,7 +107,7 @@ const FuelHistory = ({ navigation }) => {
     };
 
     const handleCellPress = (item) => {
-        navigation.navigate("MaintenanceDetails", { item });
+        navigation.navigate("MaintenanceDetails", { item, key:"tyre" });
     };
 
     const filterByDate = () => {
@@ -116,7 +116,7 @@ const FuelHistory = ({ navigation }) => {
 
     const resetFilter = () => {
         setSelectedDate(new Date());
-        // setMaintenanceData(originalMaintenanceData);
+        setMaintenanceData(originalMaintenanceData);
         setFuelData(originalFuelData);
         setIsFiltered(false);
     };
@@ -124,73 +124,60 @@ const FuelHistory = ({ navigation }) => {
     const applyFilter = () => {
         setIsModalVisible(false);
         setIsFiltered(true);
-    
-        const formattedSelectedDate = selectedDate.toISOString().split("T")[0];
-    
-        const filteredMaintenanceData = originalMaintenanceData.filter(
-            (item) => item.maintainance_date === formattedSelectedDate
-        );
-    
-        const filteredFuelData = originalFuelData.filter(
-            (item) => item.fuel_date === formattedSelectedDate
-        );
-    
-        // setMaintenanceData(filteredMaintenanceData);
-        setFuelData(filteredFuelData.length > 0 ? filteredFuelData : []); // Ensures it's explicitly set
-    };
-    
-    const renderItem = ({ item }) => {
-        // console.log('Fuel Entry:', item); // 👈 Logs the current item being rendered
-    
-        return (
-            <TouchableOpacity onPress={() => handleCellPress(item)}>
-                <View style={styles.item}>
-    
-                    <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: 'center' }}>
-                        <Text
-                            style={{ fontSize: 18, fontFamily: "AvenirNextCyr-Bold", color: Colors.primary }}
-                        >
-                            {item.fuel_type}
-                        </Text>
-                        <Text
-                            style={{ fontSize: 16, fontFamily: "AvenirNextCyr-Medium", color: Colors.primary }}
-                        >
-                     {item?.fuel_date ? item.fuel_date.split("-").reverse().join("-") : ""}
 
-                        </Text>
-                    </View>
-    
+        const formattedSelectedDate = selectedDate.toISOString().split("T")[0];
+       
+        const filteredFuelData = originalFuelData.filter(
+            (item) => item.date === formattedSelectedDate
+        );
+
+        setFuelData(filteredFuelData.length > 0 ? filteredFuelData : []); 
+    };
+
+    const renderItem = ({ item }) => (
+        <TouchableOpacity onPress={() => handleCellPress(item)}>
+            <View style={styles.item}>
+
+                <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: 'center' }}>
+                    <Text
+                        style={{ fontSize: 18, fontFamily: "AvenirNextCyr-Bold", color: Colors.primary}}
+                    >
+                                          {item?.vehicle?.name}
+
+                    </Text>
                     <Text
                         style={{ fontSize: 16, fontFamily: "AvenirNextCyr-Medium", color: Colors.primary }}
                     >
-                        {item.vehicle_registration_no}
+                                    {item?.date ? item.date.split("-").reverse().join("-") : ""}
+
                     </Text>
-    
-                    <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: 'center' }}>
-                        <Text
-                            style={{
-                                fontSize: 18,
-                                color: "green",
-                                fontFamily: "AvenirNextCyr-Bold",
-                            }}
-                        >
-                            {item.total_cost}
-                        </Text>
-                        <View style={styles.itemDetails}>
-                            <MaterialIcons
-                                name="navigate-next"
-                                size={35}
-                                color={Colors.primary}
-                            />
-                        </View>
+                </View>
+                <Text
+                    style={{ fontSize: 16, fontFamily: "AvenirNextCyr-Medium", color: Colors.primary  }}
+                >
+                    {item?.driver_no?.name}
+                </Text>
+                <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: 'center' }}>
+                <Text
+                        style={{ fontSize: 16, fontFamily: "AvenirNextCyr-Bold", color: item.status === "Active"
+                            ? "green"
+                            : item.status === "Inactive"
+                            ? "red"
+                            : "orange" }}
+                    >
+                        {item.status}
+                    </Text>
+                    <View style={styles.itemDetails}>
+                        <MaterialIcons
+                            name="navigate-next"
+                            size={35}
+                            color={Colors.primary}
+                        />
                     </View>
                 </View>
-            </TouchableOpacity>
-        );
-    };
-    
-
-console.log("fuel data",fuelData,isFiltered)
+            </View>
+        </TouchableOpacity>
+    );
 
     return (
         <LinearGradient
@@ -222,7 +209,7 @@ console.log("fuel data",fuelData,isFiltered)
                         color: "white",
                     }}
                 >
-                    Fuel History
+                    Tyre History
                 </Text>
                 <TouchableOpacity onPress={filterByDate}>
                     <Foundation name="filter" size={26} color="white" />
@@ -318,7 +305,7 @@ console.log("fuel data",fuelData,isFiltered)
             </View>
 
             <AnimatedFAB
-                label={'Add Record'}
+                label={'Add Tyre'}
                 icon={() => <AntDesign name="addfile" size={24} color="white" />}
                 color={"white"}
                 style={styles.fabStyle}
@@ -333,7 +320,7 @@ console.log("fuel data",fuelData,isFiltered)
                 animateFrom={'right'}
                 // iconMode={'static'}
                 onPress={() => {
-                    navigation.navigate("FuelUsage");
+                    navigation.navigate("Tire");
                 }}
             />
 
@@ -394,7 +381,7 @@ console.log("fuel data",fuelData,isFiltered)
     );
 };
 
-export default FuelHistory;
+export default TireHistory;
 
 const styles = StyleSheet.create({
     segmentView: {

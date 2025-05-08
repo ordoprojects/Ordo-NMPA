@@ -243,7 +243,10 @@ const SalesOrderDetails = ({ navigation, route }) => {
                     <View >
                         {item.product_image && item.product_image.length > 0 ? (
                             <Image
-                                source={{ uri: item.product_image[0] }} // Use the first image
+                                source={{uri: item.product_image.startsWith("http")
+          ? item.product_image
+          : `https://gsidev.ordosolution.com${item.product_image}`,
+      }} // Use the first image
                                 style={styles.imageView}
                             />
                         ) : (
@@ -597,7 +600,10 @@ const SalesOrderDetails = ({ navigation, route }) => {
                                     <Pressable >
                                         {item.product_image && item.product_image.length > 0 ? (
                                             <Image
-                                                source={{ uri: item.product_image[0] }} 
+                                                source={{uri: item.product_image.startsWith("http")
+          ? item.product_image
+          : `https://gsidev.ordosolution.com${item.product_image}`,
+      }} 
                                                 style={styles.imageView}
                                             />
                                         ) : (
@@ -627,7 +633,8 @@ const SalesOrderDetails = ({ navigation, route }) => {
                                      }
                                          </View>
                                          { ( orderDetails?.product_list[0]?.name !== "BASE PLATE"  && orderDetails?.is_production === true) &&
-                                         <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: '3%', justifyContent: 'space-between', }}>
+                                          <View>
+                                         <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: '3%', justifyContent: 'space-between',flex:1 }}>
                                             <View style={{ flexDirection: 'row',width:'50%'}}>
                                             <Text style={{ color: 'black', fontSize: 12, fontFamily: 'AvenirNextCyr-Medium' }}>
                                              {orderDetails?.status === "Partially Delivered" || orderDetails?.status === "Delivered" || screen == "invoice"
@@ -650,11 +657,13 @@ const SalesOrderDetails = ({ navigation, route }) => {
                                            </Text>
                                             </View>
 
-                                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                                <Text style={{ color: 'black', fontSize: 12, fontFamily: 'AvenirNextCyr-Medium' }}>Price :</Text>
-                                                <Text style={{ color: 'black', fontSize: 12, fontFamily: 'AvenirNextCyr-Medium' }}>{parseFloat(item?.price).toFixed(2)} </Text>
-                                            </View>
+                                          
                                         </View>
+                                          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                          <Text style={{ color: 'black', fontSize: 12, fontFamily: 'AvenirNextCyr-Medium' }}>Price :</Text>
+                                          <Text style={{ color: 'black', fontSize: 12, fontFamily: 'AvenirNextCyr-Medium' }}>{parseFloat(item?.price).toFixed(2)} </Text>
+                                      </View>
+                                     </View>
                                       }
 
                                        { ( orderDetails?.product_list[0]?.name === "BASE PLATE"  && orderDetails?.is_production === true) &&
@@ -885,7 +894,7 @@ const SalesOrderDetails = ({ navigation, route }) => {
 
 <Modal visible={menuVisible1} animationType="slide" transparent={true}>
       <View style={styles.modalContainer}>
-      <View style={[styles.modalContainer11,{ paddingTop:40}]}>
+      <View style={[styles.modalContainer11,{ paddingTop:50}]}>
       {dimensionData && dimensionData.length < 0 ? (
         <Text style={{fontSize: 20,color: Colors.black,fontFamily: "AvenirNextCyr-Medium",marginBottom:'2%'}}>Dimensions</Text>
       ):(null)}
@@ -908,7 +917,7 @@ const SalesOrderDetails = ({ navigation, route }) => {
           No dimension added
         </Text>
       )}
-        <TouchableOpacity style={{position:'absolute',top:9 ,right:9}} onPress={()=>{setMenuVisible1(false);}}>
+        <TouchableOpacity style={{position:'absolute',top:20 ,right:10}} onPress={()=>{setMenuVisible1(false);}}>
           <AntDesign name='close' size={28} color={`black`} />
         </TouchableOpacity>
       </View>

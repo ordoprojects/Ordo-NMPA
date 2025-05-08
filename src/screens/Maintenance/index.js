@@ -10,6 +10,7 @@ import {
   Modal,
   TextInput,
   Pressable,
+  ScrollView
 } from "react-native";
 import globalStyles from "../../styles/globalStyles";
 import LinearGradient from "react-native-linear-gradient";
@@ -28,28 +29,69 @@ import { ms, hs, vs } from "../../utils/Metrics";
 
 const Maintenance = ({ navigation, route }) => {
   // const {vehicleID}=route?.params
+  const { details, screen } = route?.params || {};
+
+  console.log("detailsss",details,screen)
+
+
   const { token, userData } = useContext(AuthContext);
   const [typeDrop, setTypeDrop] = useState([]);
   const [vehicleDrop, setVehicleDrop] = useState([]);
+  const [driverDrop, setDriverDrop] = useState([]);
+  const [tyreDrop, setTyreDrop] = useState([]);
 
-  const [typeDrop1, setTypeDrop1] = useState([]);
-  const [isFocus, setIsFocus] = useState(false);
+
+  const [isFocus2, setIsFocus2] = useState(false);
   const [isFocus1, setIsFocus1] = useState(false);
   const [visible2, setVisible2] = React.useState(false);
+  const [isFocus3, setIsFocus3] = useState(false);
+  const [driverType, setdriverType] = useState([]);
+  const [km, setKm] = useState("");
+    const [tyreNumber, setTyreNumber] = useState("");
+  
 
   const [vehicleID, setVehicleId] = useState([]);
   const [maintainanceType, setMaintainancetype] = useState([]);
   const [maintainanceDate, setMaintainanceDate] = useState("");
   const [cost, setcost] = useState("");
-  const [notes, setNotes] = useState("");
+  const [particulars, setParticulars] = useState("");
+  const [quantity, setQuantity] = useState("");
+  const [partyName, setPartyName] = useState("");
+  const [location, setLocation] = useState("");
+  const [billNo, setBillNo] = useState("");
+const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    driverDropdown();
     //getting all predefined drop down values
     MaintenanceDropdown();
     VehicleDropdown();
+    tyreDropdown();
   }, []);
 
+  useEffect(() => {
+    if (details) {
+      setVehicleId(details?. vehicle_no?.id || '');
+      setMaintainancetype(details?.maintainance_type_detail?.map(item => item.id) || []);
+      setMaintainanceDate(formatDate(details?.maintainance_date));
+      setcost(details.cost?.toString() || "");
+      setParticulars(details.particulars || "");
+      setQuantity(details.qty?.toString() || "");
+      setPartyName(details.party_name || "");
+      setLocation(details.location || "");
+      setBillNo(details.bill_number || "");
+      setNotes(details.notes || "");
+      setKm(details.km?.toString() || "");
+      setTyreNumber(details.tyre_no || "");
+      setdriverType(details?.driver_no?.id);
+    }
+  }, [details]);
+  
+const formatDate = (isoString) => {
+    return isoString ? moment(isoString).format("DD/MM/YYYY") : '';
+  };
+  
   const onDismiss2 = React.useCallback(() => {
     setVisible2(false);
   }, [setVisible2]);
@@ -91,7 +133,7 @@ const Maintenance = ({ navigation, route }) => {
   const handleSubmit = async () => {
     // console.log(maintainanceType)
     // Check if required fields are filled
-    if (!vehicleID || !maintainanceType || !maintainanceDate || !cost || !notes) {
+    if (!vehicleID || !maintainanceType || !maintainanceDate || !cost || !notes || !km || !particulars) {
       Alert.alert('Error', 'Please fill in all required fields');
       return;
     }
@@ -112,29 +154,52 @@ const Maintenance = ({ navigation, route }) => {
       ),
       notes: notes, // This field can be empty
       cost: cost,
+      driver_name:driverType,
+      km:km,
+      particulars:particulars,
+      qty:quantity,
+      tyre_no:tyreNumber,
+      party_name:partyName,
+      bill_number:billNo,
+      location:location,
+
     });
 
     // console.log("base 64", base64img);
     console.log("raw", raw);
 
-    var requestOptions = {
-      method: "POST",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
-    };
-
-    try {
-      const response = await fetch(
-        "https://gsidev.ordosolution.com/api/maintainance/",
-        requestOptions
-      );
-      const result = await response.json();
-
-      console.log("Maintenance Result:", result);
-      Toast.show("Maintenance data saved successfully", Toast.LONG);
-
-      navigation.goBack();
+    let url = "https://gsidev.ordosolution.com/api/maintainance/";
+       let method = "POST"; // Default is POST for creating a new tyre
+     
+       // If in "edit" mode, update the tyre using PUT
+       if (screen === "edit" && details?.id) {
+         url = `https://gsidev.ordosolution.com/api/maintainance/${details?.id}/`; // Update URL with the specific tyre id
+         method = "PUT"; // Change method to PUT for updating
+       }
+     
+       // Request options
+       var requestOptions = {
+         method: method,
+         headers: myHeaders,
+         body: raw,
+         redirect: "follow",
+       };
+     
+       try {
+         const response = await fetch(url, requestOptions);
+         const result = await response.json();
+     
+         console.log("Maintainance Result:", result);
+     
+         // Show a success message
+         Toast.show(`Maintainance data ${screen === "edit" ? "updated" : "added"} successfully`, Toast.LONG);
+     
+          // Navigate back accordingly
+     if (screen === "edit") {
+       navigation.pop(2); // Go back two screens if editing
+     } else {
+       navigation.goBack(); // Or just one screen if adding
+     }
     } catch (error) {
       console.log("error", error);
     }
@@ -142,6 +207,38 @@ const Maintenance = ({ navigation, route }) => {
 
   };
 
+
+  const tyreDropdown = async (id) => {
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${userData.token}`);
+  
+    var requestOptions = {
+      method: "GET",
+      headers: myHeaders,
+      redirect: "follow",
+    };
+  
+    try {
+      const response = await fetch(
+        "https://gsidev.ordosolution.com/api/tyrelist/",
+        requestOptions
+      );
+      const result = await response.json();
+      console.log("tyre", result);
+  
+      const positionDrop = result?.tyre.map((item) => ({
+        label: item.label,
+        value: item.value,
+      }));
+  
+   
+  
+      setTyreDrop(positionDrop);
+    } catch (error) {
+      console.log("error", error);
+    }
+  };
+  
 
   const MaintenanceDropdown = async (id) => {
     var myHeaders = new Headers();
@@ -186,6 +283,44 @@ const Maintenance = ({ navigation, route }) => {
     }
   };
 
+ 
+  const driverDropdown = async (id) => {
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${userData.token}`);
+
+    var raw = "";
+
+    var requestOptions = {
+      method: "GET",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow",
+    };
+
+    try {
+      const response = await fetch(
+        "https://gsidev.ordosolution.com/api/alldrivers/",
+        requestOptions
+      );
+      const result = await response.json();
+      console.log("hkdgjhahsgfhjsf", userData.token)
+      const driverType = result.driver.map((brand) => {
+        return {
+          label: brand.label,
+          value: brand.value,
+        };
+      });
+
+      setDriverDrop(driverType);
+
+    } catch (error) {
+      console.log("error", error);
+    }
+  };
+
+ 
+  
+
   const VehicleDropdown = async (id) => {
     var myHeaders = new Headers();
     myHeaders.append("Authorization", `Bearer ${userData.token}`);
@@ -201,17 +336,18 @@ const Maintenance = ({ navigation, route }) => {
 
     try {
       const response = await fetch(
-        "https://gsidev.ordosolution.com/api/vehiclelist/",
+        "https://gsidev.ordosolution.com/api/allvehiclelist/",
         requestOptions
       );
       const result = await response.json();
-      // console.log("hkdgjhahsgfhjsf",result)
-      const vehicleDrop = result.vehicles.map((types) => {
-        return {
-          label: types.label,
-          value: types.value,
-        };
-      });
+    //   console.log("vehicle",result)
+      const vehicleDrop = Object.values(result).flatMap((items) =>
+        items.map((item) => ({
+            label: `${item.label}  (${item.capacity ? item.capacity + " tons" : "No Capacity"})`,
+            value: item.value,
+            capacity: item?.capacity
+        }))
+    );
 
       setVehicleDrop(vehicleDrop);
       // console.log(result)
@@ -268,7 +404,7 @@ const Maintenance = ({ navigation, route }) => {
       <View
         style={{
           height: "90%",
-          backgroundColor: "#f5f5f5",
+          backgroundColor: "white",
           width: "100%",
           borderTopEndRadius: 20,
           borderTopStartRadius: 20,
@@ -277,32 +413,101 @@ const Maintenance = ({ navigation, route }) => {
           justifyContent: "space-between",
         }}
       >
+        <ScrollView showsHorizontalScrollIndicator={false}>
         <View>
+          <View style={{marginTop:'3%'}}>
+          
+            
+          {(!isFocus1 && !vehicleID) ? (
+    <Text style={styles.label1}>
+      Vehicle No.<Text style={{ color: 'red' }}>*</Text>
+    </Text>
+  ) : (
+    <Text style={[styles.label1, isFocus1 && { color: Colors.primary }]}>
+      Vehicle No. <Text style={{ color: 'red' }}>*</Text>
+    </Text>
+  )}
           {/* <Text style={styles.label}>Vehicle</Text> */}
+           <Dropdown
+         
+                       style={[styles.dropdown, isFocus1 && { borderColor: Colors.primary}]}
+                       containerStyle={styles.dropdownContainer}
+                       placeholderStyle={styles.placeholderStyle}
+                       searchPlaceholder="Search"
+                       selectedTextStyle={styles.selectedTextStyle}
+                       itemTextStyle={styles.selectedTextStyle}
+                       inputSearchStyle={styles.inputSearchStyle}
+                       iconStyle={styles.iconStyle}
+                       data={vehicleDrop}
+                       maxHeight={400}
+                       labelField="label"
+                       valueField="value"
+                       placeholder={!isFocus1 ? "Please select the vehicle": "..."}
+                       //searchPlaceholder="Search..."
+                       value={vehicleID}
+                       onFocus={() => setIsFocus1(true)}
+                       onBlur={() => setIsFocus1(false)}
+                       onChange={(item) => {
+                         setVehicleId(item.value);
+                         setIsFocus1(false);
+                       }}
+                     />
+   
+          </View>
+         
+
+
+         <View style={{marginTop:'3%'}}>
+         
+            
+            {(!isFocus3 && !driverType) ? (
+      <Text style={styles.label1}>
+        Driver Name
+      </Text>
+    ) : (
+      <Text style={[styles.label1, isFocus3 && { color: Colors.primary }]}>
+        Driver Name
+      </Text>
+    )}
           <Dropdown
-            style={[styles.dropdown]}
-            containerStyle={styles.dropdownContainer}
-            placeholderStyle={styles.placeholderStyle}
-            searchPlaceholder="Search"
-            selectedTextStyle={styles.selectedTextStyle}
-            itemTextStyle={styles.selectedTextStyle}
-            inputSearchStyle={styles.inputSearchStyle}
-            iconStyle={styles.iconStyle}
-            data={vehicleDrop}
-            maxHeight={400}
-            labelField="label"
-            valueField="value"
-            placeholder={"Please select the vehicle"}
-            //searchPlaceholder="Search..."
-            value={vehicleID}
+                         style={[styles.dropdown, isFocus3 && { borderColor: Colors.primary}]}
+                        containerStyle={styles.dropdownContainer}
+                        placeholderStyle={styles.placeholderStyle}
+                        searchPlaceholder="Search"
+                        selectedTextStyle={styles.selectedTextStyle}
+                        itemTextStyle={styles.selectedTextStyle}
+                        inputSearchStyle={styles.inputSearchStyle}
+                        iconStyle={styles.iconStyle}
+                        data={driverDrop}
+                        maxHeight={400}
+                        labelField="label"
+                        valueField="value"
+                        placeholder={!isFocus3 ? "Please select the driver" : "..."}
+                        //searchPlaceholder="Search..."
+                        value={driverType}
+                        onFocus={() => setIsFocus3(true)}
+                        onBlur={() => setIsFocus3(false)}
+                        onChange={(item) => {
+                          setdriverType(item.value);
+                          setIsFocus3(false);
+                        }}
+                      />
+</View>
 
-            onChange={(item) => {
-              setVehicleId(item.value);
-            }}
-          />
+<View style={{marginTop:'3%'}}>
 
+  {
+    (!maintainanceType || maintainanceType.length === 0) ? (
+      <Text style={styles.label1}>
+        Maintenance Type <Text style={{ color: 'red' }}>*</Text>
+      </Text>
+    ) : (
+      <Text style={[styles.label1, { color: Colors.primary }]}>
+        Maintenance Type <Text style={{ color: 'red' }}>*</Text>
+      </Text>
+    )
+  }
 
-          {/* <Text style={styles.label}>Maintenance Type</Text> */}
           <MultiSelect
             style={styles.dropdown}
             placeholderStyle={styles.placeholderStyle}
@@ -322,7 +527,7 @@ const Maintenance = ({ navigation, route }) => {
             renderItem={renderItem}
             renderSelectedItem={(item, unSelect) => (
               <TouchableOpacity onPress={() => unSelect && unSelect(item)}>
-                <View style={styles.selectedStyle}>
+                <View style={{...styles.selectedStyle}}>
                   <Text style={styles.textSelectedStyle}>{item.label}</Text>
                   <AntDesign color="black" name="delete" size={17} />
                 </View>
@@ -338,6 +543,46 @@ const Maintenance = ({ navigation, route }) => {
             )}
             selectedStyle={styles.selectedStyle}
           />
+
+</View>
+
+<View style={{marginTop:'3%'}}>
+
+            
+            {(!isFocus2 && !tyreNumber) ? (
+      <Text style={styles.label1}>
+        Tyre No.
+      </Text>
+    ) : (
+      <Text style={[styles.label1, isFocus2 && { color: Colors.primary }]}>
+        Tyre No.
+      </Text>
+    )}
+          <Dropdown
+                         style={[styles.dropdown, isFocus2 && { borderColor: Colors.primary}]}
+                        containerStyle={styles.dropdownContainer}
+                        placeholderStyle={styles.placeholderStyle}
+                        searchPlaceholder="Search"
+                        selectedTextStyle={styles.selectedTextStyle}
+                        itemTextStyle={styles.selectedTextStyle}
+                        inputSearchStyle={styles.inputSearchStyle}
+                        iconStyle={styles.iconStyle}
+                        data={tyreDrop}
+                        maxHeight={400}
+                        labelField="label"
+                        valueField="value"
+                        placeholder={!isFocus2 ? "Please select your Tyre no." : "..."}
+                        //searchPlaceholder="Search..."
+                        value={tyreNumber}
+                        onFocus={() => setIsFocus2(true)}
+                        onBlur={() => setIsFocus2(false)}
+                        onChange={(item) => {
+                          setTyreNumber(item.value);
+                          setIsFocus2(false);
+                        }}
+                      />
+                      </View>
+          
           {/* <Dropdown
             style={[styles.dropdown]}
             containerStyle={styles.dropdownContainer}
@@ -361,11 +606,22 @@ const Maintenance = ({ navigation, route }) => {
               setIsFocus(false);
             }}
           /> */}
-          <View style={{}}>
+         <View style={{marginTop:'3%'}}>
+         
+          {(!maintainanceDate) ? (
+    <Text style={styles.label1}>
+      Maintenance Date <Text style={{ color: 'red' }}>*</Text>
+    </Text>
+  ) : (
+    <Text style={[styles.label1, { color: Colors.primary }]}>
+      Maintenance Date <Text style={{ color: 'red' }}>*</Text>
+    </Text>
+  )}
             <InputWithLabel2
               title="Maintenance Date"
               value={maintainanceDate}
               onPress={() => setVisible2(true)}
+         
             />
 
             <DatePickerModal
@@ -393,10 +649,33 @@ const Maintenance = ({ navigation, route }) => {
             placeholder="Please enter the cost"
             placeholderTextColor="#cecece"
           /> */}
+        <TextInput1
+              mode="outlined"
+              label={
+                <Text>
+                  KM <Text style={{ color: 'red' }}>*</Text>
+                </Text>
+              }
+              value={km}
+              theme={{ colors: { onSurfaceVariant: "#4b0482" } }}
+              activeOutlineColor="#4b0482"
+              outlineColor="#B6B4B4"
+              textColor="#4b0482"
+              onChangeText={(text) => setKm(text)}
+              returnKeyType="done"
+              blurOnSubmit={false}
+              outlineStyle={{ borderRadius: 10 }}
+              style={{ marginBottom: "5%", height: 55, backgroundColor: "white" }}
+              
+            />
 
           <TextInput1
             mode="outlined"
-            label="Cost"
+            label={
+              <Text>
+                Amount <Text style={{ color: 'red' }}>*</Text>
+              </Text>
+            }
             value={cost}
             theme={{ colors: { onSurfaceVariant: "#4b0482" } }}
             activeOutlineColor="#4b0482"
@@ -410,6 +689,94 @@ const Maintenance = ({ navigation, route }) => {
             style={{ marginBottom: "5%", height: 55, backgroundColor: "white" }}
           />
 
+<TextInput1
+            mode="outlined"
+            label={
+              <Text>
+                Particulars <Text style={{ color: 'red' }}>*</Text>
+              </Text>
+            }
+            value={particulars}
+            theme={{ colors: { onSurfaceVariant: "#4b0482" } }}
+            activeOutlineColor="#4b0482"
+            outlineColor="#B6B4B4"
+            textColor="#4b0482"
+            onChangeText={(text) => setParticulars(text)}
+            returnKeyType="done"
+            // keyboardType="number-pad"
+            blurOnSubmit={false}
+            outlineStyle={{ borderRadius: 10 }}
+            style={{ marginBottom: "5%", height: 55, backgroundColor: "white" }}
+          />
+
+<TextInput1
+            mode="outlined"
+            label="Quantity"
+            value={quantity}
+            theme={{ colors: { onSurfaceVariant: "#4b0482" } }}
+            activeOutlineColor="#4b0482"
+            outlineColor="#B6B4B4"
+            textColor="#4b0482"
+            onChangeText={(text) => setQuantity(text)}
+            returnKeyType="done"
+            keyboardType="number-pad"
+            blurOnSubmit={false}
+            outlineStyle={{ borderRadius: 10 }}
+            style={{ marginBottom: "5%", height: 55, backgroundColor: "white" }}
+          />
+
+<TextInput1
+            mode="outlined"
+            label="Party Name"
+            value={partyName}
+            theme={{ colors: { onSurfaceVariant: "#4b0482" } }}
+            activeOutlineColor="#4b0482"
+            outlineColor="#B6B4B4"
+            textColor="#4b0482"
+            onChangeText={(text) => setPartyName(text)}
+            returnKeyType="done"
+            // keyboardType="number-pad"
+            blurOnSubmit={false}
+            outlineStyle={{ borderRadius: 10 }}
+            style={{ marginBottom: "5%", height: 55, backgroundColor: "white" }}
+          />
+
+<TextInput1
+            mode="outlined"
+            label="Bill No."
+            value={billNo}
+            theme={{ colors: { onSurfaceVariant: "#4b0482" } }}
+            activeOutlineColor="#4b0482"
+            outlineColor="#B6B4B4"
+            textColor="#4b0482"
+            onChangeText={(text) => setBillNo(text)}
+            returnKeyType="done"
+            // keyboardType="number-pad"
+            blurOnSubmit={false}
+            outlineStyle={{ borderRadius: 10 }}
+            style={{ marginBottom: "5%", height: 55, backgroundColor: "white" }}
+          />
+
+<TextInput1
+            mode="outlined"
+            label="Location"
+            value={location}
+            theme={{ colors: { onSurfaceVariant: "#4b0482" } }}
+            activeOutlineColor="#4b0482"
+            outlineColor="#B6B4B4"
+            textColor="#4b0482"
+            onChangeText={(text) => setLocation(text)}
+            returnKeyType="done"
+            // keyboardType="number-pad"
+            blurOnSubmit={false}
+            outlineStyle={{ borderRadius: 10 }}
+            style={{ marginBottom: "5%", height: 55, backgroundColor: "white" }}
+          />
+
+
+
+
+
           {/* <Text style={styles.label}>Note</Text> */}
           {/* <TextInput
             style={{ backgroundColor: 'white' }}
@@ -422,7 +789,11 @@ const Maintenance = ({ navigation, route }) => {
           /> */}
           <TextInput1
             mode="outlined"
-            label="Notes"
+            label={
+              <Text>
+                Notes <Text style={{ color: 'red' }}>*</Text>
+              </Text>
+            }
             value={notes}
             theme={{ colors: { onSurfaceVariant: "#4b0482" } }}
             activeOutlineColor="#4b0482"
@@ -436,6 +807,7 @@ const Maintenance = ({ navigation, route }) => {
           // style={{ marginBottom: "5%", height: 55, backgroundColor: "white" }}
           />
         </View>
+        </ScrollView>
         <LinearGradient
                     colors={Colors.linearColors}
                     start={Colors.start}
@@ -501,6 +873,7 @@ const styles = StyleSheet.create({
   },
   dropdownContainer: {
     backgroundColor: "white",
+    // marginTop:10
     // color:'white'
   },
   selectedTextStyle: {
@@ -524,7 +897,7 @@ const styles = StyleSheet.create({
     borderColor: "#cecece",
     borderWidth: 1,
     backgroundColor: "white",
-    height: 50,
+    height: 60,
     marginBottom: 15,
     fontFamily: "AvenirNextCyr-Medium",
     flexDirection: "row",
@@ -535,7 +908,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   dropdown: {
-    height: 55,
+    height: 60,
     borderColor: "#B6B4B4",
     borderWidth: 1,
     //borderRadius: 8,
@@ -549,6 +922,18 @@ const styles = StyleSheet.create({
     padding: 8,
     flex: 1,
   },
+ label1: {
+       position: 'absolute',
+       backgroundColor: 'white',
+       left: 4,
+       top: -10,
+       zIndex: 999,
+       paddingHorizontal: 8,
+       fontSize: 14,
+       fontFamily: 'AvenirNextCyr-Medium',
+       color: Colors.primary
+     },
+  
 
 
   selectedStyle: {
@@ -558,11 +943,10 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     backgroundColor: 'white',
     shadowColor: '#000',
-    marginTop: 8,
     marginRight: 12,
     paddingHorizontal: 12,
     paddingVertical: 8,
-
+marginBottom:8,
     shadowOpacity: 0.2,
     shadowRadius: 1.41,
 

@@ -224,13 +224,13 @@ const CheckInInventory = ({ navigation, route }) => {
 
     // if (userData && userData.dealer_name === 'Nikai FMCG') {
     //   // Use the new API and payload for 'Nikai Fmcg'
-    //   apiUrl = 'https://gsi.ordosolution.com/get_category.php';
+    //   apiUrl = 'https://gsidev.ordosolution.com/get_category.php';
     //   requestData = {
     //     __user_id__: userData.id, // Use the userId from userData
     //   };
     // } else {
     // Use the regular API and payload
-    apiUrl = 'https://gsi.ordosolution.com/get_category_from_brand.php';
+    apiUrl = 'https://gsidev.ordosolution.com/get_category_from_brand.php';
     requestData = {
       __brand_id__: brandId,
     };
@@ -264,9 +264,9 @@ const CheckInInventory = ({ navigation, route }) => {
 
   const getSubCategory = async (id) => {
     // Fetch category list API
-    // const apiUrl = 'https://gsi.ordosolution.com/get_category.php';
+    // const apiUrl = 'https://gsidev.ordosolution.com/get_category.php';
 
-    const apiUrl = 'https://gsi.ordosolution.com/get_subcategory_from_category_v2.php';
+    const apiUrl = 'https://gsidev.ordosolution.com/get_subcategory_from_category_v2.php';
     const requestData = {
       __category_id__: id,
       __user_id__: userData.id,
@@ -305,7 +305,7 @@ const CheckInInventory = ({ navigation, route }) => {
   //       setFilteredData(masterData);
   //     } else {
   //       try {
-  //         const apiUrl = 'https://gsi.ordosolution.com/get_category_wise_product.php';
+  //         const apiUrl = 'https://gsidev.ordosolution.com/get_category_wise_product.php';
   //         const requestData = {
   //           __id__: selectedCategory,
   //         };
@@ -383,7 +383,7 @@ const CheckInInventory = ({ navigation, route }) => {
   //         setFilteredData(masterData);
   //     } else {
   //         try {
-  //             const apiUrl = 'https://gsi.ordosolution.com/get_category_wise_product.php';
+  //             const apiUrl = 'https://gsidev.ordosolution.com/get_category_wise_product.php';
   //             const requestData = {
   //                 __id__: selectedCategory,
   //             };
@@ -461,7 +461,7 @@ const CheckInInventory = ({ navigation, route }) => {
     //   // If "All" is selected, show all the products
     //   setFilteredData(masterData);
     // } else {
-    const apiUrl = 'https://gsi.ordosolution.com/get_products_from_subcategory.php';
+    const apiUrl = 'https://gsidev.ordosolution.com/get_products_from_subcategory.php';
     const requestData = {
       __sub_category_id__: setSelectedCategory,
       __user_id__: userData.id,
@@ -740,7 +740,10 @@ const CheckInInventory = ({ navigation, route }) => {
             <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
               {item.product_image && item.product_image.length > 0 ? (
                 <Image
-                  source={{ uri: item.product_image[0] }}
+                  source={{uri: item.product_image.startsWith("http")
+          ? item.product_image
+          : `https://gsidev.ordosolution.com${item.product_image}`,
+      }}
                   style={styles.imageView}
                 />
               ) : (

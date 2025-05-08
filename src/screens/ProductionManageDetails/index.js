@@ -1376,7 +1376,10 @@ const ProductionManageDetails = ({ navigation, route }) => {
                       <Pressable>
                         {item.product_image && item.product_image.length > 0 ? (
                           <Image
-                            source={{ uri: item.product_image[0] }} 
+                            source={{uri: item.product_image.startsWith("http")
+          ? item.product_image
+          : `https://gsidev.ordosolution.com${item.product_image}`,
+      }} 
                             style={styles.imageView}
                           />
                         ) : (
@@ -2274,16 +2277,9 @@ const ProductionManageDetails = ({ navigation, route }) => {
     <KeyboardAvoidingView
       style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-          <TouchableOpacity
-            style={styles.closeIcon}
-            onPress={() => {
-              hideModal11();
-            }}
-          >
-            <AntDesign name="close" color="black" size={28} />
-          </TouchableOpacity>
+         
 
-          <View style={{ marginHorizontal: '1%', marginTop: '3%', gap: 1 }}>
+          <View style={{ marginHorizontal: '1%', marginTop: '7%', gap: 1 }}>
             <View>
               <View
                 style={{
@@ -2294,6 +2290,15 @@ const ProductionManageDetails = ({ navigation, route }) => {
                 <Text style={[styles.ModalText2,{width:'65%'}]} >
                   {selectedItemName}
                 </Text>
+                <TouchableOpacity
+            style={{ position: "relative",
+             }}
+            onPress={() => {
+              hideModal11();
+            }}
+          >
+            <AntDesign name="close" color="black" size={28} />
+          </TouchableOpacity>
               </View>
             </View>
 

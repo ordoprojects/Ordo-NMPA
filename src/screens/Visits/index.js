@@ -266,7 +266,7 @@ const Visits = ({ navigation }) => {
     };
 
     await fetch(
-      "https://gsi.ordosolution.com/set_account_details.php",
+      "https://gsidev.ordosolution.com/set_account_details.php",
       requestOptions
     )
       .then((response) => response.json())

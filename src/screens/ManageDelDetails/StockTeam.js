@@ -94,7 +94,7 @@ const ManageDelDetailsStock = ({ navigation, route }) => {
   const OpenDimention = (data) => {
     console.log("🚀 ~ OpenDimention ~ data:", data)
     setDimensionData(data);
-    setMenuVisible2(true)
+    setMenuVisible1(true)
   };
 
   const downloadImage = async (imageUri) => {
@@ -395,7 +395,7 @@ const ManageDelDetailsStock = ({ navigation, route }) => {
                   </View>
                 <View style={{ ...styles.row }}>
                     <Text style={{ ...styles.title }}>Order Image</Text>
-                    <TouchableOpacity onPress={() =>  OpenDimention(details?.production_order)}>
+                    <TouchableOpacity onPress={() =>  setMenuVisible2(true)}>
                       <Text style={{ ...styles.value,color:'blue' }}>View</Text>
                    </TouchableOpacity>
                 </View>
@@ -883,7 +883,10 @@ const ManageDelDetailsStock = ({ navigation, route }) => {
                       <Pressable>
                         {item.product_image && item.product_image.length > 0 ? (
                           <Image
-                            source={{ uri: item.product_image[0] }} 
+                            source={{uri: item.product_image.startsWith("http")
+          ? item.product_image
+          : `https://gsidev.ordosolution.com${item.product_image}`,
+      }} 
                             style={styles.imageView}
                           />
                         ) : (
@@ -1194,7 +1197,7 @@ const ManageDelDetailsStock = ({ navigation, route }) => {
             renderItem={renderItem}
             // keyExtractor={(item ,index) => item.production_id.toString()}
           />
-        <TouchableOpacity style={{position:'absolute',top:10 ,right:10}} onPress={()=>{setMenuVisible1(false);}}>
+        <TouchableOpacity style={{position:'absolute',top:20 ,right:10}} onPress={()=>{setMenuVisible1(false);}}>
           <AntDesign name='close' size={28} color={`black`} />
         </TouchableOpacity>
       </View>

@@ -39,7 +39,7 @@ const MaintenanceHistory = ({ navigation }) => {
     }, [userData])
   );
 
-
+console.log("maintenanceData",maintenanceData)
   const FetchMaintanaData = async () => {
     setLoading(true);
     var myHeaders = new Headers();
@@ -91,16 +91,17 @@ const MaintenanceHistory = ({ navigation }) => {
     setIsFiltered(true);
 
     const formattedSelectedDate = selectedDate.toISOString().split("T")[0];
+
     const filteredMaintenanceData = originalMaintenanceData.filter(
-      (item) => item.maintainance_date === formattedSelectedDate
-    );
-    const filteredFuelData = originalFuelData.filter(
-      (item) => item.fuel_date === formattedSelectedDate
+        (item) => item.maintainance_date === formattedSelectedDate
     );
 
-    setMaintenanceData(filteredMaintenanceData);
-    setFuelData(filteredFuelData);
-  };
+  
+
+    setMaintenanceData(filteredMaintenanceData.length > 0 ? filteredMaintenanceData : []);
+    // setFuelData(filteredFuelData.length > 0 ? filteredFuelData : []); // Ensures it's explicitly set
+};
+
 
 
   const renderItem = ({ item }) => (
@@ -109,15 +110,15 @@ const MaintenanceHistory = ({ navigation }) => {
 
         <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: 'center',flex:1 }}>
           <Text
-            style={{ fontSize: 18, fontFamily: "AvenirNextCyr-Bold", color: Colors.primary,flex:0.75 }}
+            style={{ fontSize: 18, fontFamily: "AvenirNextCyr-Bold", color: Colors.primary,flex:0.70 }}
           >
            {item.maintainance_type.length > 0 ? item.maintainance_type[0] : ''}
            {item.maintainance_type.length > 1 ? '...' : ''}
           </Text>
           <Text
-            style={{ fontSize: 16, fontFamily: "AvenirNextCyr-Medium", color: Colors.primary,flex:0.25 }}
+            style={{ fontSize: 16, fontFamily: "AvenirNextCyr-Medium", color: Colors.primary,flex:0.30 }}
           >
-            {item.maintainance_date}
+              {item?.maintainance_date ? item.maintainance_date.split("-").reverse().join("-") : ""}
           </Text>
         </View>
         <Text
@@ -162,7 +163,7 @@ const MaintenanceHistory = ({ navigation }) => {
           onPress={() => {
             navigation.goBack();
           }}
-          style={{ paddingLeft: "5%" }}
+          style={{ paddingLeft: "1%" }}
         >
           <Image
             source={require("../../assets/images/Refund_back.png")}
@@ -251,8 +252,23 @@ const MaintenanceHistory = ({ navigation }) => {
               maintenanceData
             }
             renderItem={renderItem}
-            keyExtractor={(index) => index.toString()}
+            keyExtractor={(item, index) => item.id?.toString() ?? index.toString()}
+
             style={{ marginTop: "3%" }}
+            ListEmptyComponent={
+              <Text style={{
+                textAlign: 'center',
+                marginTop: '80%',
+                fontFamily: "AvenirNextCyr-Medium",
+                fontSize: 16,
+                color: 'gray'
+              }}>
+                {isFiltered
+                  ? `No data available for ${selectedDate.toDateString()}`
+                  : 'No data available'}
+              </Text>
+            }
+            
           />
         )}
       </View>

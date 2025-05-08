@@ -32,7 +32,7 @@ const VersionModel = ({ modalVisible, closeModal }) => {
             source={require("./../assets/images/GSILogo.png")}
             style={styles.imageView}
           />
-          <Text style={styles.versionText}>App Version: 1.10.8</Text>
+          <Text style={styles.versionText}>App Version: 1.10.10</Text>
           <Text style={styles.versionText1}>For any assistance or inquiries, feel free to reach out to us !!</Text>
 
           <View style={{flexDirection:'row',gap:30 ,alignItems:"center" ,marginVertical:'5%'}}>

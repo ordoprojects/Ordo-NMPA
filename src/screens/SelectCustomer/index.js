@@ -120,7 +120,7 @@ const SelectCustomer = ({ navigation, route }) => {
   //     redirect: 'follow'
   //   };
 
-  //   fetch("https://gsi.ordosolution.com/get_my_collabrators.php", requestOptions)
+  //   fetch("https://gsidev.ordosolution.com/get_my_collabrators.php", requestOptions)
   //     .then(response => response.json())
   //     .then(async result => {
 
@@ -165,7 +165,7 @@ const SelectCustomer = ({ navigation, route }) => {
   //             "region": "MEERUT",
   //             "status": "Pending",
   //             "no_of_visit": "1",
-  //             "account_profile_pic": "https://gsi.ordosolution.com/index.php?preview=yes&entryPoint=downloadquote&id=8c8e82ed-5233-0645-1393-6561c904b69a_img_src_c&type=Accounts"
+  //             "account_profile_pic": "https://gsidev.ordosolution.com/index.php?preview=yes&entryPoint=downloadquote&id=8c8e82ed-5233-0645-1393-6561c904b69a_img_src_c&type=Accounts"
   //         },
   //         {
   //             "__account_id__": "487781ea-aaf9-da84-b44b-656034d8bf5a",
@@ -177,7 +177,7 @@ const SelectCustomer = ({ navigation, route }) => {
   //             "region": "AMRITSAR",
   //             "status": "Pending",
   //             "no_of_visit": "1",
-  //             "account_profile_pic": "https://gsi.ordosolution.com/index.php?preview=yes&entryPoint=downloadquote&id=487781ea-aaf9-da84-b44b-656034d8bf5a_img_src_c&type=Accounts"
+  //             "account_profile_pic": "https://gsidev.ordosolution.com/index.php?preview=yes&entryPoint=downloadquote&id=487781ea-aaf9-da84-b44b-656034d8bf5a_img_src_c&type=Accounts"
   //         }
   //     ],
   //     TU: [
@@ -191,7 +191,7 @@ const SelectCustomer = ({ navigation, route }) => {
   //             "region": "noida",
   //             "status": "Pending",
   //             "no_of_visit": "1",
-  //             "account_profile_pic": "https://gsi.ordosolution.com/index.php?preview=yes&entryPoint=downloadquote&id=4456439f-59fc-b67c-a4dc-655f4b4dbd4f_img_src_c&type=Accounts"
+  //             "account_profile_pic": "https://gsidev.ordosolution.com/index.php?preview=yes&entryPoint=downloadquote&id=4456439f-59fc-b67c-a4dc-655f4b4dbd4f_img_src_c&type=Accounts"
   //         },
   //         {
   //             "__account_id__": "3780cdbe-472b-fa95-a8d0-65439aca4bf2",
@@ -203,7 +203,7 @@ const SelectCustomer = ({ navigation, route }) => {
   //             "region": "EAST DELHI",
   //             "status": "Pending",
   //             "no_of_visit": "1",
-  //             "account_profile_pic": "https://gsi.ordosolution.com/index.php?preview=yes&entryPoint=downloadquote&id=3780cdbe-472b-fa95-a8d0-65439aca4bf2_img_src_c&type=Accounts"
+  //             "account_profile_pic": "https://gsidev.ordosolution.com/index.php?preview=yes&entryPoint=downloadquote&id=3780cdbe-472b-fa95-a8d0-65439aca4bf2_img_src_c&type=Accounts"
   //         }
   //     ],
   //     WE: [],
@@ -435,7 +435,7 @@ const SelectCustomer = ({ navigation, route }) => {
 
   //     console.log("rawwww", raw)
 
-  //     fetch("https://gsi.ordosolution.com/create_tour_plan.php", requestOptions)
+  //     fetch("https://gsidev.ordosolution.com/create_tour_plan.php", requestOptions)
   //       .then(response => response.json())
   //       .then(result => {
   //         console.log("tour detail", result);
@@ -544,7 +544,7 @@ const SelectCustomer = ({ navigation, route }) => {
 
       console.log("rawwww", raw)
 
-      // fetch("https://gsi.ordosolution.com/create_tour_plan.php", requestOptions)
+      // fetch("https://gsidev.ordosolution.com/create_tour_plan.php", requestOptions)
       //   .then(response => response.json())
       //   .then(result => {
       //     console.log("tour detail", result);
@@ -850,7 +850,7 @@ const SelectCustomer = ({ navigation, route }) => {
 
   const [categoryOption, setCategoryOption] = useState([]);
   const getDropDown = () => {
-    fetch('https://gsi.ordosolution.com/get_dropdownfields.php', {
+    fetch('https://gsidev.ordosolution.com/get_dropdownfields.php', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

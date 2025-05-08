@@ -174,9 +174,9 @@ const ProductionReviewDetails = ({ navigation, route }) => {
     });
   };
 
-  useEffect(() => {
-    setModalVisible3(false);
-  }, [finalStructure]);
+  // useEffect(() => {
+  //   setModalVisible3(false);
+  // }, [finalStructure]);
 
   // Function to handle weight changes
   const handleWeightChange = (production_id, weight) => {
@@ -188,7 +188,7 @@ const ProductionReviewDetails = ({ navigation, route }) => {
   
   // Function to save the data
   const handleSavee = () => {
-    
+    console.log("clicked hereeee")
     const production_dimension = stockDeductBaseData?.map((item) => ({
       dimension: item.production_id,
       weight: parseFloat(weightData[item.production_id]) || 0
@@ -218,6 +218,8 @@ const ProductionReviewDetails = ({ navigation, route }) => {
   
     // This log will show the state before the update due to React's async nature
     console.log("Final Payload (Before State Update):------------>", finalStructure);
+    setModalVisible3(false);
+
   };
   
   const handleSave = () => {
@@ -229,7 +231,11 @@ const ProductionReviewDetails = ({ navigation, route }) => {
     });
   
     if (isMissingValues) {
-      Alert.alert("Please enter both quantity and weight");
+      Alert.alert(
+        "Invalid Input",
+        "Please enter both quantity and weight.",
+        [{ text: "OK", onPress: () => console.log("OK Pressed") }]
+      );
       return; // Exit the function if validation fails
     }
 
@@ -427,10 +433,22 @@ const CompeleteProduction =()=> {
 // Compeleting the Production API For PPGL Coil
 const CompaleteProductionAPI = () => {
   // Display a confirmation dialog
-  if (!products || products.length === 0) {
-    Alert.alert("Error", "Please enter the consumed weight and try again.");
+  // if (!products || products.length === 0) {
+  //   Alert.alert("Error", "Please enter the consumed weight and try again.");
+  //   return;
+  // }
+
+  const hasEmptyValues = products.some((product) =>
+    product.production_stock_deduction.some(
+      (deduction) => !deduction.qty || !deduction.weight
+    )
+  );
+  
+  if (hasEmptyValues) {
+    Alert.alert("Error", "Please enter the consumed quantity and weight for all items.");
     return;
   }
+  
   
   Alert.alert("Warning", "Please mark all items as completed before finalizing the production.", [
     {
@@ -863,7 +881,10 @@ const BasePlateCompleteProduction = () => {
          
              {item.product_image && item.product_image.length > 0 ? (
                <Image
-                 source={{ uri: item.product_image[0] }}
+                 source={{uri: item.product_image.startsWith("http")
+          ? item.product_image
+          : `https://gsidev.ordosolution.com${item.product_image}`,
+      }}
                  style={styles.imageView}
                />
              ) : (
@@ -1055,7 +1076,10 @@ const BasePlateCompleteProduction = () => {
                 <Pressable>
                   {item.product_image && item.product_image.length > 0 ? (
                     <Image
-                      source={{ uri: item.product_image[0] }} 
+                      source={{uri: item.product_image.startsWith("http")
+          ? item.product_image
+          : `https://gsidev.ordosolution.com${item.product_image}`,
+      }} 
                       style={styles.imageView}
                     />
                   ) : (
@@ -1704,7 +1728,7 @@ const BasePlateCompleteProduction = () => {
                   gap: 5,
                 }}
               >
-                <Text style={[styles.ModalText2,{width:'65%'}]} >
+                <Text style={[styles.ModalText2,{width:'60%'}]} >
                   {selectedItemName}
                 </Text>
                 
@@ -1980,19 +2004,23 @@ const BasePlateCompleteProduction = () => {
 <Modal visible={modalVisible2} transparent>
         <View style={styles.modalContainer1}>
           <View style={styles.modalContent11}>
+            <View style={{flexDirection:'row',alignItems:'center'}}>
+            <Text style={{fontSize: 14,
+              fontFamily: 'AvenirNextCyr-Bold',width:'90%',
+              color:Colors.primary,}} numberOfLines={2}>{selectedItemName}</Text>
             <TouchableOpacity
-              style={styles.closeIcon}
+              style={{
+                padding: 5,}}
               onPress={() => setModalVisible2(false)}>
               <AntDesign name="close" color="black" size={25} />
             </TouchableOpacity>
-            <Text style={{fontSize: 14,
-              fontFamily: 'AvenirNextCyr-Bold',
-              color:Colors.primary,}} numberOfLines={2}>{selectedItemName}</Text>
+        
+              </View>
               <View style={{marginHorizontal: '1%', marginTop: '3%',gap:10}}>
           <FlatList
             data={stockDeductData}
             keyExtractor={(item) => item.stock_id.toString()}
-            style={{ maxHeight: '87%' }} 
+            style={{ maxHeight: '87%'}} 
             renderItem={({ item }) => (
           <View style={styles.container}>
 
@@ -2086,7 +2114,11 @@ const BasePlateCompleteProduction = () => {
     <View style={styles.modalContent11}>
 
       <TouchableOpacity
-        style={styles.closeIcon}
+        style={{ 
+          position:'absolute',
+          top: 20,
+          right: 10,
+          padding: 5,}}
         onPress={() => setModalVisible3(false)}
       >
         <AntDesign name="close" color="black" size={25} />
@@ -2758,7 +2790,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingVertical: 30,
     paddingHorizontal: 10,
-    flex:1,
     marginHorizontal:'3%',
     marginVertical:'5%',
 }, container: {

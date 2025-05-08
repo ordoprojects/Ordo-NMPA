@@ -394,7 +394,7 @@ const FleetMangHome = ({ navigation, route }) => {
             }}
           >
             <View style={styles.row2}>
-              {/* <TouchableOpacity
+              <TouchableOpacity
                 onPress={() => {
                   navigation.navigate("DriversAndVehicles", {
                     screen: "CreateRFQ",
@@ -445,7 +445,7 @@ const FleetMangHome = ({ navigation, route }) => {
                     }}
                   />
                 </View>
-              </TouchableOpacity> */}
+              </TouchableOpacity>
 
               
 <TouchableOpacity onPress={() => {
@@ -809,6 +809,7 @@ const FleetMangHome = ({ navigation, route }) => {
               closeBottomSheet={closeBottomSheet}
               bottomSheetModalRef={bottomSheetModalRef}
             />
+              <CustomFloating navigation={navigation} reports="InventoryReports" screen="Fleet" />
           </View>
         </View>
       </BottomSheetModalProvider>

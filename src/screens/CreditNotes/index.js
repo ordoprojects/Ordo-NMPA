@@ -37,10 +37,11 @@ const MemoizedDebit = React.memo(Debit);
 
 const CreditNotes = ({ navigation }) => {
   const { token, dealerData, tourPlanId, userData } = useContext(AuthContext);
-  console.log("tour plan id", tourPlanId);
+  // console.log("tour plan id", tourPlanId);
   const [loading, setLoading] = useState(false);
   const [creditNotes, setCreditNotes] = useState(false);
   const [debitNotes, setDebitNotes] = useState(false);
+  const [loadingDropdown, setLoadingDropdown] = useState(false);
 
   const [noData, setNoData] = useState(false);
 
@@ -65,7 +66,9 @@ const CreditNotes = ({ navigation }) => {
 
   const [accSalesDrop, setAccSalesDrop] = useState([]);
   const [accPurchaseDrop, setAccPurchaseDrop] = useState([]);
-
+  const [salesOffset, setSalesOffset] = useState(0);
+  const [purchaseOffset, setPurchaseOffset] = useState(0);
+  const limit = 10;
 
   const handleSelect = (option) => {
     setSelectedOption(option);
@@ -112,59 +115,72 @@ const CreditNotes = ({ navigation }) => {
       });
   };
 
-  const getDropdownList = async (id) => {
-    var myHeaders = new Headers();
-    myHeaders.append("Authorization", `Bearer ${userData.token}`);
+  // console.log("userData?.token",userData?.token)
 
-    var raw = "";
-    var requestOptions = {
+  const getDropdownList = async () => {
+    if (!userData?.token) {
+      console.warn("No token found, skipping fetch.");
+      return;
+    }
+  
+    setLoadingDropdown(true);
+  
+    const myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${userData.token}`);
+  
+    const requestOptions = {
       method: "GET",
       headers: myHeaders,
-      body: raw,
       redirect: "follow",
     };
-
+  
     try {
-      // First API call
+      // Sales Invoices
       const salesResponse = await fetch(
-        "https://gsidev.ordosolution.com/api/acc_sales/",
+        "https://gsidev.ordosolution.com/api/get_sales_invoice/",
         requestOptions
       );
       const salesResult = await salesResponse.json();
-      const salesStatus = salesResult.map((sales) => {
-        return {
-          label: `Invoice - ${sales.invoice}`,
-          value: sales.id,
-        };
-      });
-
-      // Second API call
+      console.log("salesResult", salesResult);
+  
+      const salesStatus = Array.isArray(salesResult)
+        ? salesResult.map((sales) => ({
+            label: sales.label,
+            value: sales.value,
+          }))
+        : [];
+  
+      // Purchase Invoices
       const purchasesResponse = await fetch(
-        "https://gsidev.ordosolution.com/api/acc_purchase/",
+        "https://gsidev.ordosolution.com/api/get_purchase_invoice/",
         requestOptions
       );
       const purchasesResult = await purchasesResponse.json();
-      const purchasesStatus = purchasesResult.map((purchase) => {
-        return {
-          label: `Invoice - ${purchase.invoice}`,
-          value: purchase.id,
-        };
-      });
-
-      // Combine the results from both APIs if needed
-      // const combinedStatus = [...salesStatus, ...purchasesStatus];
-
-      // Update the state with the combined results
+      // console.log("purchasesResult", purchasesResult);
+  
+      const purchasesStatus = Array.isArray(purchasesResult)
+        ? purchasesResult.map((purchase) => ({
+            label: purchase.label,
+            value: purchase.value,
+          }))
+        : [];
+  
       setAccSalesDrop(salesStatus);
       setAccPurchaseDrop(purchasesStatus);
-
-      // Optionally log the combined results
-      // console.log("drop res", combinedStatus);
-
     } catch (error) {
       console.log("error", error);
+    } finally {
+      setLoadingDropdown(false);
     }
   };
+  
+  
+
+
+    // console.log("drop res sales", accSalesDrop);
+    // console.log("drop res purchase", accPurchaseDrop);
+
+
 
 
   // const dropdownPurchaseValues = async (id) => {
@@ -296,7 +312,8 @@ const CreditNotes = ({ navigation }) => {
     React.useCallback(() => {
       getAllNotes();
       getDropdownList();
-    }, [])
+
+    }, [userData?.token])
   );
 
 
@@ -452,7 +469,7 @@ const CreditNotes = ({ navigation }) => {
                 {/* <Text style={styles.MPriceText}>
                   ₹{Number(selectedPayment?.Amount)}
                 </Text> */}
-                <Text style={styles.title}>Credit Notes Details</Text>
+                <Text style={styles.title}>{tabIndex === 0 ? "Credit Notes Details":"Debit Notes Details"}</Text>
                 <View style={{}}>
                   <View
                     style={{
@@ -471,6 +488,7 @@ const CreditNotes = ({ navigation }) => {
                     <Text style={[styles.text]}>Invoice : </Text>
 
 
+                   {tabIndex === 0 ?
                     <Text
                       style={[
                         styles.text,
@@ -479,6 +497,15 @@ const CreditNotes = ({ navigation }) => {
                     >
                       INVOICE-{selectedPayment?.invoice_id}
                     </Text>
+:
+                    <Text
+                      style={[
+                        styles.text,
+
+                      ]}
+                    >
+                      INVOICE-{selectedPayment?.invoice_id} [{selectedPayment?.invoice_name}]
+                    </Text>}
                   </View>
 
 
@@ -646,31 +673,44 @@ const CreditNotes = ({ navigation }) => {
                 </View> */}
 
             <View>
+{/* 
+      // ORDO GSI APP B_430 | 10-Apr-2025 | Sahana 
+      // Fixed an issue by adding loading withinn the dropdown option, as API response is delayed*/}
+
+
               <View style={styles.dropDownContainer}>
-                <Dropdown
-                  style={[
-                    styles.dropdown,
-                    isFocus && { borderColor: "blue" },
-                  ]}
-                  placeholderStyle={styles.placeholderStyle}
-                  selectedTextStyle={styles.selectedTextStyle}
-                  itemTextStyle={styles.selectedTextStyle}
-                  inputSearchStyle={styles.inputSearchStyle}
-                  iconStyle={styles.iconStyle}
-                  data={tabIndex == 0 ? accSalesDrop : accPurchaseDrop}
-                  maxHeight={400}
-                  labelField="label"
-                  search
-                  searchPlaceholder="Search"
-                  valueField="value"
-                  placeholder={!isFocus ? "Invoice" : "..."}
-                  value={invoiceId}
-                  onFocus={() => setIsFocus(true)}
-                  onBlur={() => setIsFocus(false)}
-                  onChange={(item) => {
-                    setInvoiceId(item.value);
-                  }}
-                />
+              <Dropdown
+  style={[styles.dropdown, isFocus && { borderColor: "blue" }]}
+  placeholderStyle={styles.placeholderStyle}
+  selectedTextStyle={styles.selectedTextStyle}
+  itemTextStyle={styles.selectedTextStyle}
+  inputSearchStyle={styles.inputSearchStyle}
+  iconStyle={styles.iconStyle}
+  data={
+    loadingDropdown
+      ? [{ label: "Loading...", value: null, disabled: true }]
+      : tabIndex == 0
+      ? accSalesDrop
+      : accPurchaseDrop
+  }
+  maxHeight={400}
+  labelField="label"
+  search={!loadingDropdown}
+  searchPlaceholder="Search"
+  valueField="value"
+  placeholder={!isFocus ? "Invoice" : "..."}
+  value={invoiceId}
+  onFocus={() => setIsFocus(true)}
+  onBlur={() => setIsFocus(false)}
+  onChange={(item) => {
+    if (item.value) {
+      setInvoiceId(item.value);
+    }
+  }}
+/>
+
+
+
               </View>
 
               <TextInput1

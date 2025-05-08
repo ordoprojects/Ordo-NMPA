@@ -312,11 +312,17 @@ const CompetitorIntelligence = ({ navigation, route, visible, extended, label, a
                     <View style={styles.elementsView}>
                         <View style={{ flex: 0.35, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderRadius: 5, borderColor: '#4b0482', margin: 0 }}>
                             {/* <Image source={ {uri:productData[0].product_image}}/> */}
-                            {/* <Image source={{ uri: item.product_image }} style={{ width: 60, height: 80, resizeMode: 'contain' }} />
+                            {/* <Image source={{uri: item.product_image.startsWith("http")
+          ? item.product_image
+          : `https://gsidev.ordosolution.com${item.product_image}`,
+      }} style={{ width: 60, height: 80, resizeMode: 'contain' }} />
                              */}
                             {item.product_image && item.product_image.length > 0 ? (
                                 <Image
-                                    source={{ uri: item.product_image[0] }} // Use the first image
+                                    source={{uri: item.product_image.startsWith("http")
+          ? item.product_image
+          : `https://gsidev.ordosolution.com${item.product_image}`,
+      }} // Use the first image
                                     style={{ width: 60, height: 80, resizeMode: 'contain' }}
                                 />
                             ) : (

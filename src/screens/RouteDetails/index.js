@@ -148,6 +148,10 @@ const RouteDetails = ({ navigation, route }) => {
         return transformedData;
       };
 
+      console.log("routeDetails?.sales_order_details", routeDetails?.sales_order_details.map((order) => ({
+        so_id: order.id,
+        product_ids: order?.product_list.map((product) => JSON.stringify(product,null,2))
+      })))
 
     const DeliveryRoutStatus = () => {
 

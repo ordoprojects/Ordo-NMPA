@@ -525,7 +525,7 @@ const SuppMangHome = ({ navigation, route }) => {
 
               <TouchableOpacity
                 onPress={() => {
-                  navigation.navigate("PurchaseOrder");
+                  navigation.navigate("PurchaseOrder", { types: "PO" });
 
                 }}
                 style={{ backgroundColor: "#D8F9FF", flex: 1, borderRadius: 9 }}

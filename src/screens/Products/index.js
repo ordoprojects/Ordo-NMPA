@@ -121,6 +121,7 @@ const Products = ({ navigation, visible, extended, label, animateFrom }) => {
   }, []);
 
   const loadAllProduct = async (limit, offset) => {
+    setLoading(true);
     var myHeaders = new Headers();
     myHeaders.append("Authorization", `Bearer ${userData.token}`);
 
@@ -477,12 +478,12 @@ const Products = ({ navigation, visible, extended, label, animateFrom }) => {
           </TouchableOpacity>
         </Modal>
 
-        <ActivityIndicator
+        {/* <ActivityIndicator
           animating={loading}
           color={Colors.primary}
           size="large"
           style={styles.activityIndicator}
-        />
+        /> */}
         <Searchbar
           style={{
             marginHorizontal: "4%",
@@ -569,7 +570,10 @@ const Products = ({ navigation, visible, extended, label, animateFrom }) => {
                     {item.product_image && item.product_image.length > 0 ? (
                       <Animated.Image
                         sharedTransitionTag={`${item.id}`}
-                        source={{ uri: item.product_image[0] }} // Use the first image
+                        source={{uri: item.product_image.startsWith("http")
+          ? item.product_image
+          : `https://gsidev.ordosolution.com${item.product_image}`,
+      }} // Use the first image
                         style={styles.imageView}
                       />
                     ) : (
@@ -711,7 +715,15 @@ const Products = ({ navigation, visible, extended, label, animateFrom }) => {
             keyExtractor={(item) => item.id.toString()}
             ListEmptyComponent={() => (
               <View style={styles.noProductsContainer}>
-                <Text style={styles.noProductsText}>No Products Available</Text>
+                       { !loading ? <Text style={styles.noProductsText}>No Products Available</Text>:   <ActivityIndicator
+              animating={loading}
+              color={Colors.primary}
+              size="medium"
+              style={{paddingTop:80}}
+
+            // style={styles.activityIndicator}
+            />}
+                
               </View>
             )}
           />
@@ -725,6 +737,8 @@ const Products = ({ navigation, visible, extended, label, animateFrom }) => {
             />
           </View>}
         </View>
+
+      
         {/* <AnimatedFAB
           label={"Add Product  "}
           icon={(name = "plus")}
@@ -777,11 +791,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   activityIndicator: {
-    flex: 1,
     alignSelf: "center",
-    height: 100,
-    position: "absolute",
-    top: "30%",
+   
   },
   elementsView: {
     backgroundColor: "white",

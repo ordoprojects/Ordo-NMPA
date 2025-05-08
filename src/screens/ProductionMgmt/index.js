@@ -19,6 +19,9 @@ const ProductionMgmt = ({ navigation, route }) => {
   const [salesData, setSalesData] = useState();
   const [modalVisible, setModalVisible] = useState(false);
 
+
+  console.log("salesData",salesData)
+
   const handlePress = () => {
     setModalVisible(true);
   };
@@ -103,7 +106,7 @@ const ProductionMgmt = ({ navigation, route }) => {
       .then(res => {
 
         setTransitOrders(res)
-        console.log("res",res)
+        // console.log("res",res)
       })
       .catch((error) => {
         // Handle any errors that occurred during the request
@@ -204,7 +207,7 @@ const ProductionMgmt = ({ navigation, route }) => {
 
       {/* Value in the next row */}
       <Text style={{ fontSize: 12, color: "white", fontFamily: 'AvenirNextCyr-Bold', marginBottom: 5 }}>
-        {salesData?.production_order_management?.pending_production_count ? salesData?.production_order_management?.pending_production_count : 0}
+        {salesData?.production_order_management?.pending_production_count ?    salesData?.production_order_management?.pending_production_count : 0}
       </Text>
     </View>
 

@@ -1,8 +1,10 @@
 require_relative '../node_modules/react-native/scripts/react_native_pods'
 require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
 require_relative '../node_modules/react-native-permissions/scripts/setup'
+
 use_frameworks! :linkage => :static
 $RNFirebaseAsStaticFramework = true
+
 begin
   react_native_pods_script = Pod::Executable.execute_command('node', ['-p',
     'require.resolve("react-native/scripts/react_native_pods.rb", {paths: [process.argv[1]]})',
@@ -21,16 +23,16 @@ if linkage != nil
   Pod::UI.puts "Configuring Pod with #{linkage}ally linked Frameworks".green
   use_frameworks! :linkage => :static
   $RNFirebaseAsStaticFramework = true
- 
 end
 
 target 'ORDO' do
   config = use_native_modules!
+
   use_react_native!(
     :path => config[:reactNativePath],
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
- 
+
   pod 'Firebase/Core', :modular_headers => true
   pod 'Firebase/Firestore', :modular_headers => true
   pod 'GoogleUtilities', :modular_headers => true
@@ -41,75 +43,74 @@ target 'ORDO' do
   target 'ORDOTests' do
     inherit! :complete
   end
+
   require_relative '../node_modules/react-native-permissions/scripts/setup'
   setup_permissions([
-   'Bluetooth',
-   'Calendars',
-   'CalendarsWriteOnly',
-   'Camera',
-   'Contacts',
-   'FaceID',
-   'LocationAccuracy',
-   'LocationAlways',
-   'LocationWhenInUse',
-   'MediaLibrary',
-   'Microphone',
-   'Motion',
-   'Notifications',
-   'PhotoLibrary',
-   'PhotoLibraryAddOnly',
-   'Reminders',
-   'Siri',
-   'SpeechRecognition',
-   'StoreKit',
-])
+    'Bluetooth',
+    'Calendars',
+    'CalendarsWriteOnly',
+    'Camera',
+    'Contacts',
+    'FaceID',
+    'LocationAccuracy',
+    'LocationAlways',
+    'LocationWhenInUse',
+    'MediaLibrary',
+    'Microphone',
+    'Motion',
+    'Notifications',
+    'PhotoLibrary',
+    'PhotoLibraryAddOnly',
+    'Reminders',
+    'Siri',
+    'SpeechRecognition',
+    'StoreKit',
+  ])
 
-post_install do |installer|
-  # React Native post install
-  react_native_post_install(
-    installer,
-    config[:reactNativePath],
-    :mac_catalyst_enabled => false,
-  )
+  post_install do |installer|
+    react_native_post_install(
+      installer,
+      config[:reactNativePath],
+      :mac_catalyst_enabled => false,
+    )
 
-  # Allow non-modular includes in framework modules
-  installer.pods_project.build_configurations.each do |config|
-    config.build_settings["CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES"] = true
-  end
+    # ✅ Set global settings to prevent build issues
+    installer.pods_project.build_configurations.each do |config|
+      config.build_settings["CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES"] = true
+    end
 
-  # Modify the BoringSSL-GRPC target to remove '-GCC_WARN_INHIBIT_ALL_WARNINGS' flag
-  installer.pods_project.targets.each do |target|
-    if target.name == 'BoringSSL-GRPC'
-      target.source_build_phase.files.each do |file|
-        if file.settings && file.settings['COMPILER_FLAGS']
-          flags = file.settings['COMPILER_FLAGS'].split
-          flags.reject! { |flag| flag == '-GCC_WARN_INHIBIT_ALL_WARNINGS' }
-          file.settings['COMPILER_FLAGS'] = flags.join(' ')
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+        config.build_settings['ENABLE_BITCODE'] = 'NO' # ✅ Disable Bitcode
+      end
+
+      # Fix BoringSSL warnings
+      if target.name == 'BoringSSL-GRPC'
+        target.source_build_phase.files.each do |file|
+          if file.settings && file.settings['COMPILER_FLAGS']
+            flags = file.settings['COMPILER_FLAGS'].split
+            flags.reject! { |flag| flag == '-GCC_WARN_INHIBIT_ALL_WARNINGS' }
+            file.settings['COMPILER_FLAGS'] = flags.join(' ')
+          end
         end
       end
     end
 
-    bitcode_strip_path = `xcrun --find bitcode_strip`.chop!
-    def strip_bitcode_from_framework(bitcode_strip_path, framework_relative_path)
-      framework_path = File.join(Dir.pwd, framework_relative_path)
-      command = "#{bitcode_strip_path} #{framework_path} -r -o #{framework_path}"
-      puts "Stripping bitcode: #{command}"
-      system(command)
+    # ✅ Optional Section: Bitcode Strip from all embedded frameworks
+    require 'find'
+    bitcode_strip_path = `xcrun --find bitcode_strip`.strip
+
+    def strip_bitcode_from_embedded_frameworks(bitcode_strip_path)
+      frameworks_path = File.join(__dir__, '..', 'ios', 'Pods')
+      Find.find(frameworks_path) do |path|
+        next unless path.end_with?('.framework')
+        binary = File.join(path, File.basename(path, '.framework'))
+        next unless File.exist?(binary)
+        puts "🧹 Stripping bitcode from #{binary}"
+        system("#{bitcode_strip_path} #{binary} -r -o #{binary}")
+      end
     end
- 
-    framework_paths = [
-      "Pods/LogRocket/LogRocket.xcframework/ios-arm64/LogRocket.framework/LogRocket",
-      "Pods/hermes-engine/destroot/Library/Frameworks/macosx/hermes.framework/hermes",
-      "Pods/hermes-engine/destroot/Library/Frameworks/macosx/hermes.framework/Versions/Current/hermes",
-      "Pods/hermes-engine/destroot/Library/Frameworks/universal/hermes.xcframework/ios-arm64/hermes.framework/hermes",
-      "Pods/hermes-engine/destroot/Library/Frameworks/universal/hermes.xcframework/ios-arm64_x86_64-maccatalyst/hermes.framework/hermes"
-    ]
- 
-    framework_paths.each do |framework_relative_path|
-      strip_bitcode_from_framework(bitcode_strip_path, framework_relative_path)
 
-     end
-   end
- end
-
+    strip_bitcode_from_embedded_frameworks(bitcode_strip_path)
+  end
 end

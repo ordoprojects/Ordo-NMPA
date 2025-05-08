@@ -478,7 +478,7 @@ const Login = ({ navigation }) => {
               color: "black",
             }}
           >
-            OrDo - Version 1.10.8
+            OrDo - Version 1.10.10
           </Text>
           <Text
             style={{

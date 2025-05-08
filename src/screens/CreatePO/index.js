@@ -582,7 +582,10 @@ const handleBackToCategory = () => {
                           {item.product_image &&
                           item.product_image.length > 0 ? (
                             <Image
-                              source={{ uri: item.product_image[0] }} 
+                              source={{uri: item.product_image.startsWith("http")
+          ? item.product_image
+          : `https://gsidev.ordosolution.com${item.product_image}`,
+      }} 
                               style={styles.imageView}
                             />
                           ) : (
@@ -1079,7 +1082,10 @@ const onEndReached = (categoryId, subCategoryId) => {
                   <Pressable>
                     {item.product_image && item.product_image.length > 0 ? (
                       <Image
-                        source={{ uri: item.product_image[0] }} 
+                        source={{uri: item.product_image.startsWith("http")
+          ? item.product_image
+          : `https://gsidev.ordosolution.com${item.product_image}`,
+      }} 
                         style={styles.imageView}
                       />
                     ) : (

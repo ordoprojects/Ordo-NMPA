@@ -223,6 +223,10 @@ import ProductionList from "../screens/ProductionList";
 import ProductionRouteDetails from "../screens/ProductionRouteDetails/Index";
 import ProductionManage from "../screens/ProductionManage";
 import ProductionManageDetails from "../screens/ProductionManageDetails";
+import Tire from "../screens/Tire";
+import TireHistory from "../screens/TireHistory";
+import Trip from "../screens/Trip";
+import TripHistory from "../screens/TripHistory";
 
 export default function AppStack() {
   const { merch, admin, delivery, salesManager, collectionTeam, stockTeam,driver,userData,salesEx ,production } = useContext(AuthContext);
@@ -489,6 +493,11 @@ export default function AppStack() {
       <Stack.Screen name="ProductionRouteDetails" component={ProductionRouteDetails}/>
       <Stack.Screen name="ProductionManage" component={ProductionManage}/>
       <Stack.Screen name="ProductionManageDetails" component={ProductionManageDetails}/>
+      <Stack.Screen name="Trip" component={Trip} />
+      <Stack.Screen name="TripHistory" component={TripHistory} />
+      <Stack.Screen name="Tire" component={Tire} />
+      <Stack.Screen name="TireHistory" component={TireHistory} />
+
       <Stack.Screen name="BottomSheetComponent" component={BottomSheetComponent} />
 
     </Stack.Navigator>

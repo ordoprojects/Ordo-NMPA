@@ -27,7 +27,7 @@ import { Dropdown } from "react-native-element-dropdown";
 import moment from "moment";
 import Toast from 'react-native-simple-toast';
 import { LoadingView } from "../../components/LoadingView";
-import { RadioButton, TextInput as TextInput1 } from "react-native-paper";
+import { RadioButton, TextInput as TextInput1,Button } from "react-native-paper";
 import { ms, hs, vs } from "../../utils/Metrics";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import { Checkbox } from "react-native-paper";
@@ -106,6 +106,9 @@ const AddRoute = ({ navigation, route }) => {
     const [dropdownItemsAdd, setDropdownItemsAdd] = useState([]);
     const [hasError, setHasError] = useState(false);
     const [totalLoadedWeight, setTotalLoadedWeight] = useState(0);
+    const [offset, setOffset] = useState(0);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const [loadingFirst, setLoadingFirst] = useState(false);
 
 
     // console.log('selectedOrders---------->',JSON.stringify(selectedOrders,null,2));
@@ -121,7 +124,8 @@ const AddRoute = ({ navigation, route }) => {
     useFocusEffect(
       React.useCallback(() => {
         fetchRouteData()
-      }, [userData ,selectedOption])
+      }, [userData ,selectedOption,offset,search]
+    )
     );
 
     useEffect(() => {
@@ -262,35 +266,49 @@ const AddRoute = ({ navigation, route }) => {
             setSearch(text);
         }
     };
+    const handleLoadMore = async ()  =>{
+      setOffset((prevOffset)=>prevOffset+10)
+   }
 
 
     const fetchRouteData = async () => {
-        setLoadCustomData(true);
-
+        
+        offset > 0 ? setLoadingMore(true) : setLoadCustomData(true);
         var myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
         myHeaders.append("Authorization", `Bearer ${userData.token}`);
 
         let url = screen === "edit"
             ? `https://gsidev.ordosolution.com/api/dispatch_item_list/?route_id=${routeId}`
-            : `https://gsidev.ordosolution.com/api/dispatch_item_list/?transportation_type=${selectedOption}`;
+            : `https://gsidev.ordosolution.com/api/dispatch_item_list/?transportation_type=${selectedOption}&limit=10&offset=${offset}&search=${search}`;
 
         try {
             const response = await fetch(url, {
-                method: '',
+                method: 'GET',
                 headers: myHeaders,
             });
 
             const result = await response.json();
+            if (offset === 0) {
+              setFilteredOrders(result.sales_orders);
+          } else {
+            setFilteredOrders((prevData) => [...prevData, ...result.sales_orders]);
+          }
 
+          if (offset === 0) {
             setAllOrders(result.sales_orders);
-            setFilteredOrders(result.sales_orders);
+        } else {
+          setAllOrders((prevData) => [...prevData, ...result.sales_orders]);
+        }
+            // setAllOrders(result.sales_orders);
+            // setFilteredOrders(result.sales_orders);
             setLoadCustomData(false);
-
+            setLoadingMore(false);
         } catch (error) {
            
             console.error(error);
             setLoadCustomData(false);
+            setLoadingMore(false);
         }
     };
 
@@ -349,9 +367,13 @@ const AddRoute = ({ navigation, route }) => {
 
 
     const toggleModal = () => {
-      fetchRouteData();
-      setModalVisible(true);
-    };
+      setOffset(0);             // reset pagination
+      setSearch('');            // reset search
+      setAllOrders([]);         // clear previous data
+      fetchRouteData();         // fetch fresh data
+      setModalVisible(true);    // open modal
+    
+  };
 
     const onDismiss1 = React.useCallback(() => {
         setVisible1(false);
@@ -1528,6 +1550,8 @@ const handleRemoveCharges = (item) => {
     };
 
   const groupedOrders = groupBySalesOrderName(filteredOrders);
+console.log("grouped",groupedOrders);
+
 
   const handleLoadedWeightChange = (orderId, productId, text) => {
     const updatedOrders = selectedOrders.map(order => {
@@ -1889,9 +1913,11 @@ const handleRemoveCharges = (item) => {
                                         </View>
                                         <Text style={{ alignSelf: 'center', fontSize: 20, color: 'black', fontFamily: 'AvenirNextCyr-Medium', marginVertical: 10 }}>Select Orders</Text>
                                         <TouchableOpacity style={{ marginRight: 10 }} onPress={() => {
-                                            setModalVisible(false);
                                             setSearch('');
-                                            setFilteredOrders(allOrders);
+                                            setOffset(0);
+                                            setModalVisible(false);
+                                            setFilteredOrders([]); // reset to prevent stale/duplicated display
+                                            setAllOrders([]);
                                         }}>
                                             <AntDesign name='close' size={20} color={`black`} />
                                         </TouchableOpacity>
@@ -1906,7 +1932,10 @@ const handleRemoveCharges = (item) => {
             value={search}
             placeholder="Search order"
             placeholderTextColor="gray"
-            onChangeText={searchProduct}
+            onChangeText={(val) => {
+              setOffset(0); // ✅ Reset offset
+              setSearch(val); // ✅ Update search term
+            }}
             keyboardShouldPersistTaps='always'
         />
         <TouchableOpacity style={styles.searchButton}>
@@ -1927,9 +1956,13 @@ const handleRemoveCharges = (item) => {
             ...globalStyles.border 
         }}
         onPress={() => {
+          if (search != '') {
             setSearch('');
-            setFilteredOrders(allOrders);
-            Keyboard.dismiss();
+            setOffset(0);
+            setFilteredOrders([]);
+          }else{
+            console.log("hy")
+          }
         }}
     >
         <Text style={{ color: '#6B1594', fontFamily: 'AvenirNextCyr-Medium', fontSize: 14 }}>Clear</Text>
@@ -2033,6 +2066,12 @@ const handleRemoveCharges = (item) => {
           <Text style={styles.noProductsText}>No Orders Available</Text>
         </View>
       )}
+      ListFooterComponent={
+        groupedOrders?.length < 1
+            ? null
+            : loadingMore ? <ActivityIndicator style={{ paddingVertical: 5 }} /> : <Button onPress={handleLoadMore}>Load More</Button>
+    }
+
     />
              }
                                 </View>

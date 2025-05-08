@@ -32,7 +32,7 @@ const PaymentDetails = ({ navigation, route }) => {
             redirect: 'follow'
         };
 
-        fetch("https://gsi.ordosolution.com/get_payment_detail.php", requestOptions)
+        fetch("https://gsidev.ordosolution.com/get_payment_detail.php", requestOptions)
             .then(response => response.json())
             .then(res => {
                 console.log("res", res?.payment);

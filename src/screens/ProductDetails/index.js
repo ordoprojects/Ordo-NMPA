@@ -44,24 +44,31 @@ const ProductDetails = ({navigation, route}) => {
 
       <View style={{marginVertical: '4%',flex:0.4}}>
       <Carousel
-          loop
-          width={width}
-          height={width / 2}
-          autoPlay={true}
-          data={item?.product_image?.length ? item.product_image : [require("../../assets/images/noImagee.png")]}
-          scrollAnimationDuration={1000}
-          pagingEnabled={true}
-          onSnapToItem={(index) => setActiveSlide(index)}
-          renderItem={({ item: image }) => (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-              <Animated.Image
-                sharedTransitionTag="shared"
-                source={typeof image === 'string' ? { uri: image } : image}
-                style={{ width: 200, height: 200, resizeMode: "contain" }}
-              />
-            </View>
-          )}
-        />
+  loop
+  width={width}
+  height={width / 2}
+  autoPlay={true}
+  data={
+    item?.product_image
+      ? [item.product_image.startsWith('http')
+          ? item.product_image
+          : `https://gsidev.ordosolution.com${item.product_image}`]
+      : [require("../../assets/images/noImagee.png")]
+  }
+  scrollAnimationDuration={1000}
+  pagingEnabled={true}
+  onSnapToItem={(index) => setActiveSlide(index)}
+  renderItem={({ item: image }) => (
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <Animated.Image
+        sharedTransitionTag="shared"
+        source={typeof image === 'string' ? { uri: image } : image}
+        style={{ width: 200, height: 200, resizeMode: "contain" }}
+      />
+    </View>
+  )}
+/>
+
       </View>
 
       <View style={styles.itemDescriptionView}>

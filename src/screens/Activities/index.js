@@ -58,7 +58,7 @@ const Activities = ({ navigation, route }) => {
             body: raw,
             redirect: 'follow'
         };
-        // fetch("https://gsi.ordosolution.com/get_activities.php", requestOptions)
+        // fetch("https://gsidev.ordosolution.com/get_activities.php", requestOptions)
         fetch(`https://dev.ordo.primesophic.com/get_activities.php`, requestOptions)
             .then(response => response.json())
             .then(result => {

@@ -392,7 +392,10 @@ const OrderApprovalDetails = ({ navigation, route }) => {
                                     <Pressable >
                                         {item.product_image && item.product_image.length > 0 ? (
                                             <Image
-                                                source={{ uri: item.product_image[0] }} 
+                                                source={{uri: item.product_image.startsWith("http")
+          ? item.product_image
+          : `https://gsidev.ordosolution.com${item.product_image}`,
+      }} 
                                                 style={styles.imageView}
                                             />
                                         ) : (
@@ -706,9 +709,9 @@ const OrderApprovalDetails = ({ navigation, route }) => {
 
 <Modal visible={menuVisible1} animationType="slide" transparent={true}>
       <View style={styles.modalContainer}>
-      <View style={[styles.modalContainer11,{ paddingTop:40}]}>
+      <View style={[styles.modalContainer11,{ paddingTop:50}]}>
       {dimensionData && dimensionData.length < 0 ? (
-        <Text style={{fontSize: 20,color: Colors.black,fontFamily: "AvenirNextCyr-Medium",marginBottom:'2%'}}>Dimeons</Text>
+        <Text style={{fontSize: 20,color: Colors.black,fontFamily: "AvenirNextCyr-Medium",marginBottom:'2%'}}>Dimensions</Text>
       ):(null)}
         {dimensionData && dimensionData.length > 0 ? (
         <FlatList
@@ -729,7 +732,7 @@ const OrderApprovalDetails = ({ navigation, route }) => {
           No dimension added
         </Text>
       )}
-        <TouchableOpacity style={{position:'absolute',top:9 ,right:9}} onPress={()=>{setMenuVisible1(false);}}>
+        <TouchableOpacity style={{position:'absolute',top:18 ,right:10}} onPress={()=>{setMenuVisible1(false);}}>
           <AntDesign name='close' size={28} color={`black`} />
         </TouchableOpacity>
       </View>

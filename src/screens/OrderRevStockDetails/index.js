@@ -221,6 +221,7 @@ const OrderRevStockDetails = ({ navigation, route }) => {
   };
 
   const handleSelectStockModel = () => {
+    console.log("MM DROP",rowMMs)
     setRowMM(rowMMs);
     getDropdownProductBasePlate(rowMMs);
   };
@@ -1003,7 +1004,7 @@ console.log("idddddddddddddd ",id)
 
     setValue1('1');
     if (!MM) return;
-
+console.log("MM BASE",MM)
     setCompanyOptions([]);
     setRowData1([]);
 
@@ -1024,11 +1025,13 @@ console.log("idddddddddddddd ",id)
       `https://gsidev.ordosolution.com/api/production_base_dropdown_v2/?base_mm=${MM}&so_id=${orderDetails?.id}`,
       requestOptions
     )
+    
       .then((response) => response.json())
       .then(async (result) => {
 
         if (result.error) {
           getDropdownProduct(MM);
+          Toast.show("No Base Plate Available", Toast.LONG);
         } else {
           setCompanyOptions(Array.isArray(result) ? result : []);
           setModalVisible3(true);
@@ -1040,6 +1043,7 @@ console.log("idddddddddddddd ",id)
       });
   };
 
+  console.log("company options",companyOptions)
 
   // Stock Selection for the Base Plate 
 const saveRowsToSelectedItemBasePlate = () => {
@@ -1093,6 +1097,16 @@ const saveRowsToSelectedItemBasePlate = () => {
 
 // Save Stock data for the Base Plate - Multiple Values
 const saveStockDeductDataMulti = () => {
+
+  if (selectedProductId) {
+    const isQtyValid = rowData1.some(item => item.qtys && item.qtys.toString().trim() !== '');
+  
+    if (!isQtyValid) {
+      Alert.alert('Missing Quantity', 'Please enter quantity before submitting.');
+      return;
+    }
+  }
+  
 
   const updatedRows = [...rows1];
 
@@ -1156,6 +1170,16 @@ const saveStockDeductDataMulti = () => {
 
 // save Stock data for the Base Plate - Single Value 
 const saveStockDeductData = () => {
+
+  if (selectedProductId) {
+    const isQtyValid = rowData1.some(item => item.qtys && item.qtys.toString().trim() !== '');
+  
+    if (!isQtyValid) {
+      Alert.alert('Missing Quantity', 'Please enter quantity before submitting.');
+      return;
+    }
+  }
+  
 
   const updatedRows = [...rows1];
   if (selectedRowIndex !== null) {
@@ -2119,7 +2143,10 @@ const renderProductItem = useCallback(({ item }) => {
                     >
                         {item.product_image && item.product_image.length > 0 ? (
                             <Image
-                                source={{ uri: item.product_image[0] }} 
+                                source={{uri: item.product_image.startsWith("http")
+          ? item.product_image
+          : `https://gsidev.ordosolution.com${item.product_image}`,
+      }} 
                                 style={styles.imageView}
                             />
                         ) : (
@@ -2943,7 +2970,10 @@ useEffect(()=>{
 
     {item.product_image && item.product_image.length > 0 ? (
       <Image
-        source={{ uri: item.product_image[0] }}
+        source={{uri: item.product_image.startsWith("http")
+          ? item.product_image
+          : `https://gsidev.ordosolution.com${item.product_image}`,
+      }}
         style={styles.imageView}
       />
     ) : (
@@ -3167,7 +3197,10 @@ useEffect(()=>{
                 <Pressable>
                   {item.product_image && item.product_image.length > 0 ? (
                     <Image
-                      source={{ uri: item.product_image[0] }} 
+                      source={{uri: item.product_image.startsWith("http")
+          ? item.product_image
+          : `https://gsidev.ordosolution.com${item.product_image}`,
+      }} 
                       style={styles.imageView}
                     />
                   ) : (
@@ -3384,6 +3417,7 @@ useEffect(()=>{
           </TouchableOpacity>
         </View>
       )}
+
 
       <Modal visible={visible} transparent={true}>
         <View
@@ -3998,6 +4032,7 @@ useEffect(()=>{
                         value={ item?.qtys?.toString() || ''} // Prepopulate if available
                         onChangeText={(text) => updateQty(index, text)}
                         returnKeyType="done"
+                        editable={!!selectedProductId}  // ⬅️ Disable if no dropdown selected
                       />
 
                       <TextInput
@@ -4069,7 +4104,9 @@ useEffect(()=>{
 
         <TouchableOpacity
           style={styles.closeIcon}
-          onPress={() => setModalVisible3(false)} >
+          onPress={() =>{ setModalVisible3(false)
+            setSelectedProductId(null); // ⬅️ Reset the dropdown
+          } }>
           <AntDesign name="close" color="black" size={25} />
         </TouchableOpacity>
 
@@ -4325,14 +4362,16 @@ useEffect(()=>{
                         returnKeyType="done"
                       />
 
-                      <TextInput
-                        style={{ borderWidth: 1, padding: 5, width: 100 }}
-                        value={item?.thickness}
-                        placeholder="0.00"
-                        onChangeText={(text) => handleInputChange1(index, 'thickness', text)}
-                        keyboardType="number-pad"
-                        returnKeyType="done"
-                      />
+<TextInput
+  style={{ borderWidth: 1, padding: 5, width: 100, backgroundColor: item?.stock_deduct_data?.length > 0 ? '#f2f2f2' : 'white' }}
+  value={item?.thickness}
+  placeholder="0.00"
+  onChangeText={(text) => handleInputChange1(index, 'thickness', text)}
+  keyboardType="number-pad"
+  returnKeyType="done"
+  editable={item?.stock_deduct_data?.length === 0}
+/>
+
 
                       <TextInput
                         style={{ borderWidth: 1, padding: 5, width: 90 }}

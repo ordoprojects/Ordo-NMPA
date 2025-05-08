@@ -68,7 +68,7 @@ const ProductionList = ({ navigation }) => {
         };
     
         fetch(
-            `https://gsidev.ordosolution.com/api/production_route_filter/?limit=15&offset=${offset}&search_name=${search}`,
+            `https://gsidev.ordosolution.com/api/production_route_filter/?limit=10&offset=${offset}&search_name=${search}`,
             requestOptions
         )
             .then((response) => response.json())

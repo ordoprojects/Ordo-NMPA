@@ -220,7 +220,10 @@ const TrackingDetails = ({ navigation, route }) => {
                   <Pressable>
                     {item.product_image && item.product_image.length > 0 ? (
                       <Image
-                        source={{ uri: item.product_image[0] }}
+                        source={{uri: item.product_image.startsWith("http")
+          ? item.product_image
+          : `https://gsidev.ordosolution.com${item.product_image}`,
+      }}
                         style={styles.imageView}
                       />
                     ) : (
@@ -526,7 +529,7 @@ const TrackingDetails = ({ navigation, route }) => {
       </View>
 
 
-      {screen == "SO" && <View style={{ flex: 1 }}>
+      {/* {screen == "SO" && <View style={{ flex: 1 }}>
 
         <Text style={{ fontFamily: 'AvenirNextCyr-Medium', fontSize: 17, marginBottom: '3%' }}>Route</Text>
 
@@ -547,7 +550,6 @@ const TrackingDetails = ({ navigation, route }) => {
 
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
               <Text style={{ color: Colors.primary, fontSize: 14, fontFamily: 'AvenirNextCyr-Bold', }}>{selectedRoute?.source} - {selectedRoute?.destination} Via {selectedRoute?.via}</Text>
-              {/* <Text style={{ color: 'black', fontSize: 12, fontFamily: 'AvenirNextCyr-Medium' }}> {item.via}</Text> */}
 
             </View>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: '2%', }}>
@@ -566,7 +568,7 @@ const TrackingDetails = ({ navigation, route }) => {
           </TouchableOpacity>
 
         }
-      </View>}
+      </View>} */}
 
       <ProgressDialog
         visible={loading}

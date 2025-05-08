@@ -242,7 +242,7 @@ const ReturnsCartReview = ({ navigation, route, animatedValue,
     //         redirect: 'follow'
     //     };
 
-    //     fetch("https://gsi.ordosolution.com/uploadFile.php", requestOptions)
+    //     fetch("https://gsidev.ordosolution.com/uploadFile.php", requestOptions)
     //         .then(response => response.json())
     //         .then(result => {
 

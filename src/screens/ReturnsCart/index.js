@@ -303,7 +303,7 @@ const ReturnsCart = ({ navigation, route }) => {
     //         redirect: 'follow'
     //     };
 
-    //     fetch("https://gsi.ordosolution.com/set_return_order.php", requestOptions)
+    //     fetch("https://gsidev.ordosolution.com/set_return_order.php", requestOptions)
     //         .then(response => response.json())
     //         .then(result => {
     //             console.log("returen order res", result);

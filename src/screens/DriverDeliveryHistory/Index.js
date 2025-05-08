@@ -18,7 +18,7 @@ import { AuthContext } from "../../Context/AuthContext";
 import DarkLoading from "../../styles/DarkLoading";
 import { useFocusEffect } from "@react-navigation/native";
 import DatePicker from "react-native-date-picker";
-import { Searchbar ,ActivityIndicator,Modal as PaperModal ,Portal ,PaperProvider ,DefaultTheme } from "react-native-paper";
+import { Searchbar ,ActivityIndicator,Modal as PaperModal ,Portal ,PaperProvider ,DefaultTheme ,Button} from "react-native-paper";
 import { cameraPermission } from "../../utils/Helper";
 import { launchCamera } from "react-native-image-picker";
 import RNFS from 'react-native-fs';
@@ -50,7 +50,8 @@ const DriverDeliveryHistory = ({ route, navigation }) => {
   const [dimensionData, setDimensionData] = useState('');
   const [isProduction, setIsProduction] = useState([]);
   const [menuVisible1, setMenuVisible1] = useState(false);
-
+const [offset, setOffset] = useState(0);
+    const [loadingMore, setLoadingMore] = useState(false);
 
   console.log('================isProduction====================');
   console.log(JSON.stringify(isProduction,null,2));
@@ -59,7 +60,7 @@ const DriverDeliveryHistory = ({ route, navigation }) => {
   useFocusEffect(
     React.useCallback(() => {
       GetDriverDetails();
-    }, [])
+    }, [userData,offset])
   );
 
   const OpenDimention = (data) => {
@@ -111,7 +112,7 @@ const DriverDeliveryHistory = ({ route, navigation }) => {
 
 
   const GetDriverDetails = async () => {
-    setLoading(true);
+    offset > 0 ? setLoadingMore(true) : setLoading(true);
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     myHeaders.append("Authorization", `Bearer ${userData.token}`);
@@ -123,7 +124,7 @@ const DriverDeliveryHistory = ({ route, navigation }) => {
     };
 
     fetch(
-      `https://gsidev.ordosolution.com/api/completed_routes/?driver_id=${DriverID}`,
+      `https://gsidev.ordosolution.com/api/completed_routes/?driver_id=${DriverID}&limit=7&offset=${offset}`,
       requestOptions
     )
       .then((response) => {
@@ -139,17 +140,39 @@ const DriverDeliveryHistory = ({ route, navigation }) => {
             const dateB = new Date(b.updated_at);
             return dateB - dateA;
           });
-          setVehicleData(result);
+          if (offset === 0) {
+            setVehicleData(result);
+            // Store full fetched data
+        } else {
+          setVehicleData((prevData) => [...prevData, ...result]);
+        }
+
+        if (offset === 0) {
           setFilteredData(sortedData);
+          // Store full fetched data
+      } else {
+        setFilteredData((prevData) => [...prevData, ...sortedData]);
+      }
+
+
+          // setFilteredData(sortedData);
         }
         setLoading(false);
+        setLoadingMore(false);
+
         setIsSearching(false);
       })
       .catch((error) => {
         setLoading(false);
+        setLoadingMore(false);
+
         console.log("Error getting History", error);
       });
   };
+
+  const handleLoadMore = async ()  =>{
+    setOffset((prevOffset)=>prevOffset+7)
+ }
 
   const handleDateChange = (date) => {
     setSelectedDate(date);
@@ -417,7 +440,10 @@ const DriverDeliveryHistory = ({ route, navigation }) => {
       <View>
         {item.product_image ? (
           <Image
-            source={{ uri: item.product_image }}
+            source={{uri: item.product_image.startsWith("http")
+          ? item.product_image
+          : `https://gsidev.ordosolution.com${item.product_image}`,
+      }}
             style={styles.productImage}
           />
         ) : (
@@ -543,6 +569,11 @@ const DriverDeliveryHistory = ({ route, navigation }) => {
               renderItem={renderItem}
               keyExtractor={(item, index) => index.toString()}
               style={{ marginTop: "3%" }}
+              ListFooterComponent={
+                filteredData?.length < 1
+                    ? null
+                    : loadingMore ? <ActivityIndicator style={{ paddingVertical: 5 }} /> : <Button onPress={handleLoadMore}>Load More</Button>
+            }
             />
           </>
         )}

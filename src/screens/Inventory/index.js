@@ -556,17 +556,21 @@ const renderProductItem = useCallback(({ item }) => {
               padding: "1%",
             }}
           >
-            {item.product_image && item.product_image.length > 0 ? (
-              <Image
-                source={{ uri: item.product_image[0] }}
-                style={styles.imageView}
-              />
-            ) : (
-              <Image
-                source={require("../../assets/images/noImagee.png")}
-                style={styles.imageView}
-              />
-            )}
+           {item.product_image ? (
+    <Image
+      source={{
+        uri: item.product_image.startsWith("http")
+          ? item.product_image
+          : `https://gsidev.ordosolution.com${item.product_image}`,
+      }}
+      style={styles.imageView}
+    />
+  ) : (
+    <Image
+      source={require("../../assets/images/noImagee.png")}
+      style={styles.imageView}
+    />
+  )}
           </View>
           <View style={{ flex: 1, paddingLeft: 15, marginLeft: 10 }}>
             <View

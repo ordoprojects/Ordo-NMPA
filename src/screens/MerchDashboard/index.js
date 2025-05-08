@@ -26,6 +26,11 @@ const Approved = ({ navigation, approvedArray, renderItem }) => {
       <FlatList
         data={approvedArray}
         renderItem={renderItem}
+        ListEmptyComponent={
+            <View style={{ paddingTop: '50%', alignItems: 'center' }}>
+              <Text style={{ fontSize: 16, color: 'grey' }}>No Approved Data found</Text>
+            </View>
+        }
       />
     </View>
   );
@@ -77,6 +82,11 @@ const Pending = ({ navigation, pendingArray, renderItem }) => {
       <FlatList
         data={pendingArray}
         renderItem={renderItem}
+        ListEmptyComponent={
+            <View style={{ paddingTop: "50%", alignItems: 'center' }}>
+              <Text style={{ fontSize: 16, color: 'grey' }}>No Pending Data found</Text>
+            </View>
+        }
       />
       {/* <Modal
         animationType="slide"
@@ -212,6 +222,8 @@ const MerchDashboard = ({ navigation }) => {
     setValue1(null);
     toggleModal();
   };
+
+  console.log("approved",approvedArray)
 
 
   const getPlans = async () => {

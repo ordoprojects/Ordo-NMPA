@@ -32,6 +32,11 @@ const AddVehicle = ({ navigation, route }) => {
   const [visible, setVisible] = React.useState(false);
   const [visible1, setVisible1] = React.useState(false);
   const [visible2, setVisible2] = React.useState(false);
+  const [visible3, setVisible3] = React.useState(false);
+  const [visible4, setVisible4] = React.useState(false);
+  const [visible5, setVisible5] = React.useState(false);
+
+
 
   const [rcModalVisible, setRcModalVisible] = useState(false);
   const [insuranceModalVisible, setInsuranceModalVisible] = useState(false);
@@ -120,6 +125,22 @@ const AddVehicle = ({ navigation, route }) => {
     setVisible2(false);
   }, [setVisible2]);
 
+
+  const onDismiss3 = React.useCallback(() => {
+    setVisible3(false);
+  }, [setVisible3]);
+
+  const onDismiss4 = React.useCallback(() => {
+    setVisible4(false);
+  }, [setVisible4]);
+
+  const onDismiss5 = React.useCallback(() => {
+    setVisible5(false);
+  }, [setVisible5]);
+
+
+
+
   const onChange = React.useCallback(({ startDate, endDate }) => {
     setVisible(false);
     console.log("dates", { startDate, endDate });
@@ -149,6 +170,40 @@ const AddVehicle = ({ navigation, route }) => {
     setLastModDate(EmStart);
   }, []);
 
+  const onChange3 = React.useCallback(({ startDate, endDate }) => {
+    setVisible3(false);
+    // console.log("dates", { startDate, endDate });
+
+    const EmStart = moment(startDate).format("DD/MM/YYYY");
+    const EmEnd = endDate ? moment(endDate).format("DD/MM/YYYY") : EmStart;
+
+    setFCStartDate(EmStart);
+    setFCEndDate(EmEnd);
+  }, []);
+
+
+  const onChange4 = React.useCallback(({ startDate, endDate }) => {
+    setVisible4(false);
+    // console.log("dates", { startDate, endDate });
+
+    const EmStart = moment(startDate).format("DD/MM/YYYY");
+    const EmEnd = endDate ? moment(endDate).format("DD/MM/YYYY") : EmStart;
+
+    setPermitStartDate(EmStart);
+    setPermitEndDate(EmEnd);
+  }, []);
+
+  const onChange5 = React.useCallback(({ startDate, endDate }) => {
+    setVisible5(false);
+    // console.log("dates", { startDate, endDate });
+
+    const EmStart = moment(startDate).format("DD/MM/YYYY");
+    const EmEnd = endDate ? moment(endDate).format("DD/MM/YYYY") : EmStart;
+
+    setTaxStartDate(EmStart);
+    setTaxEndDate(EmEnd);
+  }, []);
+
   const [isSwitchOn, setIsSwitchOn] = React.useState(true);
 
   const onToggleSwitch = () => setIsSwitchOn(!isSwitchOn);
@@ -163,10 +218,10 @@ const AddVehicle = ({ navigation, route }) => {
 
   const { token, userData } = useContext(AuthContext);
   const [vehicleNumber, setVehicleNumber] = useState(details?.registration_no);
-  const [vehicleName, setVehicleName] = useState(details?.vehicle_type);
+  const [vehicleName, setVehicleName] = useState(details?.truck_type);
   const [chassisNumber, setchassisNumber] = useState(details?.chassis_number);
   const [model, setModel] = useState(details?.model);
-  const [make, setMake] = useState(details?.make);
+  const [vehicleMake, setVehicleMake] = useState(details?.make || ""); //
   const [fuelType, setFuelType] = useState(details?.fuel_type);
   const [year, setYear] = useState(details?.year.toString());
   const [odometer, setOdometer] = useState(details?.current_odometer ? details.current_odometer.toString() : '');
@@ -175,6 +230,21 @@ const AddVehicle = ({ navigation, route }) => {
   const [insuranceStartDate, setInsuranceStartDate] = useState("");
   const [insuranceEndDate, setInsuranceEndDate] = useState("");
   const [lastModDate, setLastModDate] = useState("");
+  const [engineNumber, setEngineNumber] = useState(details?.engine_number || "");
+  const [FCStartDate, setFCStartDate] = useState("");
+  const [FCEndDate, setFCEndDate] = useState("");
+  const [permitStartDate, setPermitStartDate] = useState("");
+  const [permitEndDate, setPermitEndDate] = useState("");
+  const [taxStartDate, setTaxStartDate] = useState("");
+  const [taxEndDate, setTaxEndDate] = useState("");
+  const [vehicleType, setVehicleType] = useState(details?.vehicle_type);
+  const [GVW, setGVW] = useState(details?.gvw || "");
+
+
+console.log("Vehicle",vehicleType);
+
+
+
   const [driver, setDriver] = useState(details?.driver_id);
   const [typeDrop, setTypeDrop] = useState([]);
   const [makeDrop, setMakeDrop] = useState([]);
@@ -185,6 +255,8 @@ const AddVehicle = ({ navigation, route }) => {
   const [categoryOption, setCategoryOption] = useState([]);
   const [company, setCompany] = useState(details?.company);
   const [companyOpt, setCompanyOpt] = useState([]);
+  const [vehicleTypeOpt, setVehicleTypOpt] = useState([]);
+  const [statusOpt, setStatusOpt] = useState([]);
 
 
 
@@ -197,6 +269,10 @@ const AddVehicle = ({ navigation, route }) => {
   const [isFocus3, setIsFocus3] = useState(false);
   const [isFocus4, setIsFocus4] = useState(false);
   const [isFocus5, setIsFocus5] = useState(false);
+  const [isFocus6, setIsFocus6] = useState(false);
+  const [isFocus7, setIsFocus7] = useState(false);
+
+
 
   const [loading, setLoading] = useState(false);
 
@@ -213,16 +289,23 @@ const AddVehicle = ({ navigation, route }) => {
     }
   }, [details])
   const loadDate = () => {
-    setEmissionsStartDate(moment(details?.emission_start_date, "YYYY-MM-DD").format("DD/MM/YYYY"))
-    setEmissionEndDate(moment(details?.emission_end_date, "YYYY-MM-DD").format("DD/MM/YYYY"));
-    setInsuranceStartDate(moment(details?.insurance_start_date, "YYYY-MM-DD").format("DD/MM/YYYY"));
-    setInsuranceEndDate(moment(details?.insurance_end_date, "YYYY-MM-DD").format("DD/MM/YYYY"));
-    setLastModDate(moment(details?.last_maintenance_date, "YYYY-MM-DD").format("DD/MM/YYYY"))
-  }
+    setEmissionsStartDate(moment(details?.emission_start_date, "DD-MM-YYYY").format("DD/MM/YYYY"));
+    setEmissionEndDate(moment(details?.emission_end_date, "DD-MM-YYYY").format("DD/MM/YYYY"));
+    setInsuranceStartDate(moment(details?.insurance_start_date, "DD-MM-YYYY").format("DD/MM/YYYY"));
+    setInsuranceEndDate(moment(details?.insurance_end_date, "DD-MM-YYYY").format("DD/MM/YYYY"));
+    setLastModDate(moment(details?.last_maintenance_date, "DD-MM-YYYY").format("DD/MM/YYYY"));
+    setFCStartDate(moment(details?.fc_start_date, "DD-MM-YYYY").format("DD/MM/YYYY"));
+    setFCEndDate(moment(details?.fc_end_date, "DD-MM-YYYY").format("DD/MM/YYYY"));
+    setPermitStartDate(moment(details?.permit_start_date, "DD-MM-YYYY").format("DD/MM/YYYY"));
+    setPermitEndDate(moment(details?.permit_end_date, "DD-MM-YYYY").format("DD/MM/YYYY"));
+    setTaxStartDate(moment(details?.tax_start_date, "DD-MM-YYYY").format("DD/MM/YYYY"));
+    setTaxEndDate(moment(details?.tax_end_date, "DD-MM-YYYY").format("DD/MM/YYYY"));
+  };
+  
 
   useEffect(() => {
     getBrand();
-  }, []);
+  }, [userData]);
 
   const getBrand = async (userId) => {
     // Fetch category list API
@@ -241,7 +324,7 @@ const AddVehicle = ({ navigation, route }) => {
 
     try {
       const response = await fetch(
-        "https://gsidev.ordosolution.com/api/company/",
+        "https://gsidev.ordosolution.com/api/company_list/",
         requestOptions
       );
       const result = await response.json();
@@ -251,8 +334,8 @@ const AddVehicle = ({ navigation, route }) => {
       
       const allOption = { label: 'All', value: 'all' };
     const transformedData = result.map((item) => ({
-      label: item?.name,
-      value: item?.id,
+      label: item?.label,
+      value: item?.value,
     }));
 
     // Filter out duplicate labels and remove "All" if already present
@@ -273,7 +356,41 @@ const AddVehicle = ({ navigation, route }) => {
     CatDropdown();
     VehicleDropdown();
     driverDropdown();
+    tyreDropdown();
   }, []);
+
+
+
+  const tyreDropdown = async (id) => {
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${userData.token}`);
+  
+    var requestOptions = {
+      method: "GET",
+      headers: myHeaders,
+      redirect: "follow",
+    };
+  
+    try {
+      const response = await fetch(
+        "https://gsidev.ordosolution.com/api/tyre_choices/",
+        requestOptions
+      );
+      const result = await response.json();
+      // console.log("tyre", result);
+  
+     
+  
+      const statusDrop = result.status_choices.map((item) => ({
+        label: item.label,
+        value: item.value,
+      }));
+  
+      setStatusOpt(statusDrop);
+    } catch (error) {
+      console.log("error", error);
+    }
+  };
 
   const CatDropdown = async (id) => {
     var myHeaders = new Headers();
@@ -328,7 +445,7 @@ const AddVehicle = ({ navigation, route }) => {
 
     try {
       const response = await fetch(
-        "https://gsidev.ordosolution.com/api/driverlist/",
+        "https://gsidev.ordosolution.com/api/alldrivers/",
         requestOptions
       );
       const result = await response.json();
@@ -363,6 +480,8 @@ const AddVehicle = ({ navigation, route }) => {
         requestOptions
       );
       const result = await response.json();
+
+      console.log("res",result)
       const type = result.truck_type_choices.map((brand) => {
         return {
           label: brand.label,
@@ -388,6 +507,18 @@ const AddVehicle = ({ navigation, route }) => {
       });
 
       setFuelDrop(fuelDrop);
+
+      const vehicleDrop = result.vehicle_types.map((fuel_types) => {
+        return {
+          label: fuel_types.label,
+          value: fuel_types.value,
+        };
+      });
+
+      setVehicleTypOpt(vehicleDrop);
+
+
+
     } catch (error) {
       console.log("error", error);
     }
@@ -449,6 +580,67 @@ const AddVehicle = ({ navigation, route }) => {
     );
   };
 
+
+  const InputWithLabel3 = ({ title, value, onPress }) => {
+    const textColor =
+      displayValue2 === "Select Start Date - End Date" ? "#cecece" : "black";
+    return (
+      <View>
+        <Text style={styles.labelText}>{title}</Text>
+        <Pressable style={{ ...styles.inputContainer }} onPress={onPress}>
+          <Text style={{ ...styles.input2, color: textColor }}>
+            {displayValue2}
+          </Text>
+          <Image
+            style={{ width: 20, height: 20, marginRight: 15 }}
+            source={require("../../assets/images/calendar.png")}
+          ></Image>
+        </Pressable>
+      </View>
+    );
+  };
+
+
+  const InputWithLabel4 = ({ title, value, onPress }) => {
+    const textColor =
+      displayValue3 === "Select Start Date - End Date" ? "#cecece" : "black";
+    return (
+      <View>
+        <Text style={styles.labelText}>{title}</Text>
+        <Pressable style={{ ...styles.inputContainer }} onPress={onPress}>
+          <Text style={{ ...styles.input2, color: textColor }}>
+            {displayValue3}
+          </Text>
+          <Image
+            style={{ width: 20, height: 20, marginRight: 15 }}
+            source={require("../../assets/images/calendar.png")}
+          ></Image>
+        </Pressable>
+      </View>
+    );
+  };
+
+  const InputWithLabel5 = ({ title, value, onPress }) => {
+    const textColor =
+      displayValue4 === "Select Start Date - End Date" ? "#cecece" : "black";
+    return (
+      <View>
+        <Text style={styles.labelText}>{title}</Text>
+        <Pressable style={{ ...styles.inputContainer }} onPress={onPress}>
+          <Text style={{ ...styles.input2, color: textColor }}>
+            {displayValue4}
+          </Text>
+          <Image
+            style={{ width: 20, height: 20, marginRight: 15 }}
+            source={require("../../assets/images/calendar.png")}
+          ></Image>
+        </Pressable>
+      </View>
+    );
+  };
+
+  // console.log("id",details?.id)
+
   const optionData = [
     { label: "Quarterly", value: "Quarterly" },
     { label: "Monthly", value: "Monthly" },
@@ -467,23 +659,33 @@ const AddVehicle = ({ navigation, route }) => {
   const handleSubmit = async () => {
 
     const requiredFields = [
-      { key: 'Driver', value: driver },
+      // { key: 'Driver', value: driver },
       { key: 'Chassis Number', value: chassisNumber },
       { key: 'Emissions Start Date', value: emissionsStartDate },
       { key: 'Emissions End Date', value: emissionEndDate },
       { key: 'Insurance Start Date', value: insuranceStartDate },
       { key: 'Insurance End Date', value: insuranceEndDate },
-      { key: 'Vehicle Type', value: vehicleName },
+      { key: 'Truck Type', value: vehicleName },
       { key: 'Year', value: year },
-      { key: 'Fuel Type', value: fuelType },
-      { key: 'Registration Number', value: vehicleNumber },
-      { key: 'Make', value: make },
+      // { key: 'Fuel Type', value: fuelType },
+      { key: 'Vehicle Number', value: vehicleNumber },
+      // { key: 'Vehicle Make', value: vehicleMake },
       { key: 'Model', value: model },
       { key: 'Current Odometer', value: odometer },
-      { key: 'Vehicle Category', value: vehicleCat },
-      { key: 'Vehicle Capacity', value: capacity },
+      // { key: 'Vehicle Category', value: vehicleCat },
+      // { key: 'Vehicle Capacity', value: capacity },
       { key: 'Company', value: company },
-      { key: 'Last Maintenance Date', value: lastModDate }
+      { key: 'Last Maintenance Date', value: lastModDate },
+      { key: 'Engine Number', value: engineNumber },
+      { key: 'FC Start Date', value: FCStartDate },
+      { key: 'FC End Date', value: FCEndDate },
+      { key: 'Permit Start Date', value: permitStartDate },
+      { key: 'Permit End Date', value: permitEndDate },
+      { key: 'Tax Start Date', value: taxStartDate },
+      { key: 'Tax End Date', value: taxEndDate },
+      // { key: 'Vehicle Type', value: vehicleType },
+
+
     ];
   
     const missingFields = requiredFields.filter(field => !field.value).map(field => field.key);
@@ -496,7 +698,6 @@ const AddVehicle = ({ navigation, route }) => {
     setLoading(true);
 
     let url = screen === "add" ? 'https://gsidev.ordosolution.com/api/vehicle/' : `https://gsidev.ordosolution.com/api/vehicle/${details.id}/`
-
     var myHeaders = new Headers();
     myHeaders.append("Authorization", `Bearer ${userData.token}`);
     myHeaders.append("Content-Type", "application/json");
@@ -519,11 +720,11 @@ const AddVehicle = ({ navigation, route }) => {
       insurance_end_date: moment(insuranceEndDate, "DD/MM/YYYY").format(
         "YYYY-MM-DD"
       ),
-      vehicle_type: vehicleName,
+      truck_type: vehicleName,
       year: year,
       fuel_type: fuelType,
       registration_no: vehicleNumber,
-      make: make,
+      make: vehicleMake,
       model: model,
       current_odometer: odometer,
       status: status,
@@ -533,6 +734,29 @@ const AddVehicle = ({ navigation, route }) => {
       last_maintenance_date: moment(lastModDate, "DD/MM/YYYY").format(
         "YYYY-MM-DD"
       ),
+      vehicle_type:vehicleType,
+      fc_start_date: moment(FCStartDate, "DD/MM/YYYY").format(
+        "YYYY-MM-DD"
+      ),
+      fc_end_date: moment(FCEndDate, "DD/MM/YYYY").format(
+        "YYYY-MM-DD"
+      ),
+      permit_start_date: moment(permitStartDate, "DD/MM/YYYY").format(
+        "YYYY-MM-DD"
+      ),
+      permit_end_date: moment(permitEndDate, "DD/MM/YYYY").format(
+        "YYYY-MM-DD"
+      ),
+      tax_start_date: moment(taxStartDate, "DD/MM/YYYY").format(
+        "YYYY-MM-DD"
+      ),
+      tax_end_date: moment(taxEndDate, "DD/MM/YYYY").format(
+        "YYYY-MM-DD"
+      ),
+      gvw:GVW,
+      engine_number:engineNumber,
+
+
     });
 
     // console.log("base 64", base64img);
@@ -591,16 +815,31 @@ const AddVehicle = ({ navigation, route }) => {
       ? `${insuranceStartDate} - ${insuranceEndDate}`
       : "Select Start Date - End Date";
 
-      const renderLabel = (label, focus, value) => {
-        if ((Array.isArray(value) && value.length > 0) || (!Array.isArray(value) && value)) {
-            return (
-                <Text style={[styles.labelll, (label == "Source" || label == "Destination") && { top: 8 }]}>
-                    {label}
-                </Text>
-            );
-        }
-        return null;
-      };
+      const displayValue2 =
+      FCStartDate && FCEndDate
+        ? `${FCStartDate} - ${FCEndDate}`
+        : "Select Start Date - End Date";
+
+        const displayValue3 =
+        permitStartDate && permitEndDate
+          ? `${permitStartDate} - ${permitEndDate}`
+          : "Select Start Date - End Date";
+
+          const displayValue4 =
+          taxStartDate && taxEndDate
+            ? `${taxStartDate} - ${taxEndDate}`
+            : "Select Start Date - End Date";
+            const renderLabel = (label, focus, value, required = false) => {
+              if ((Array.isArray(value) && value.length > 0) || (!Array.isArray(value) && value)) {
+                return (
+                  <Text style={[styles.labelll, (label === "Source" || label === "Destination") && { top: 8 }]}>
+                    {label} {required && <Text style={{ color: 'red' }}>*</Text>}
+                  </Text>
+                );
+              }
+              return null;
+            };
+            
 
   return (
     <View style={styles.rootContainer}>
@@ -688,7 +927,7 @@ const AddVehicle = ({ navigation, route }) => {
         <ScrollView style={{}}>
           <FloatingInput
             mode="outlined"
-            label={<Text style={styles.placeholderStyle}>Vehicle Number</Text>}
+            label={<Text style={styles.placeholderStyle}>Vehicle Number <Text style={{ color: 'red' }}>*</Text></Text>}
             theme={{ colors: { onSurfaceVariant: "#4b0482" } }}
             style={{ backgroundColor: "white", marginBottom: '4%',fontFamily: "AvenirNextCyr-Medium",}}
             activeOutlineColor="#4b0482"
@@ -706,7 +945,7 @@ const AddVehicle = ({ navigation, route }) => {
 
           {/* <Text style={styles.label}>Vehicle Type</Text> */}
           <View style={{marginVertical:'0%'}}>
-{renderLabel("Truck Type", isFocus4, vehicleName)}
+{renderLabel("Truck Type", isFocus4, vehicleName,true)}
           <Dropdown
             style={[styles.dropdown]}
             containerStyle={styles.dropdownContainer}
@@ -759,6 +998,32 @@ const AddVehicle = ({ navigation, route }) => {
 </View>
 
 
+<View style={{marginVertical:'0%'}}>
+          {renderLabel("Vehicle Type", isFocus6, vehicleType)}
+          <Dropdown
+            style={[styles.dropdown]}
+            containerStyle={styles.dropdownContainer}
+            placeholderStyle={styles.placeholderStyle}
+            searchPlaceholder="Search"
+            selectedTextStyle={styles.selectedTextStyle}
+            itemTextStyle={styles.selectedTextStyle}
+            inputSearchStyle={styles.inputSearchStyle}
+            iconStyle={styles.iconStyle}
+            data={vehicleTypeOpt}
+            maxHeight={400}
+            labelField="label"
+            valueField="value"
+            placeholder={!isFocus3 ? "Select vehicle Type" : "..."}
+            value={vehicleType}
+            onFocus={() => setIsFocus6(true)}
+            onBlur={() => setIsFocus6(false)}
+            onChange={(item) => {
+              setVehicleType(item.value);
+              setIsFocus6(false);
+            }}
+          />
+</View>
+
 <View style={{marginVertical:'1%'}}>
 {renderLabel("Categories", isFocus4, vehicleCat)}
 <MultiSelect
@@ -810,7 +1075,7 @@ const AddVehicle = ({ navigation, route }) => {
 
           <FloatingInput
             mode="outlined"
-            label={<Text style={styles.placeholderStyle}>Chassis No.</Text>}
+            label={<Text style={styles.placeholderStyle}>Chassis No. <Text style={{ color: 'red' }}>*</Text></Text>}
             theme={{ colors: { onSurfaceVariant: "#4b0482" } }}
             style={{ backgroundColor: "white", marginBottom: '4%' }}
             activeOutlineColor="#4b0482"
@@ -828,7 +1093,7 @@ const AddVehicle = ({ navigation, route }) => {
 
           <FloatingInput
             mode="outlined"
-            label={<Text style={styles.placeholderStyle}>Model</Text>}
+            label={<Text style={styles.placeholderStyle}>Model <Text style={{ color: 'red' }}>*</Text></Text>}
             theme={{ colors: { onSurfaceVariant: "#4b0482" } }}
             style={{ backgroundColor: "white", marginBottom: '4%' }}
             activeOutlineColor="#4b0482"
@@ -843,7 +1108,10 @@ const AddVehicle = ({ navigation, route }) => {
             value={model}
           />
 
-          {/* <Text style={styles.label}>Make</Text> */}
+
+          
+
+          {/* <Text style={styles.label}>Make</Text>
           <Dropdown
             style={[styles.dropdown]}
             containerStyle={styles.dropdownContainer}
@@ -865,8 +1133,9 @@ const AddVehicle = ({ navigation, route }) => {
               setMake(item.value);
               setIsFocus(false);
             }}
-          />
-
+          /> */}
+   <View style={{marginTop:'2%'}}>
+   {renderLabel("Company", isFocus5, company,true)}
 <Dropdown
             style={[styles.dropdown]}
             containerStyle={styles.dropdownContainer}
@@ -889,8 +1158,10 @@ const AddVehicle = ({ navigation, route }) => {
               setIsFocus5(false);
             }}
           />
-
+</View>
           {/* <Text style={styles.label}>Fuel Type</Text> */}
+          <View style={{marginVertical:'0%'}}>
+          {renderLabel("Fuel Type", isFocus2, fuelType)}
           <Dropdown
             style={[styles.dropdown]}
             containerStyle={styles.dropdownContainer}
@@ -914,9 +1185,12 @@ const AddVehicle = ({ navigation, route }) => {
             }}
           />
 
+</View>
+        
+
           <FloatingInput
             mode="outlined"
-            label={<Text style={styles.placeholderStyle}>Odometer</Text>}
+            label={<Text style={styles.placeholderStyle}>Odometer <Text style={{ color: 'red' }}>*</Text></Text>}
             theme={{ colors: { onSurfaceVariant: "#4b0482" } }}
             style={{ backgroundColor: "white", marginBottom: '4%' }}
             activeOutlineColor="#4b0482"
@@ -933,7 +1207,7 @@ const AddVehicle = ({ navigation, route }) => {
 
           <FloatingInput
             mode="outlined"
-            label={<Text style={styles.placeholderStyle}>Year</Text>}
+            label={<Text style={styles.placeholderStyle}>Year <Text style={{ color: 'red' }}>*</Text></Text>}
             theme={{ colors: { onSurfaceVariant: "#4b0482" } }}
             style={{ backgroundColor: "white", marginBottom: '4%'}}
             activeOutlineColor="#4b0482"
@@ -946,6 +1220,57 @@ const AddVehicle = ({ navigation, route }) => {
             onSubmitEditing={() => Keyboard.dismiss()}
             returnKeyType="done"
             value={year}
+          />
+
+<FloatingInput
+            mode="outlined"
+            label={<Text style={styles.placeholderStyle}>Engine Number <Text style={{ color: 'red' }}>*</Text></Text>}
+            theme={{ colors: { onSurfaceVariant: "#4b0482" } }}
+            style={{ backgroundColor: "white", marginBottom: '4%'}}
+            activeOutlineColor="#4b0482"
+            outlineColor="#B6B4B4"
+            textColor="#4b0482"
+            onChangeText={(text) => setEngineNumber(text)}
+            autoCapitalize="none"
+            blurOnSubmit={false}
+            // keyboardType="number-pad"
+            onSubmitEditing={() => Keyboard.dismiss()}
+            returnKeyType="done"
+            value={engineNumber}
+          />
+
+<FloatingInput
+            mode="outlined"
+            label={<Text style={styles.placeholderStyle}>Vehicle Make</Text>}
+            theme={{ colors: { onSurfaceVariant: "#4b0482" } }}
+            style={{ backgroundColor: "white", marginBottom: '4%'}}
+            activeOutlineColor="#4b0482"
+            outlineColor="#B6B4B4"
+            textColor="#4b0482"
+            onChangeText={(text) => setVehicleMake(text)}
+            autoCapitalize="none"
+            blurOnSubmit={false}
+            // keyboardType="number-pad"
+            onSubmitEditing={() => Keyboard.dismiss()}
+            returnKeyType="done"
+            value={vehicleMake}
+          />
+
+<FloatingInput
+            mode="outlined"
+            label={<Text style={styles.placeholderStyle}>GVW</Text>}
+            theme={{ colors: { onSurfaceVariant: "#4b0482" } }}
+            style={{ backgroundColor: "white", marginBottom: '4%'}}
+            activeOutlineColor="#4b0482"
+            outlineColor="#B6B4B4"
+            textColor="#4b0482"
+            onChangeText={(text) => setGVW(text)}
+            autoCapitalize="none"
+            blurOnSubmit={false}
+            keyboardType="number-pad"
+            onSubmitEditing={() => Keyboard.dismiss()}
+            returnKeyType="done"
+            value={GVW}
           />
 
           <View
@@ -982,8 +1307,17 @@ const AddVehicle = ({ navigation, route }) => {
               marginTop: "5%",
             }}
           >
+                {(!displayValue2) ? (
+                <Text style={styles.label1}>
+                 Insurance Date <Text style={{ color: 'red' }}>*</Text>
+                </Text>
+              ) : (
+                <Text style={[styles.label1, { color: Colors.primary }]}>
+                 Insurance Date <Text style={{ color: 'red' }}>*</Text>
+                </Text>
+              )}
             <InputWithLabel1
-              title="Insurance Date"
+              // title="Insurance Date"
               value={displayValue1}
               onPress={() => setVisible1(true)}
             />
@@ -1004,6 +1338,124 @@ const AddVehicle = ({ navigation, route }) => {
             />
           </View>
 
+
+          <View
+            style={{
+              justifyContent: "center",
+              flex: 1,
+              alignItems: "center",
+              marginTop: "5%",
+            }}
+          >
+                {(!displayValue2) ? (
+                <Text style={styles.label1}>
+                 FC Date <Text style={{ color: 'red' }}>*</Text>
+                </Text>
+              ) : (
+                <Text style={[styles.label1, { color: Colors.primary }]}>
+                 FC Date <Text style={{ color: 'red' }}>*</Text>
+                </Text>
+              )}
+            <InputWithLabel3
+              // title="FC Date"
+              value={displayValue2}
+              onPress={() => setVisible3(true)}
+            />
+
+            <DatePickerModal
+              mode="range"
+              visible={visible3}
+              onDismiss={onDismiss3}
+              startDate={undefined}
+              endDate={undefined}
+              onConfirm={onChange3}
+              saveLabel="Save"
+              label="Select Period"
+              startLabel="From"
+              endLabel="To"
+              animationType="slide"
+              presentationStyle="pageSheet"
+            />
+          </View>
+
+          <View
+            style={{
+              justifyContent: "center",
+              flex: 1,
+              alignItems: "center",
+              marginTop: "5%",
+            }}
+          >
+               {(!displayValue3) ? (
+                <Text style={styles.label1}>
+                 Permit Date <Text style={{ color: 'red' }}>*</Text>
+                </Text>
+              ) : (
+                <Text style={[styles.label1, { color: Colors.primary }]}>
+                 Permit Date <Text style={{ color: 'red' }}>*</Text>
+                </Text>
+              )}
+            <InputWithLabel4
+              // title="Permit Date"
+              value={displayValue3}
+              onPress={() => setVisible4(true)}
+            />
+
+            <DatePickerModal
+              mode="range"
+              visible={visible4}
+              onDismiss={onDismiss4}
+              startDate={undefined}
+              endDate={undefined}
+              onConfirm={onChange4}
+              saveLabel="Save"
+              label="Select Period"
+              startLabel="From"
+              endLabel="To"
+              animationType="slide"
+              presentationStyle="pageSheet"
+            />
+          </View>
+
+          <View
+            style={{
+              justifyContent: "center",
+              flex: 1,
+              alignItems: "center",
+              marginTop: "5%",
+            }}
+          >
+             {(!displayValue4) ? (
+                <Text style={styles.label1}>
+                  Tax Date <Text style={{ color: 'red' }}>*</Text>
+                </Text>
+              ) : (
+                <Text style={[styles.label1, { color: Colors.primary }]}>
+                 Tax Date <Text style={{ color: 'red' }}>*</Text>
+                </Text>
+              )}
+            <InputWithLabel5
+              // title="Tax Date"
+              value={displayValue4}
+              onPress={() => setVisible5(true)}
+            />
+
+            <DatePickerModal
+              mode="range"
+              visible={visible5}
+              onDismiss={onDismiss5}
+              startDate={undefined}
+              endDate={undefined}
+              onConfirm={onChange5}
+              saveLabel="Save"
+              label="Select Period"
+              startLabel="From"
+              endLabel="To"
+              animationType="slide"
+              presentationStyle="pageSheet"
+            />
+          </View>
+
           <View
             style={{
               justifyContent: "center",
@@ -1013,8 +1465,17 @@ const AddVehicle = ({ navigation, route }) => {
               marginBottom:'3%'
             }}
           >
+                 {(!lastModDate) ? (
+                <Text style={styles.label1}>
+                  Last Maintenance Date <Text style={{ color: 'red' }}>*</Text>
+                </Text>
+              ) : (
+                <Text style={[styles.label1, { color: Colors.primary }]}>
+                 Last Maintenance Date <Text style={{ color: 'red' }}>*</Text>
+                </Text>
+              )}
             <InputWithLabel2
-              title="Last Maintenance Date"
+              // title="Last Maintenance Date"
               value={lastModDate}
               onPress={() => setVisible2(true)}
             />
@@ -1435,7 +1896,17 @@ labelll: {
   fontFamily: 'AvenirNextCyr-Medium',
   color: Colors.primary
 },
-  
+    label1: {
+      position: 'absolute',
+      // backgroundColor: 'white',
+      left: 0,
+      top:-8,
+      zIndex: 1,
+      paddingHorizontal: 8,
+      paddingTop:5,
+      fontSize: 15,
+      color: Colors.primary 
+    }
 });
 
 export default AddVehicle;

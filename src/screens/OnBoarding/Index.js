@@ -110,7 +110,7 @@ const OnBoarding = ({ navigation }) => {
   };
 
   const saveProfilePictureToApi = async (imgbase64) => {
-    const apiUrl = "https://gsi.ordosolution.com/set_account_details.php";
+    const apiUrl = "https://gsidev.ordosolution.com/set_account_details.php";
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
 

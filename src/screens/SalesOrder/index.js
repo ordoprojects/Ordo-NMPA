@@ -512,7 +512,10 @@ const renderProductItem = useCallback(({ item }) => {
           >
             {item.product_image && item.product_image.length > 0 ? (
               <Image
-                source={{ uri: item.product_image[0] }}
+                source={{uri: item.product_image.startsWith("http")
+          ? item.product_image
+          : `https://gsidev.ordosolution.com${item.product_image}`,
+      }}
                 style={styles.imageView}
               />
             ) : (
@@ -1281,8 +1284,8 @@ console.log("rows1",rows1)
            Alert.alert(
                "Missing Fields", 
                isBasePlate 
-                   ? "Please enter all values: height, width, thickness, and nos."
-                   : "Please enter height, width, and nos.",
+                   ? "Please enter all values: length, width, thickness, and nos."
+                   : "Please enter ft, inches, and nos.",
                [{ text: "OK" }]
            );
            return;
@@ -1633,7 +1636,10 @@ console.log("rows1",rows1)
                         >
                           {item.product_image && item.product_image.length > 0 ? (
                             <Image
-                              source={{ uri: item.product_image[0] }} // Use the first image
+                              source={{uri: item.product_image.startsWith("http")
+          ? item.product_image
+          : `https://gsidev.ordosolution.com${item.product_image}`,
+      }} // Use the first image
                               style={styles.imageView}
                             />
                           ) : (
@@ -2568,23 +2574,44 @@ onPress={() => {
         gap: 10,
       }}>
 
-     <TextInput
-          style={{ borderWidth: 1, padding: 5, width: 100, textAlign: 'center' }}
-          value={selectedItemName === "BASE PLATE" ? item?.height_inch :item?.width_ft}
-          placeholder="0.00"
-          onChangeText={(text) => handleInputChange1(index, 'width_ft', text)}
-          keyboardType="number-pad"
-          returnKeyType="done"
-        />
+<TextInput
+  style={{ borderWidth: 1, padding: 5, width: 100, textAlign: 'center' }}
+  value={
+    selectedItemName === "BASE PLATE"
+      ? item?.height_inch
+      : item?.width_ft
+  }
+  placeholder="0.00"
+  onChangeText={(text) =>
+    handleInputChange1(
+      index,
+      selectedItemName === "BASE PLATE" ? 'height_inch' : 'width_ft',
+      text
+    )
+  }
+  keyboardType="number-pad"
+  returnKeyType="done"
+/>
 
-        <TextInput
-          style={{ borderWidth: 1, padding: 5, width: 100, textAlign: 'center' }}
-          value={selectedItemName === "BASE PLATE" ? item?.width_ft :item?.height_inch}
-          placeholder="0.00"
-          onChangeText={(text) => handleInputChange1(index, 'height_inch', text)}
-          keyboardType="number-pad"
-          returnKeyType="done"
-        />
+<TextInput
+  style={{ borderWidth: 1, padding: 5, width: 100, textAlign: 'center' }}
+  value={
+    selectedItemName === "BASE PLATE"
+      ? item?.width_ft
+      : item?.height_inch
+  }
+  placeholder="0.00"
+  onChangeText={(text) =>
+    handleInputChange1(
+      index,
+      selectedItemName === "BASE PLATE" ? 'width_ft' : 'height_inch',
+      text
+    )
+  }
+  keyboardType="number-pad"
+  returnKeyType="done"
+/>
+
 
      
 

@@ -30,6 +30,7 @@ const Pending = ({ fetchData, pendingOrders, loading, renderItem }) => {
   
   const { userData } = useContext(AuthContext);
 
+
   if (loading) {
     return (
       <OrdersSkeleton />
@@ -50,7 +51,7 @@ const Pending = ({ fetchData, pendingOrders, loading, renderItem }) => {
         renderItem={renderItem}
         ListEmptyComponent={() => (
           <View style={styles.noProductsContainer}>
-            <Text style={styles.noProductsText}>No Pending Orders</Text>
+            <Text style={styles.noProductsText}>No Confirmed Orders</Text>
           </View>
         )}
         onEndReached={handleEndReached} 
@@ -78,7 +79,7 @@ const Shipped = ({ navigation, route, fetchData, transitOrders, renderItem, load
         renderItem={renderItem}
         ListEmptyComponent={() => (
           <View style={styles.noProductsContainer}>
-            <Text style={styles.noProductsText}>No Shipped Orders</Text>
+            <Text style={styles.noProductsText}>No Pending Orders</Text>
           </View>
         )}
       //keyExtractor={(item) => item.id.toString()}
@@ -142,7 +143,10 @@ const Cancelled = ({ navigation, route, cancelledOrders, renderItem, loading }) 
   );
 }
 
-const PurchaseOrder = ({ navigation }) => {
+const PurchaseOrder = ({ navigation ,route}) => {
+  const { types } = route.params;
+console.log("types",types)
+
   const [selectedOption, setSelectedOption] = useState("all");
 
   const [modalVisible, setModalVisible] = useState(false);
@@ -166,7 +170,9 @@ const PurchaseOrder = ({ navigation }) => {
 
   const [cancelledOrders, setCancelledOrders] = useState([]);
   const [filteredCancelledOrders, setFilteredCancelledOrders] = useState([]);
-  const [screenName, setScreenName] = useState('Confirmed');
+  const [screenName, setScreenName] = useState('In Transit');
+
+  console.log("screenName on mount", screenName);
 
 
   const {
@@ -184,18 +190,18 @@ const PurchaseOrder = ({ navigation }) => {
     const fetchPendingData = async () => {
         try {
             if (screenName === 'Confirmed'){
-                const Data = await fetchDataForRFQ('Confirmed', 30, 0, userData, search);
+                const Data = await fetchDataForRFQ('Confirmed', 30, 0, userData, search,types);
                 setConfirmedOrders(Data.results);
 
             }else if (screenName === 'In Transit'){
-                const Data = await fetchDataForRFQ('In Transit', 30, 0, userData, search);
+                const Data = await fetchDataForRFQ('Pending', 30, 0, userData, search,types);
                 setTransitOrders(Data.results);
     
             }else if (screenName === 'Delivered'){
-                const Data = await fetchDataForRFQ('Delivered', 30, 0, userData, search);
+                const Data = await fetchDataForRFQ('Delivered', 30, 0, userData, search,types);
                  setDeliveredOrders(Data.results);
             }else{
-                const Data = await fetchDataForRFQ('Cancel', 30, 0, userData, search);
+                const Data = await fetchDataForRFQ('Cancel', 30, 0, userData, search,types);
                 setCancelledOrders(Data.results);
             }
            
@@ -214,19 +220,19 @@ const fetchData = async () => {
     let Data;
     switch (screenName) {
       case 'Confirmed':
-        Data = await fetchDataForRFQ('Confirmed', 30, 0, userData, search);
+        Data = await fetchDataForRFQ('Confirmed', 30, 0, userData, search,types);
         setConfirmedOrders(Data.results);
         break;
       case 'In Transit':
-        Data = await fetchDataForRFQ('In Transit', 30, 0, userData, search);
+        Data = await fetchDataForRFQ('Pending', 30, 0, userData, search,types);
         setTransitOrders(Data.results);
         break;
       case 'Delivered':
-        Data = await fetchDataForRFQ('Delivered', 30, 0, userData, search);
+        Data = await fetchDataForRFQ('Delivered', 30, 0, userData, search,types);
         setDeliveredOrders(Data.results);
         break;
       case 'Cancel':
-        Data = await fetchDataForRFQ('Cancel', 30, 0, userData, search);
+        Data = await fetchDataForRFQ('Cancel', 30, 0, userData, search,types);
         setCancelledOrders(Data.results);
         break;
       default:
@@ -240,6 +246,7 @@ const fetchData = async () => {
   }
 };
 
+console.log("Transit Orders",transitOrders)
 // Call fetchData whenever screenName changes
 useEffect(() => {
   fetchData();
@@ -393,13 +400,13 @@ useEffect(() => {
         style={styles.elementsView} activeOpacity={0.8}>
         <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-            {item.status === 'Cancelled' ? (
+            {item.status === 'Cancel' ? (
               <AntDesign name='closecircleo' size={30} color='red' />
             ) :
-              item.status === 'In Transit' ? (
-                <MaterialCommunityIcons
-                  name="truck-fast-outline"
-                  color='#004600'
+              item.status === 'Pending' ? (
+                <MaterialIcons
+                  name="access-time"
+                  color='#CC5500'
                   size={30}
 
                 />
@@ -413,9 +420,9 @@ useEffect(() => {
                   />
                 )
                   : (
-                    <MaterialIcons name="access-time" size={30} color='#CC5500' />
+                    <AntDesign name="checkcircleo" size={30} color='#004600' />
                   )}
-            <Text style={[{ fontSize: 12, color: 'black', fontFamily: "AvenirNextCyr-Medium", marginTop: 5 }, { color: item.status === 'Cancelled' ? 'red' : (item.status === 'In Transit' ? '#004600' : (item.status === 'Delivered' ? '#004600' : '#CC5500')) }]}>
+            <Text style={[{ fontSize: 12, color: 'black', fontFamily: "AvenirNextCyr-Medium", marginTop: 5 }, { color: item.status === 'Cancel' ? 'red' : (item.status === 'Pending' ? '#CC5500' : (item.status === 'Delivered' ? '#004600' : '#004600')) }]}>
               {item.status}
             </Text>
           </View>
@@ -439,7 +446,7 @@ useEffect(() => {
                 {item?.name} ({item?.supplier_name}-{item?.supplier_id})
               </Text>
 
-              {item.status === "Confirmed" && <TouchableOpacity
+              {/* {item.status === "Confirmed" && <TouchableOpacity
                 style={{ borderColor: 'tomato', borderWidth: 1, borderRadius: 20, paddingHorizontal: '4%', paddingVertical: '1%' }}
                 onPress={() => {
                   changeStatus(item.id);
@@ -454,7 +461,7 @@ useEffect(() => {
                 >
                   Cancel
                 </Text>
-              </TouchableOpacity>}
+              </TouchableOpacity>} */}
             </View>
 
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5 }}>
@@ -636,6 +643,16 @@ useEffect(() => {
         screenOptions={{ tabBarIndicatorStyle: { backgroundColor: Colors.primary } }}>
 
 
+<Tab.Screen
+          name="Shipped"
+          listeners={{
+            tabPress: () => {setScreenName('In Transit');fetchData()}
+             }}
+          options={{ title: 'Pending', tabBarLabelStyle: { fontFamily: "AvenirNextCyr-Bold", textTransform: 'capitalize' } }}
+        >
+          {(props) => <Shipped {...props} fetchData={fetchData} transitOrders={filteredTransitOrders} renderItem={renderItem} loading={ordersLoading} />}
+        </Tab.Screen>
+
         <Tab.Screen
           name="Pending"
           listeners={{
@@ -648,18 +665,10 @@ useEffect(() => {
 
 
 
-        <Tab.Screen
-          name="Shipped"
-          listeners={{
-            tabPress: () => {setScreenName('In Transit');fetchData()}
-             }}
-          options={{ title: 'In Transit', tabBarLabelStyle: { fontFamily: "AvenirNextCyr-Bold", textTransform: 'capitalize' } }}
-        >
-          {(props) => <Shipped {...props} fetchData={fetchData} transitOrders={filteredTransitOrders} renderItem={renderItem} loading={ordersLoading} />}
-        </Tab.Screen>
+       
 
 
-
+{/* 
         <Tab.Screen
           name="Delivered"
           listeners={{
@@ -668,7 +677,7 @@ useEffect(() => {
           options={{ title: 'Delivered', tabBarLabelStyle: { fontFamily: "AvenirNextCyr-Bold", textTransform: 'capitalize' } }}
         >
           {(props) => <Delivered {...props} fetchData={fetchData} deliveredOrders={filteredDeliveredOrders} renderItem={renderItem} loading={ordersLoading} />}
-        </Tab.Screen>
+        </Tab.Screen> */}
 
 
 

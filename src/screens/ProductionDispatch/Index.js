@@ -27,7 +27,7 @@ import { Dropdown } from "react-native-element-dropdown";
 import moment from "moment";
 import Toast from 'react-native-simple-toast';
 import { LoadingView } from "../../components/LoadingView";
-import { RadioButton, TextInput as TextInput1 } from "react-native-paper";
+import { RadioButton, TextInput as TextInput1,Button } from "react-native-paper";
 import { ms, hs, vs } from "../../utils/Metrics";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import { Checkbox } from "react-native-paper";
@@ -97,6 +97,8 @@ const ProductionDispatch = ({ navigation, route }) => {
   const [hasError, setHasError] = useState(false);
   const [totalLoadedWeight, setTotalLoadedWeight] = useState(0);
   const [recentlyDeletedDimension, setRecentlyDeletedDimension] = useState(null);
+const [offset, setOffset] = useState(0);
+    const [loadingMore, setLoadingMore] = useState(false);
 
   const downloadImage = async (imageUri) => {
     // Define the path where you want to save the file
@@ -132,7 +134,7 @@ const ProductionDispatch = ({ navigation, route }) => {
   useFocusEffect(
     React.useCallback(() => {
       fetchRouteData()
-    }, [userData, selectedOption])
+    }, [userData, selectedOption,offset,search])
   );
 
   useEffect(() => {
@@ -248,9 +250,11 @@ const ProductionDispatch = ({ navigation, route }) => {
     }
   };
 
+ 
 
   const fetchRouteData = async () => {
-    setLoadCustomData(true);
+    offset > 0 ? setLoadingMore(true) : setLoadCustomData(true);
+
 
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
@@ -258,27 +262,46 @@ const ProductionDispatch = ({ navigation, route }) => {
 
     let url = screen === "edit"
       ? `https://gsidev.ordosolution.com/api/production_item_list/?route_id=${routeId}`
-      : `https://gsidev.ordosolution.com/api/production_item_list/?transportation_type=${selectedOption}`;
+      : `https://gsidev.ordosolution.com/api/production_item_list/?transportation_type=${selectedOption}&limit=10&offset=${offset}&search=${search}`;
 
     try {
       const response = await fetch(url, {
-        method: '',
+        method: "GET",
         headers: myHeaders,
+        redirect: "follow",
       });
 
       const result = await response.json();
 
+      if (offset === 0) {
+        setFilteredOrders(result.sales_orders);
+    } else {
+      setFilteredOrders((prevData) => [...prevData, ...result.sales_orders]);
+    }
+
+    if (offset === 0) {
       setAllOrders(result.sales_orders);
-      setFilteredOrders(result.sales_orders);
+  } else {
+    setAllOrders((prevData) => [...prevData, ...result.sales_orders]);
+  }
+
+      // setAllOrders(result.sales_orders);
+      // setFilteredOrders(result.sales_orders);
       setLoadCustomData(false);
+      setLoadingMore(false);
 
     } catch (error) {
 
       console.error(error);
       setLoadCustomData(false);
+      setLoadingMore(false);
+
     }
   };
 
+  const handleLoadMore = async ()  =>{
+    setOffset((prevOffset)=>prevOffset+10)
+ }
 
   const getRouteDetails = async () => {
     setLoading(true);
@@ -334,8 +357,12 @@ const ProductionDispatch = ({ navigation, route }) => {
 
 
   const toggleModal = () => {
-    fetchRouteData();
-    setModalVisible(true);
+      setOffset(0);             // reset pagination
+      setSearch('');            // reset search
+      setAllOrders([]);         // clear previous data
+      fetchRouteData();         // fetch fresh data
+      setModalVisible(true);    // open modal
+    
   };
 
   const onDismiss1 = React.useCallback(() => {
@@ -1469,6 +1496,7 @@ const ProductionDispatch = ({ navigation, route }) => {
   };
   
 
+  console.log("search",search)
 
   const renderProductSection = () => {
     return (
@@ -1743,9 +1771,11 @@ const ProductionDispatch = ({ navigation, route }) => {
                       </View>
                       <Text style={{ alignSelf: 'center', fontSize: 20, color: 'black', fontFamily: 'AvenirNextCyr-Medium', marginVertical: 10 }}>Select Orders</Text>
                       <TouchableOpacity style={{ marginRight: 10 }} onPress={() => {
-                        setModalVisible(false);
-                        setSearch('');
-                        setFilteredOrders(allOrders);
+                     setSearch('');
+                     setOffset(0);
+                     setModalVisible(false);
+                     setFilteredOrders([]); // reset to prevent stale/duplicated display
+                     setAllOrders([]);
                       }}>
                         <AntDesign name='close' size={20} color={`black`} />
                       </TouchableOpacity>
@@ -1760,7 +1790,10 @@ const ProductionDispatch = ({ navigation, route }) => {
                           value={search}
                           placeholder="Search order"
                           placeholderTextColor="gray"
-                          onChangeText={searchProduct}
+                          onChangeText={(val) => {
+                            setOffset(0); // ✅ Reset offset
+                            setSearch(val); // ✅ Update search term
+                          }}
                           keyboardShouldPersistTaps='always'
                         />
                         <TouchableOpacity style={styles.searchButton}>
@@ -1768,26 +1801,33 @@ const ProductionDispatch = ({ navigation, route }) => {
                         </TouchableOpacity>
                       </View>
                       <TouchableOpacity
-                        style={{
-                          height: 45,
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          backgroundColor: '#fff',
-                          borderRadius: 8,
-                          paddingHorizontal: 16,
-                          elevation: 5,
-                          flex: 0.2,
-                          marginLeft: 10,
-                          ...globalStyles.border
-                        }}
-                        onPress={() => {
-                          setSearch('');
-                          setFilteredOrders(allOrders);
-                          Keyboard.dismiss();
-                        }}
-                      >
-                        <Text style={{ color: '#6B1594', fontFamily: 'AvenirNextCyr-Medium', fontSize: 14 }}>Clear</Text>
-                      </TouchableOpacity>
+  style={{
+    height: 45,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    elevation: 5,
+    flex: 0.2,
+    marginLeft: 10,
+    ...globalStyles.border
+  }}
+  onPress={() => {
+    if (search != '') {
+      setSearch('');
+      setOffset(0);
+      setFilteredOrders([]);
+    }else{
+      console.log("hy")
+    }
+  }}
+>
+  <Text style={{ color: '#6B1594', fontFamily: 'AvenirNextCyr-Medium', fontSize: 14 }}>
+    Clear
+  </Text>
+</TouchableOpacity>
+
                     </View>
 
                     {
@@ -1920,6 +1960,11 @@ const ProductionDispatch = ({ navigation, route }) => {
                               <Text style={styles.noProductsText}>No Orders Available</Text>
                             </View>
                           )}
+                                ListFooterComponent={
+                                  groupedOrders?.length < 1
+                                      ? null
+                                      : loadingMore ? <ActivityIndicator style={{ paddingVertical: 5 }} /> : <Button onPress={handleLoadMore}>Load More</Button>
+                              }
                         />
                     }
                   </View>

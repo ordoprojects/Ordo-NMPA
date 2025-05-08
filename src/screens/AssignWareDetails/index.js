@@ -409,7 +409,10 @@ console.log("kshbAS",products)
                                         {item.product_image ? (
                                             <Image
 
-                                                source={{ uri: item.product_image[0] }}
+                                                source={{uri: item.product_image.startsWith("http")
+          ? item.product_image
+          : `https://gsidev.ordosolution.com${item.product_image}`,
+      }}
                                                 style={{ ...styles.imageView }}
                                             // onLoadStart={()=>{setLoading3(true)}}
                                             // onLoad={()=>{setLoading3(false)}}

@@ -1184,7 +1184,7 @@ PODS:
   - hermes-engine (0.74.3):
     - hermes-engine/Pre-built (= 0.74.3)
   - hermes-engine/Pre-built (0.74.3)
-  - leveldb-library (1.22.5)
+  - leveldb-library (1.22.6)
   - MapboxCommon (23.10.1)
   - MapboxCoreMaps (10.18.0):
     - MapboxCommon (~> 23.10)
@@ -3023,7 +3023,7 @@ SPEC CHECKSUMS:
   "gRPC-C++": e725ef63c4475d7cdb7e2cf16eb0fde84bd9ee51
   gRPC-Core: eee4be35df218649fe66d721a05a7f27a28f069b
   hermes-engine: 1f547997900dd0752dc0cc0ae6dd16173c49e09b
-  leveldb-library: e8eadf9008a61f9e1dde3978c086d2b6d9b9dc28
+  leveldb-library: cc8b8f8e013647a295ad3f8cd2ddf49a6f19be19
   MapboxCommon: 0ff437e44988da6856e280d00ffb266564ed0487
   MapboxCoreMaps: f1bd9405f5b9d3e343f2fe4138775299699a22fb
   MapboxMaps: e76b14f52c54c40b76ddecd04f40448e6f35a864
@@ -3129,6 +3129,6 @@ SPEC CHECKSUMS:
   Turf: aa2ede4298009639d10db36aba1a7ebaad072a5e
   Yoga: bd92064a0d558be92786820514d74fc4dddd1233
 
-PODFILE CHECKSUM: 3b6339942d7ef1be557de86fbf702fe9f111e08c
+PODFILE CHECKSUM: 6a61baf524a75a899aa620327a6d8c1c53b5ae21
 
 COCOAPODS: 1.16.2

@@ -152,7 +152,10 @@ const ReturnDetails = ({ navigation, route }) => {
                         <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
                             <Image
 
-                                source={{ uri: item.product_image }}
+                                source={{uri: item.product_image.startsWith("http")
+          ? item.product_image
+          : `https://gsidev.ordosolution.com${item.product_image}`,
+      }}
                                 style={{
                                     ...styles.imageView,
                                 }}

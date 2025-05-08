@@ -14,7 +14,7 @@ import AntDesign from "react-native-vector-icons/AntDesign"
 const VehicleDetails = ({ navigation, route }) => {
 
   const { vehicle } = route.params;
-
+console.log("vehicle details", vehicle)
 
   return (
     <View style={{ flex: 1, backgroundColor: "white" }}>
@@ -69,8 +69,8 @@ const VehicleDetails = ({ navigation, route }) => {
 
         <Image
           style={{
-            height: "29%",
-            width: "80%",
+            height: "25%",
+            width: "70%",
             resizeMode: "contain",
             alignSelf: "center",
           }}
@@ -86,6 +86,8 @@ const VehicleDetails = ({ navigation, route }) => {
             }}
           />
         </View>
+                <ScrollView style={{}}>
+        
 
         <View style={styles.rowView}>
           <View style={styles.column}>
@@ -98,7 +100,7 @@ const VehicleDetails = ({ navigation, route }) => {
           </View>
 
           <View style={styles.column}>
-            <Text style={styles.label}>Model</Text>
+            <Text style={styles.label}>Vehicle Model</Text>
             <Text style={styles.value}>{vehicle.model}</Text>
           </View>
         </View>
@@ -129,8 +131,8 @@ const VehicleDetails = ({ navigation, route }) => {
             <Text style={styles.value}>{vehicle.emission_end_date}</Text>
           </View>
           <View style={styles.column}>
-            <Text style={styles.label}>Make</Text>
-            <Text style={styles.value}>{vehicle.make}</Text>
+            <Text style={styles.label}>Company</Text>
+            <Text style={styles.value}>{vehicle.company_name}</Text>
           </View>
         </View>
 
@@ -148,6 +150,51 @@ const VehicleDetails = ({ navigation, route }) => {
             <Text style={styles.value}>{vehicle.status}</Text>
           </View>
         </View>
+
+        <View style={styles.rowView}>
+          <View style={styles.column}>
+            <Text style={styles.label}>FC start</Text>
+            <Text style={styles.value}>{vehicle.fc_start_date}</Text>
+          </View>
+          <View style={styles.column}>
+            <Text style={styles.label}>FC end</Text>
+            <Text style={styles.value}>{vehicle.fc_end_date}</Text>
+          </View>
+          <View style={styles.column}>
+            <Text style={styles.label}>Engine No.</Text>
+            <Text style={styles.value}>{vehicle.engine_number}</Text>
+          </View>
+        </View>
+
+        <View style={styles.rowView}>
+          <View style={styles.column}>
+            <Text style={styles.label}>Permit start</Text>
+            <Text style={styles.value}>{vehicle.permit_start_date}</Text>
+          </View>
+          <View style={styles.column}>
+            <Text style={styles.label}>Permit end</Text>
+            <Text style={styles.value}>{vehicle.permit_end_date}</Text>
+          </View>
+          <View style={styles.column}>
+            <Text style={styles.label}>Truck Type</Text>
+            <Text style={styles.value}>{vehicle.truck_type}</Text>
+          </View>
+        </View>
+
+        <View style={styles.rowView}>
+          <View style={styles.column}>
+            <Text style={styles.label}>Tax start</Text>
+            <Text style={styles.value}>{vehicle.tax_start_date}</Text>
+          </View>
+          <View style={styles.column}>
+            <Text style={styles.label}>Tax end</Text>
+            <Text style={styles.value}>{vehicle.tax_end_date}</Text>
+          </View>
+          <View style={styles.column}>
+            <Text style={styles.label}>Vehicle Capacity</Text>
+            <Text style={styles.value}>{vehicle.vehicle_capacity}</Text>
+          </View>
+        </View>
         
         <View style={styles.rowView}>
           <View style={styles.column}>
@@ -158,7 +205,27 @@ const VehicleDetails = ({ navigation, route }) => {
             <Text style={styles.label}>Current odometer</Text>
             <Text style={styles.value}>{vehicle.current_odometer}</Text>
           </View>
+          <View style={styles.column}>
+            <Text style={styles.label}>GVW</Text>
+            <Text style={styles.value}>{vehicle.gvw}</Text>
+          </View>
+          
         </View>
+
+        <View style={styles.rowView}>
+          <View style={styles.column}>
+            <Text style={styles.label}>Driver </Text>
+            <Text style={styles.value}>{vehicle.driver?.name}</Text>
+          </View>
+          <View style={styles.column}>
+            <Text style={styles.label}>Vehicle Make</Text>
+            <Text style={styles.value}>{vehicle?.make}</Text>
+          </View>
+        
+          
+        </View>
+
+        </ScrollView>
       </LinearGradient>
 
    

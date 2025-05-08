@@ -15,6 +15,11 @@ import AntDesign from 'react-native-vector-icons/AntDesign'
 import Octicons from "react-native-vector-icons/Octicons";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import Entypo from "react-native-vector-icons/Entypo";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+
+
 import Colors from '../constants/Colors';
 
 const CustomFloating = ({ navigation, reports, screen }) => {
@@ -167,7 +172,7 @@ const CustomFloating = ({ navigation, reports, screen }) => {
         };
     });
 
-    // console.log("screen",screen);
+    console.log("screen",screen);
 
     return (
         <View style={styles.container}>
@@ -214,6 +219,7 @@ const CustomFloating = ({ navigation, reports, screen }) => {
                     </View>
                     <Animated.Text style={[styles.text, opacityText]}>Credit Notes</Animated.Text>
                 </AnimatedTouchable>
+                
 
             }
 
@@ -259,6 +265,72 @@ const CustomFloating = ({ navigation, reports, screen }) => {
                     Create
                 </Animated.Text>
             </AnimatedTouchable>}
+
+            {screen == "Fleet" &&
+            <>
+                <AnimatedTouchable
+                    onPress={() => {
+                        navigation.navigate('MaintenanceHistory');
+                    }}
+                    style={[
+                        styles.contentContainer,
+                        firstIcon, firstWidthStyle
+                    ]}
+                >
+                    <View style={styles.iconContainer}>
+                        <Ionicons name="settings-sharp" size={24} color="white" />
+                    </View>
+                    <Animated.Text style={[styles.text, opacityText]}>Maintenance</Animated.Text>
+                </AnimatedTouchable>
+                   <AnimatedTouchable
+                   onPress={() => {
+                       navigation.navigate('FuelHistory');
+                   }}
+                   style={[
+                       styles.contentContainer,
+                       secondIcon, secondWidthStyle
+                   ]}
+               >
+                   <View style={styles.iconContainer}>
+                       <MaterialCommunityIcons name="fuel" size={24} color="white" />
+                   </View>
+                   <Animated.Text style={[styles.text, opacityText]}>Fuel Usage</Animated.Text>
+               </AnimatedTouchable>
+
+
+               <AnimatedTouchable
+                   onPress={() => {
+                       navigation.navigate('TripHistory');
+                   }}
+                   style={[
+                       styles.contentContainer,
+                       thirdIcon, thirdWidthStyle
+                   ]}
+               >
+                   <View style={styles.iconContainer}>
+                       <FontAwesome5 name="route" size={24} color="white" />
+                   </View>
+                   <Animated.Text style={[styles.text, opacityText]}>Trip</Animated.Text>
+               </AnimatedTouchable>
+
+
+               <AnimatedTouchable
+                   onPress={() => {
+                       navigation.navigate('TireHistory');
+                   }}
+                   style={[
+                       styles.contentContainer,
+                       fourthIcon, fourthWidthStyle
+                   ]}
+               >
+                   <View style={styles.iconContainer}>
+                       <MaterialCommunityIcons name="tire" size={24} color="white" />
+                   </View>
+                   <Animated.Text style={[styles.text, opacityText]}>Tyre</Animated.Text>
+               </AnimatedTouchable>
+               </>
+            }
+
             
 
             <Pressable

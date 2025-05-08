@@ -117,7 +117,7 @@ const MIListDetail = ({ navigation, route }) => {
         redirect: 'follow'
       };
 
-      fetch("https://gsi.ordosolution.com/set_marketintelligence.php", requestOptions)
+      fetch("https://gsidev.ordosolution.com/set_marketintelligence.php", requestOptions)
         .then(response => response.json())
         .then(result => {
           console.log('seconday movemnt save res', result);

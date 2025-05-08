@@ -654,7 +654,7 @@ const removeProductFromCart = (item) => {
     //         redirect: 'follow'
     //     };
 
-    //     fetch("https://gsi.ordosolution.com/set_return_order.php", requestOptions)
+    //     fetch("https://gsidev.ordosolution.com/set_return_order.php", requestOptions)
     //         .then(response => response.json())
     //         .then(result => {
     //             console.log("returen order res", result);
@@ -967,7 +967,10 @@ const renderProductItem = useCallback(({ item }) => {
                                                 <View style={{ backgroundColor: 'white', elevation: 5, ...globalStyles.border, borderRadius: 5, padding: '1%' }}>
                                                     {item.product_image && item.product_image.length > 0 ? (
                                                         <Image
-                                                            source={{ uri: item.product_image[0] }} // Use the first image
+                                                            source={{uri: item.product_image.startsWith("http")
+          ? item.product_image
+          : `https://gsidev.ordosolution.com${item.product_image}`,
+      }} // Use the first image
                                                             style={styles.imageView}
                                                         />
                                                     ) : (
@@ -2040,7 +2043,10 @@ console.log("selectedItem",selectedItem);
                   <Pressable>
                     {item.product_image && item.product_image.length > 0 ? (
                       <Image
-                        source={{ uri: item.product_image[0] }} 
+                        source={{uri: item.product_image.startsWith("http")
+          ? item.product_image
+          : `https://gsidev.ordosolution.com${item.product_image}`,
+      }} 
                         style={styles.imageView}
                       />
                     ) : (
