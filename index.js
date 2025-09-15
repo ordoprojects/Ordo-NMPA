@@ -6,6 +6,10 @@ import {AppRegistry} from 'react-native';
 import App from './App';
 import {name as appName} from './app.json';
 import messaging from '@react-native-firebase/messaging';
+import 'react-native-get-random-values';
+// import 'react-native-quick-crypto';
+import { Buffer } from 'buffer';
+global.Buffer = Buffer;
 console.log('+++++++++THIS IS FROM INDEX.JS+++++++++++++++++');
 // Register background handler
 messaging().setBackgroundMessageHandler(async remoteMessage => {

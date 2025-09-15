@@ -15,6 +15,8 @@ rescue => e
   raise e
 end
 
+# Set minimum iOS version to 13.0 for React Native 0.74.3
+# min_ios_version_supported = '13.0'
 platform :ios, min_ios_version_supported
 prepare_react_native_project!
 
@@ -25,26 +27,26 @@ if linkage != nil
   $RNFirebaseAsStaticFramework = true
 end
 
-target 'ORDO' do
+target 'NMPA' do
   config = use_native_modules!
 
   use_react_native!(
     :path => config[:reactNativePath],
-    :app_path => "#{Pod::Config.instance.installation_root}/.."
+    :app_path => "#{Pod::Config.instance.installation_root}/..",
+    :hermes_enabled => false # Set to true if using Hermes
   )
 
+  # Firebase pods
   pod 'Firebase/Core', :modular_headers => true
   pod 'Firebase/Firestore', :modular_headers => true
   pod 'GoogleUtilities', :modular_headers => true
   pod 'FirebaseCoreInternal', :modular_headers => true
+  
+  # Other dependencies
   pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
   pod 'RNPermissions', :path => '../node_modules/react-native-permissions'
 
-  target 'ORDOTests' do
-    inherit! :complete
-  end
-
-  require_relative '../node_modules/react-native-permissions/scripts/setup'
+  # Permissions setup
   setup_permissions([
     'Bluetooth',
     'Calendars',
@@ -67,24 +69,37 @@ target 'ORDO' do
     'StoreKit',
   ])
 
+  target 'NMPATests' do
+    inherit! :complete
+    # Pods for testing
+  end
+
   post_install do |installer|
     react_native_post_install(
       installer,
       config[:reactNativePath],
-      :mac_catalyst_enabled => false,
+      :mac_catalyst_enabled => false
     )
-
+    
     # ✅ Set global settings to prevent build issues
     installer.pods_project.build_configurations.each do |config|
-      config.build_settings["CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES"] = true
+      config.build_settings["CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES"] = 'YES'
+      config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = '13.0'
     end
 
     installer.pods_project.targets.each do |target|
       target.build_configurations.each do |config|
-        config.build_settings['ENABLE_BITCODE'] = 'NO' # ✅ Disable Bitcode
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+        config.build_settings['ENABLE_BITCODE'] = 'NO'
+        
+        # Fix React imports
+        if target.name == 'React-Core'
+          config.build_settings['HEADER_SEARCH_PATHS'] ||= '$(inherited)'
+          config.build_settings['HEADER_SEARCH_PATHS'] << ' "${PODS_CONFIGURATION_BUILD_DIR}/React-Core/React-Core.framework/Headers"'
+        end
       end
 
-      # Fix BoringSSL warnings
+      # Fix BoringSSL warnings (if using gRPC/Firestore)
       if target.name == 'BoringSSL-GRPC'
         target.source_build_phase.files.each do |file|
           if file.settings && file.settings['COMPILER_FLAGS']
@@ -96,21 +111,22 @@ target 'ORDO' do
       end
     end
 
-    # ✅ Optional Section: Bitcode Strip from all embedded frameworks
-    require 'find'
-    bitcode_strip_path = `xcrun --find bitcode_strip`.strip
-
-    def strip_bitcode_from_embedded_frameworks(bitcode_strip_path)
-      frameworks_path = File.join(__dir__, '..', 'ios', 'Pods')
-      Find.find(frameworks_path) do |path|
-        next unless path.end_with?('.framework')
-        binary = File.join(path, File.basename(path, '.framework'))
-        next unless File.exist?(binary)
-        puts "🧹 Stripping bitcode from #{binary}"
-        system("#{bitcode_strip_path} #{binary} -r -o #{binary}")
+    # ✅ Optional: Bitcode Strip from all embedded frameworks
+    begin
+      bitcode_strip_path = `xcrun --find bitcode_strip`.strip
+      def strip_bitcode_from_embedded_frameworks(bitcode_strip_path)
+        frameworks_path = File.join(__dir__, '..', 'ios', 'Pods')
+        Find.find(frameworks_path) do |path|
+          next unless path.end_with?('.framework')
+          binary = File.join(path, File.basename(path, '.framework'))
+          next unless File.exist?(binary)
+          puts "🧹 Stripping bitcode from #{binary}"
+          system("#{bitcode_strip_path} #{binary} -r -o #{binary}")
+        end
       end
+      strip_bitcode_from_embedded_frameworks(bitcode_strip_path)
+    rescue => e
+      puts "⚠️  Bitcode stripping skipped: #{e.message}"
     end
-
-    strip_bitcode_from_embedded_frameworks(bitcode_strip_path)
   end
 end

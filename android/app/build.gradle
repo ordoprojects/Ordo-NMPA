@@ -3,6 +3,7 @@ apply plugin: 'com.google.gms.google-services'
 apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
 apply from: file("../../node_modules/react-native-vector-icons/fonts.gradle")
+apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"  
 
 react {
     // All settings can remain commented unless you need to customize.
@@ -16,13 +17,13 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.ordo.gsi"
+    namespace "com.ordosolution.nmpa"
     defaultConfig {
-        applicationId "com.ordo.gsi"
+        applicationId "com.ordosolution.nmpa"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 33
-        versionName "1.10.21"
+        versionCode 1
+        versionName "1.0.0"
     }
 
     signingConfigs {
@@ -48,7 +49,7 @@ android {
 
 dependencies {
     implementation("com.facebook.react:react-android")
-
+implementation project(':react-native-pdf')
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")
     } else {

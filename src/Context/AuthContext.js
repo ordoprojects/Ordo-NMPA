@@ -98,7 +98,7 @@ export const AuthProvider = ({ children, navigation }) => {
                     setTotalTransactions(finance_management.total_general_transactions);
 
                 } catch (error) {
-                    console.error('Error fetching data:', error);
+                    console.error('Error fetching data inAuth:', error);
                 }
             }
         };
@@ -231,8 +231,10 @@ export const AuthProvider = ({ children, navigation }) => {
                 redirect: 'follow'
             };
 
+            console.log("user id",userData.id)
+
             try {
-                const response = await fetch("https://gsidev.ordosolution.com/api/logout/", requestOptions);
+                const response = await fetch("https://ntcdev.ordosolution.com/api/logout/", requestOptions);
                 const result = await response.json();
                 if (result.msg === "Successfully logged out.") {
                     console.log("Successfully logged out.");
@@ -268,6 +270,7 @@ export const AuthProvider = ({ children, navigation }) => {
         setIsLoading(true);
         setToken(null);
         setUserData(null);
+        
         try {
             clearToken();
         } catch (error) {

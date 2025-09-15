@@ -13,5 +13,5 @@
         android:layout_gravity="center"
         android:background="#fff"
         android:scaleType="centerCrop"
-        android:src="@mipmap/spalshscreen"></ImageView>
+        ></ImageView>
 </FrameLayout>

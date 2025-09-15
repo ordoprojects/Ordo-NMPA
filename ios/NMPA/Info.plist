@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundleDisplayName</key>
+	<string>NMPA</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>$(PRODUCT_NAME)</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>FirebaseAppDelegateProxyEnabled</key>
+	<false/>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<false/>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+	</dict>
+	<key>NSAppleMusicUsageDescription</key>
+	<string>NMPA needs access to your Apple Music</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>NMPA needs Bluetooth access to connect to devices for scanning barcodes of products.</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>NMPA needs Bluetooth access to connect to peripheral devices for scanning barcodes of products.</string>
+	<key>NSCalendarsUsageDescription</key>
+	<string>NMPA needs access to your Calendars</string>
+	<key>NSCameraUsageDescription</key>
+	<string>NMPA needs access to your camera to take photos for your profile, product images, and customers.</string>
+	<key>NSContactsUsageDescription</key>
+	<string>NMPA needs access to your Contacts</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>NMPA needs access to your location to provide location-based services and enhance your experience.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>NMPA needs access to your location to provide location-based services and enhance your experience.</string>
+	<key>NSLocationUsageDescription</key>
+	<string>NMPA needs access to your location to provide location-based services and enhance your experience.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>NMPA needs access to your location to provide location-based services and enhance your experience.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>NMPA needs access to your Microphone</string>
+	<key>NSMotionUsageDescription</key>
+	<string>NMPA motion use.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>NMPA needs access to your photo library to save scanned barcode images and other product photos.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>NMPA needs access to your photo library to upload photos and save scanned barcode images.</string>
+	<key>NSRemindersUsageDescription</key>
+	<string>NMPA needs access to your Reminders Usage</string>
+	<key>NSSiriUsageDescription</key>
+	<string>NMPA needs access to your Siri</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>NMPA needs access to speech recognition to provide voice commands for easier navigation.</string>
+	<key>NSVideoSubscriberAccountUsageDescription</key>
+	<string>NMPA needs access to your Video Subscriber</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>AvenirNextLTPro-Bold.otf</string>
+		<string>AvenirNextLTPro-It.otf</string>
+		<string>AvenirNextLTPro-Regular.otf</string>
+		<string>Manrope-SemiBold.otf</string>
+		<string>Avenir Next LT Pro Bold.ttf</string>
+		<string>Avenir-Regular.ttf</string>
+		<string>AvenirNextCyr-Bold.ttf</string>
+		<string>AvenirNextCyr-Demi.ttf</string>
+		<string>AvenirNextCyr-Medium.ttf</string>
+		<string>AvenirNextCyr-Thin.ttf</string>
+		<string>Lato-Bold.ttf</string>
+		<string>Lato-Regular.ttf</string>
+		<string>Poppins-Black.ttf</string>
+		<string>Poppins-Bold.ttf</string>
+		<string>Poppins-ExtraBold.ttf</string>
+		<string>Poppins-Italic.ttf</string>
+		<string>Poppins-Light.ttf</string>
+		<string>Poppins-Regular.ttf</string>
+		<string>Poppins-SemiBold.ttf</string>
+		<string>Poppins-Thin.ttf</string>
+		<string>ProximaNova-Black.ttf</string>
+		<string>ProximaNova-Bold.ttf</string>
+		<string>ProximaNova-Extrabld.ttf</string>
+		<string>ProximaNova-Light.ttf</string>
+		<string>ProximaNova-Regular.ttf</string>
+		<string>ProximaNova-Semibold.ttf</string>
+		<string>ProximaNovaT-Thin.ttf</string>
+		<string>Satoshi-Medium.ttf</string>
+		<string>AntDesign.ttf</string>
+		<string>Entypo.ttf</string>
+		<string>EvilIcons.ttf</string>
+		<string>Feather.ttf</string>
+		<string>FontAwesome.ttf</string>
+		<string>FontAwesome5_Brands.ttf</string>
+		<string>FontAwesome5_Regular.ttf</string>
+		<string>FontAwesome5_Solid.ttf</string>
+		<string>FontAwesome6_Brands.ttf</string>
+		<string>FontAwesome6_Regular.ttf</string>
+		<string>FontAwesome6_Solid.ttf</string>
+		<string>Foundation.ttf</string>
+		<string>Ionicons.ttf</string>
+		<string>MaterialIcons.ttf</string>
+		<string>MaterialDesignIcons.ttf</string>
+		<string>MaterialCommunityIcons.ttf</string>
+		<string>SimpleLineIcons.ttf</string>
+		<string>Octicons.ttf</string>
+		<string>Zocial.ttf</string>
+		<string>Fontisto.ttf</string>
+	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>remote-notification</string>
+	</array>
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>arm64</string>
+	</array>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
+</dict>
+</plist>

@@ -22,16 +22,20 @@ import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 import Colors from '../constants/Colors';
 
-const CustomFloating = ({ navigation, reports, screen }) => {
+const CustomFloating = ({ navigation, reports, screen,extra }) => {
     const AnimatedTouchable = Animated.createAnimatedComponent(Pressable);
     const firstValue = useSharedValue(30);
     const secondValue = useSharedValue(30);
     const thirdValue = useSharedValue(30);
     const fourthValue = useSharedValue(30);
+    const fifthValue = useSharedValue(30);
+
     const firstWidth = useSharedValue(60);
     const secondWidth = useSharedValue(60);
     const thirdWidth = useSharedValue(60);
     const fourthWidth = useSharedValue(60);
+    const fifthWidth = useSharedValue(60);
+
     const isOpen = useSharedValue(false);
     const opacity = useSharedValue(0);
     const progress = useDerivedValue(() =>
@@ -64,17 +68,26 @@ const CustomFloating = ({ navigation, reports, screen }) => {
                     fourthValue.value = withDelay(100, withTiming(30, config));
                 }
             });
+               fifthWidth.value = withTiming(60, { duration: 100 }, finish => {
+                if (finish) {
+                    fifthValue.value = withDelay(100, withTiming(30, config));
+                }
+            });
             opacity.value = withTiming(0, { duration: 100 });
         } else {
             firstValue.value = withDelay(200, withSpring(130));
             secondValue.value = withDelay(100, withSpring(210));
             thirdValue.value = withDelay(100, withSpring(290));
-            fourthValue.value = withSpring(370);
+            fourthValue.value = withDelay(100, withSpring(370));
+            fifthValue.value = withSpring(450);
+
 
             firstWidth.value = withDelay(1200, withSpring(200));
             secondWidth.value = withDelay(1100, withSpring(200));
             thirdWidth.value = withDelay(1100, withSpring(200));
-            fourthWidth.value = withDelay(1000, withSpring(200));
+            fourthWidth.value = withDelay(1100, withSpring(200));
+            fifthWidth.value = withDelay(1000, withSpring(200));
+
 
             opacity.value = withDelay(1200, withSpring(1));
         }
@@ -108,6 +121,13 @@ const CustomFloating = ({ navigation, reports, screen }) => {
             width: fourthWidth.value,
         };
     });
+
+      const fifthWidthStyle = useAnimatedStyle(() => {
+        return {
+            width: fifthWidth.value,
+        };
+    });
+
 
 
     const firstIcon = useAnimatedStyle(() => {
@@ -166,6 +186,22 @@ const CustomFloating = ({ navigation, reports, screen }) => {
         };
     });
 
+
+
+       const fifthIcon = useAnimatedStyle(() => {
+        const scale = interpolate(
+            fourthValue.value,
+            [30, 290],
+            [0, 1],
+            Extrapolation.CLAMP,
+        );
+
+        return {
+            bottom: fifthValue.value,
+            transform: [{ scale: scale }],
+        };
+    });
+
     const plusIcon = useAnimatedStyle(() => {
         return {
             transform: [{ rotate: `${progress.value * 45}deg` }],
@@ -207,7 +243,7 @@ const CustomFloating = ({ navigation, reports, screen }) => {
                 </Animated.Text>
             </AnimatedTouchable>} */}
 
-            {screen == "Finance" &&
+            {screen == "Finance" && 
                 <AnimatedTouchable
                     onPress={() => {
                         navigation.navigate('CreditNotes', { from: 'Ordermanagement' });
@@ -327,6 +363,22 @@ const CustomFloating = ({ navigation, reports, screen }) => {
                        <MaterialCommunityIcons name="tire" size={24} color="white" />
                    </View>
                    <Animated.Text style={[styles.text, opacityText]}>Tyre</Animated.Text>
+               </AnimatedTouchable>
+
+
+                  <AnimatedTouchable
+                   onPress={() => {
+                       navigation.navigate('TireInspectionHistory');
+                   }}
+                   style={[
+                       styles.contentContainer,
+                       fifthIcon, fifthWidthStyle
+                   ]}
+               >
+                   <View style={styles.iconContainer}>
+                       <MaterialCommunityIcons name="note-edit" size={24} color="white" />
+                   </View>
+                   <Animated.Text style={[styles.text, opacityText]}>Tyre Inspection</Animated.Text>
                </AnimatedTouchable>
                </>
             }
