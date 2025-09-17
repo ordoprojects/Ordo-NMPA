@@ -356,5 +356,4 @@ forgotPasswordText: {
   fontWeight: '500',
 },
 });
-
 export default LoginScreen;
