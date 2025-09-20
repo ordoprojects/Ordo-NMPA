@@ -1,5 +1,5 @@
 {
-  "welcome": "Welcome to NMPA Medical\nServices",
+ "welcome": "Welcome to NMPA Chikitsa\nMitra",
   "username": "Username",
   "password": "Password",
   "enter_username": "Enter your username",
@@ -60,8 +60,10 @@
   "appointment": "Appointment",
   "requested": "Requested",
   "duration": "Duration",
-  "month": "month",
-  "day": "day",
+ "month": "month",
+"month_plural": "months",
+"day": "day",
+"day_plural": "days",
   "recent_referral_requests": "Recent Referral Requests",
   "status": "Status",
   "view": "View",
@@ -79,6 +81,8 @@
   "dispatched": "Dispatched",
   "completed": "Completed",
   "no_referrals_found": "No referrals found",
+  "no_referral_requests": "No referral requests",
+  "no_medicine_requests": "No medicine requests",
   "no_medicine_requests_found": "No medicine requests found",
   "prescription": "Prescription #{{id}}",
   "confirm_cancellation": "Confirm Cancellation",
@@ -151,7 +155,12 @@
     "hospitals_load_error": "Failed to load hospitals",
     "submission_failed": "Failed to submit referral",
     "submission_success": "Appointment created successfully",
-    "submission_error": "Failed to submit appointment"
+    "submission_error": "Failed to submit appointment",
+    "edit_title": "Edit Referral",
+    "update_hospital": "Update Hospital",
+    "hospital_change_success": "Hospital changed successfully",
+    "hospital_change_error": "Failed to change hospital",
+    "hospital_change_failed": "Hospital change failed"
   },
   "medicine_request_list": {
     "title": "Medicine Request List",
@@ -244,7 +253,13 @@
     "doctor": "Doctor",
     "not_available": "N/A",
     "status_approved": "Approved",
+    "status_rejected": "Rejected",
     "status_pending": "Pending",
+    "status_assigned_to_doctor": "Assigned to Doctor",
+    "status_unknown": "Unknown Status",
+    "status_completed": "Completed",
+     "status_dispatched": "Dispatched",
+     "load_more": "Load More",
     "reject": "Reject",
     "approve": "Approve",
     "approval_notes_title": "Approval Notes",
@@ -312,7 +327,7 @@
     "doctor_approval": "Doctor Approval",
     "approved": "Approved",
     "pending": "Pending",
-    "approval_notes": "Approval Notes",
+    "approval_notes": "Notes",
     "delivery_info": "Delivery Information",
     "approved_at": "Approved At",
     "tracking_id": "Tracking ID",
@@ -343,7 +358,8 @@
     "appointment_info": "Appointment Information",
        "pdf_password_protected": "This PDF is password protected",
     "enter_pdf_password": "Enter PDF password",
-    "view_pdf_fullscreen": "View PDF in Fullscreen"
+    "view_pdf_fullscreen": "View PDF in Fullscreen",
+    "rejected": "Rejected"
   },
   "common": {
     "submit": "Submit"
@@ -372,5 +388,26 @@
     "eligibility": "MEDICAL ELIGIBILITY",
     "eligibility_yes": "Yes",
     "blood_group": "BLOOD GROUP"
-  }
+  },
+  "recent_medicine_requests": "Recent Medicine Requests",
+  "prescription_upload_success": "Prescription and Medicine Uploaded Successfully",
+  "created_at": "Created At",
+  "load_more": "Load More",
+  "medical_card_qr_title": "Medical Card QR Code",
+  "qr_generating": "Generating QR Code...",
+  "qr_scan_subtitle": "Scan to view medical details",
+  "close": "Close",
+  "cancelled": "Cancelled",  
+  "validation_phone_number": "Please enter your phone number",
+  "invalid_phone_number": "Please enter a valid phone number",
+  "send_otp": "Send OTP",
+  "otp_send_failed": "Failed to send OTP",
+  "dont_have_abha": "Don't have an ABHA card with you?",
+  "click_here_to_register": "Click here to register",
+  "otp_sent_to": "OTP sent to",
+  "otp_resent": "OTP resent successfully",
+  "otp_verification_failed": "OTP verification failed",
+  "auto_fill_otp": "Auto-fill OTP"
+  
+
 }

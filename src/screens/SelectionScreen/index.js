@@ -8,7 +8,7 @@ import { useRole } from '../../Context/RoleContext';
 import { BASE_URL } from '../../navigation/Config';
 import Toast from 'react-native-simple-toast';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useTranslation } from 'react-i18next'; // Add this import
+import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const SelectionScreen = ({ route }) => {
@@ -17,7 +17,7 @@ const SelectionScreen = ({ route }) => {
   const { setRole } = useRole();
   const { tempToken, email } = route.params;
   const navigation = useNavigation();
-  const { t } = useTranslation(); // Add this hook
+  const { t } = useTranslation();
 
   console.log("tempToken", tempToken);
 
@@ -38,6 +38,14 @@ const SelectionScreen = ({ route }) => {
       const data = await response.json();
       
       if (!response.ok) {
+        // Check for specific token-related errors
+        if (response.status === 401 || 
+            data.message?.toLowerCase().includes('token') ||
+            data.message?.toLowerCase().includes('expired') ||
+            data.message?.toLowerCase().includes('invalid')) {
+          
+          throw new Error(t('invalid_or_expired_token'));
+        }
         throw new Error(data.message || t('role_selection_failed'));
       }
 
@@ -91,7 +99,17 @@ const SelectionScreen = ({ route }) => {
 
     } catch (error) {
       console.error('Role selection error:', error);
+      
+      // Show error message
       Toast.show(error.message || t('failed_to_select_role'), Toast.LONG);
+      
+      // Navigate back if it's a token-related error
+      if (error.message === t('invalid_or_expired_token')) {
+        // Wait a moment for the toast to be visible, then navigate back
+        setTimeout(() => {
+          navigation.goBack();
+        }, 1500);
+      }
     } finally {
       setIsLoading(false);
     }

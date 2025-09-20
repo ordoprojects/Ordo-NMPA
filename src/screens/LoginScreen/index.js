@@ -1,10 +1,9 @@
-import React, { useState ,useCallback} from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet, SafeAreaView,
-    KeyboardAvoidingView, Platform, ScrollView, Keyboard, TouchableWithoutFeedback,
-    Dimensions ,BackHandler
+    KeyboardAvoidingView, Platform, ScrollView, Dimensions, BackHandler,
+    Linking, ActivityIndicator
  } from 'react-native';
 import { TextInput } from 'react-native-paper';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Colors from '../../constants/Colors';
 import { BASE_URL } from '../../navigation/Config';
 import Toast from 'react-native-simple-toast';
@@ -15,10 +14,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 
 const LoginScreen = ({ navigation }) => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
   const { setRole } = useRole();
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
@@ -27,120 +24,78 @@ const LoginScreen = ({ navigation }) => {
   const isSmallDevice = height < 700; // You can adjust this threshold
 
   useFocusEffect(
-  useCallback(() => {
-    const onBackPress = () => {
-      console.log("dfghjnk")
-      // Disable going back from login
-      return true; // true = prevent default, false = allow
-    };
+    useCallback(() => {
+      const onBackPress = () => {
+        // Disable going back from login
+        return true; // true = prevent default, false = allow
+      };
 
-    BackHandler.addEventListener('hardwareBackPress', onBackPress);
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
 
-    return () =>
-      BackHandler.removeEventListener('hardwareBackPress', onBackPress);
-  }, [])
-);
+      return () =>
+        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    }, [])
+  );
 
+  const handleSendOTP = async () => {
+    // Validate phone number
+    if (!phoneNumber.trim()) {
+      Toast.show(t('validation_phone_number'), Toast.LONG);
+      return;
+    }
 
-  const toggleShowPassword = () => {
-    setShowPassword(!showPassword);
-  };
-
-  const handleLogin = async () => {
-    // Case sensitive authentication
-    if (!username.trim() || !password.trim()) {
-      Toast.show(t('validation_username_password'), Toast.LONG);
+    // Basic phone number validation (you can enhance this based on your requirements)
+    const phoneRegex = /^[0-9]{10}$/; // Assuming 10-digit phone numbers
+    if (!phoneRegex.test(phoneNumber.trim())) {
+      Toast.show(t('invalid_phone_number'), Toast.LONG);
       return;
     }
 
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${BASE_URL}/auth/login/`, {
+      // Call your API to send OTP
+      const response = await fetch(`${BASE_URL}/auth/otp/send`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          email: username.trim(), // Case sensitive
-          password: password.trim() // Case sensitive
+          phone_number: phoneNumber.trim(),
         }),
       });
 
       const data = await response.json();
       
       if (!response.ok) {
-        throw new Error(data.message || t('login_failed'));
+        throw new Error(data.message || t('otp_send_failed'));
       }
 
-      // Handle multiple roles case first
-      if (data.roles && Array.isArray(data.roles)) {
-        console.log('Multiple roles detected - navigating to role selection');
-        navigation.navigate('Selection', {
-          tempToken: data.temp_token,
-          availableRoles: data.roles,
-          email: username.trim()
-        });
-        return;
-      }
-
-      // Rest of your login function remains the same...
-      if (!data.token) {
-        throw new Error('No authentication token received');
-      }
-
-      const decodeJWT = (token) => {
-        try {
-          const [, payload] = token.split('.');
-          if (!payload) throw new Error('Invalid token format');
-          const decoded = Buffer.from(payload, 'base64').toString('utf-8');
-          return JSON.parse(decoded);
-        } catch (error) {
-          console.error('JWT decode error:', error);
-          throw new Error('Failed to process user data');
-        }
-      };
-
-      const userData = decodeJWT(data.token);
-      if (!userData?.user_id) {
-        throw new Error('Invalid user data in token');
-      }
-
-      const authData = {
-        token: data.token,
-        user: {
-          id: userData.user_id,
-          firstName: userData.first_name,
-          lastName: userData.last_name,
-          role: userData.role,
-          email: username.trim()
-        },
-        expiresAt: userData.exp * 1000
-      };
-
-      await AsyncStorage.setItem('authData', JSON.stringify(authData));
-      setRole(userData.role);
-      Toast.show(t('login_success'), Toast.LONG);
-      
-      navigation.reset({
-        index: 0,
-        routes: [{ name: userData.role === 'doctor' ? 'DoctorHome' : 'Main' }]
+      // Navigate to OTP verification screen
+      navigation.navigate('OTP', {
+        phoneNumber: phoneNumber.trim(),
       });
 
     } catch (error) {
-      console.error('Login error:', error);
-      Toast.show(error.message || t('login_failed'), Toast.LONG);
+      console.error('OTP send error:', error);
+      Toast.show(error.message || t('otp_send_failed'), Toast.LONG);
     } finally {
       setIsLoading(false);
     }
   };
 
+  const handleABHARegistration = () => {
+    // Open the ABHA registration website
+    Linking.openURL('https://abha.abdm.gov.in/abha/v3/register')
+      .catch(err => console.error('Failed to open URL:', err));
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Language Selector */}
-    <View style={[styles.languageSelectorContainer, { top: insets.top + 10 }]}>
-      <LanguageSelector />
-    </View>
+      <View style={[styles.languageSelectorContainer, { top: insets.top + 10 }]}>
+        <LanguageSelector />
+      </View>
       
       <KeyboardAvoidingView
         style={styles.keyboardAvoidingView}
@@ -164,13 +119,14 @@ const LoginScreen = ({ navigation }) => {
             {/* Translated title */}
             <Text style={[styles.title, isSmallDevice && styles.titleSmall]}>{t('welcome')}</Text>
 
-            {/* Username field with floating label */}
+            {/* Phone number field with floating label */}
             <View style={[styles.inputContainer, isSmallDevice && styles.inputContainerSmall]}>
               <TextInput
-                label={t('username')}
-                value={username}
-                onChangeText={setUsername}
+                label={t('phone_number')}
+                value={phoneNumber}
+                onChangeText={setPhoneNumber}
                 mode="outlined"
+                keyboardType="phone-pad"
                 autoCapitalize="none"
                 style={styles.input}
                 theme={{
@@ -180,60 +136,32 @@ const LoginScreen = ({ navigation }) => {
                     text: '#111518',
                   },
                 }}
+                disabled={isLoading}
               />
             </View>
 
-            {/* Password field with floating label */}
-            <View style={[styles.inputContainer, isSmallDevice && styles.inputContainerSmall]}>
-              <TextInput
-                label={t('password')}
-                value={password}
-                onChangeText={setPassword}
-                mode="outlined"
-                secureTextEntry={!showPassword}
-                autoCapitalize="none"
-                style={styles.input}
-                right={
-                  <TextInput.Icon 
-                    icon={showPassword ? "eye-off" : "eye"} 
-                    onPress={toggleShowPassword}
-                    color="#607a8a"
-                  />
-                }
-                theme={{
-                  colors: {
-                    primary: Colors.darkBlue,
-                    placeholder: '#607a8a',
-                    text: '#111518',
-                  },
-                }}
-              />
-            </View>
+            {isLoading ? (
+              <ActivityIndicator size="large" color={Colors.darkBlue} style={styles.loader} />
+            ) : (
+              <TouchableOpacity 
+                style={[styles.button, isLoading && styles.buttonDisabled, 
+                      isSmallDevice && styles.buttonSmall]} 
+                onPress={handleSendOTP}
+                disabled={isLoading}
+              >
+                {/* Translated button text */}
+                <Text style={styles.buttonText}>
+                  {isLoading ? t('sending_otp') : t('send_otp')}
+                </Text>
+              </TouchableOpacity>
+            )}
 
-            <TouchableOpacity 
-              style={[styles.button, isLoading && styles.buttonDisabled, 
-                     isSmallDevice && styles.buttonSmall]} 
-              onPress={handleLogin}
-              disabled={isLoading}
-            >
-              {/* Translated button text */}
-              <Text style={styles.buttonText}>
-                {isLoading ? t('logging_in') : t('login')}
-              </Text>
-            </TouchableOpacity>
-{/* <TouchableOpacity 
-  style={styles.forgotPasswordContainer}
-  onPress={() => navigation.navigate('Verify')}
->
-  <Text style={styles.forgotPasswordText}>
-    {t('forgot_password')}
-  </Text>
-</TouchableOpacity> */}
+       
           </View>
 
           {/* Ship Image at the bottom - responsive sizing */}
           <View style={[styles.shipImageContainer, 
-                       {height: height * 0.35}]}>
+                      {height: height * 0.35}]}>
             <Image
               source={require('../../assets/images/LoginImage.png')}
               style={[styles.shipImage, {width: width}]}
@@ -261,7 +189,6 @@ const styles = StyleSheet.create({
   logoContainer: {
     alignItems: 'center',
     marginTop: '20%',
-
   },
   logoContainerSmall: {
     marginTop: 20,
@@ -271,7 +198,6 @@ const styles = StyleSheet.create({
     width: 150,
     height: 100,
     resizeMode: 'contain',
-
   },
   nmpaLogoSmall: {
     width: 120,
@@ -346,14 +272,22 @@ const styles = StyleSheet.create({
     right: 10,
     zIndex: 1000,
   },
-  forgotPasswordContainer: {
-  marginTop: 15,
-  alignSelf: 'center',
-},
-forgotPasswordText: {
-  color: Colors.darkBlue,
-  fontSize: 16,
-  fontWeight: '500',
-},
+  abhaContainer: {
+    marginTop: 20,
+    paddingHorizontal: 10,
+  },
+  abhaText: {
+    textAlign: 'center',
+    color: '#607a8a',
+    fontSize: 14,
+  },
+  abhaLink: {
+    color: Colors.darkBlue,
+    fontWeight: '500',
+  },
+  loader: {
+    marginTop: 20,
+  },
 });
+
 export default LoginScreen;

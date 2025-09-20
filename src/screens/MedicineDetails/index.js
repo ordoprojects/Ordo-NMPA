@@ -70,6 +70,42 @@ const MedicineDetails = ({ navigation, route }) => {
     );
   }
 
+  const statusMap = {
+  approved: {
+    text: t('medicine_review.status_approved'),
+    color: 'green',
+  },
+  rejected: {
+    text: t('medicine_review.status_rejected'),
+    color: 'red',
+  },
+  pending: {
+    text: t('medicine_review.status_pending'),
+    color: '#FFA500', // orange
+  },
+  assigned_to_doctor: {
+    text: t('medicine_review.status_assigned_to_doctor'),
+    color: '#FFA500', // orange
+  },
+  completed: {
+    text: t('medicine_review.status_completed'),
+    color: 'green',
+  },
+  dispatched: {
+    text: t('medicine_review.status_dispatched'),
+    color: 'blue',
+  }
+};
+
+
+const currentStatus = statusMap[medicine.status] || {
+  text: t('medicine_review.status_unknown'),
+  color: 'gray',
+};
+
+const status = currentStatus.text;
+const statusColor = currentStatus.color;
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
@@ -176,10 +212,8 @@ const MedicineDetails = ({ navigation, route }) => {
             </Text>
           </View>
           <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>{t('medicine_details.doctor_approval')}</Text>
-            <Text style={styles.detailValue}>
-              {medicine.doctor_approval ? t('medicine_details.approved') : t('medicine_details.pending')}
-            </Text>
+               <Text style={styles.detailLabel}>{t('status')}</Text>
+                   <Text style={[styles.detailValue, { color: statusColor }]}>{status}</Text>
           </View>
           {medicine.approval_notes && (
             <View style={styles.detailRow}>
@@ -190,7 +224,7 @@ const MedicineDetails = ({ navigation, route }) => {
         </View>
 
         {/* Delivery Information */}
-        {medicine.status === 'completed' && (
+        {medicine.delivery_tracking_id && (
           <>
             <Text style={styles.sectionTitle}>{t('medicine_details.delivery_info')}</Text>
             <View style={styles.detailsContainer}>

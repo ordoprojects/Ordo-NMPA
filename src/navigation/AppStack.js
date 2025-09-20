@@ -32,6 +32,8 @@ const AppStack = () => {
 
 
 
+
+
     </Stack.Navigator>
   );
 };

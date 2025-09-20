@@ -1,5 +1,5 @@
 {
-  "welcome": "NMPA मेडिकल सेवाओं में\nआपका स्वागत है",
+  "welcome": "NMPA चिकित्सा\nमित्र में आपका स्वागत है",
   "username": "उपयोगकर्ता नाम",
   "password": "पासवर्ड",
   "enter_username": "अपना उपयोगकर्ता नाम दर्ज करें",
@@ -28,11 +28,11 @@
   "role_selection_failed": "भूमिका चयन विफल",
   "failed_to_select_role": "भूमिका चुनने में विफल",
   "profile": "प्रोफाइल",
-  "profile_details": "प्रोफाइल विवरण",
+  "profile_details": "प्जानकारी",
   "email_address": "ईमेल पता",
   "phone_number": "फोन नंबर",
   "date_of_birth": "जन्म तिथि",
-  "delivery_address": "डिलीवरी पता",
+  "delivery_address": "डिलिवरी का पता",
   "save_changes": "परिवर्तन सहेजें",
   "cancel": "रद्द करें",
   "profile_updated": "प्रोफाइल सफलतापूर्वक अपडेट हो गई",
@@ -61,9 +61,13 @@
   "appointment": "अपॉइंटमेंट",
   "requested": "अनुरोध किया गया",
   "duration": "अवधि",
-  "month": "महीना",
-  "day": "दिन",
+ "month": "महीना",
+"month_plural": "महीने",
+"day": "दिन",
+"day_plural": "दिन" ,
   "recent_referral_requests": "हालिया रेफरल अनुरोध",
+  "no_referral_requests": "कोई रेफ़रल अनुरोध नहीं",
+  "no_medicine_requests": "कोई दवा अनुरोध नहीं",
   "status": "स्थिति",
   "view": "देखें",
   "logout_confirmation": "क्या आप लॉगआउट करना चाहते हैं?",
@@ -152,7 +156,12 @@
     "hospitals_load_error": "अस्पताल लोड करने में विफल",
     "submission_failed": "रेफरल सबमिट करने में विफल",
     "submission_success": "अपॉइंटमेंट सफलतापूर्वक बनाया गया",
-    "submission_error": "अपॉइंटमेंट सबमिट करने में विफल"
+    "submission_error": "अपॉइंटमेंट सबमिट करने में विफल",
+    "edit_title": "रेफरल संपादित करें",
+    "update_hospital": "अस्पताल अपडेट करें",
+    "hospital_change_success": "अस्पताल सफलतापूर्वक बदला गया",
+    "hospital_change_error": "अस्पताल बदलने में विफल",
+    "hospital_change_failed": "अस्पताल परिवर्तन विफल रहा"
   },
   "medicine_request_list": {
     "title": "दवा अनुरोध सूची",
@@ -244,8 +253,14 @@
     "months_duration": "{{count}} महीना",
     "doctor": "डॉक्टर",
     "not_available": "उपलब्ध नहीं",
-    "status_approved": "स्वीकृत",
+     "status_approved": "स्वीकृत",
+    "status_rejected": "अस्वीकृत",
     "status_pending": "लंबित",
+    "status_assigned_to_doctor": "डॉक्टर को सौंपा गया",
+    "status_unknown": "अज्ञात स्थिति",
+    "status_completed": "पूर्ण",
+    "status_dispatched": "भेजा गया",
+    "load_more": "और लोड करें",
     "reject": "अस्वीकार करें",
     "approve": "स्वीकृत करें",
     "approval_notes_title": "स्वीकृति नोट्स",
@@ -298,8 +313,8 @@
   "title": "दवा विवरण",
   "status_assigned_to_doctor": "डॉक्टर को सौंपा गया",
   "status_completed": "पूर्ण",
-  "months_duration": "{{count}} महीना(महिने)",
-  "days_duration": "{{count}} दिन(दिनों)",
+  "months_duration": "{{count}} महीना",
+  "days_duration": "{{count}} दिन",
   "not_available": "उपलब्ध नहीं",
   "prescription": "पर्ची",
   "medicine_details": "दवा विवरण",
@@ -313,7 +328,7 @@
   "doctor_approval": "डॉक्टर की मंज़ूरी",
   "approved": "मंज़ूर",
   "pending": "लंबित",
-  "approval_notes": "मंज़ूरी नोट्स",
+  "approval_notes": "नोट्स",
   "delivery_info": "डिलीवरी जानकारी",
   "approved_at": "मंज़ूर की तिथि",
   "tracking_id": "ट्रैकिंग आईडी",
@@ -344,7 +359,8 @@
     "appointment_info": "अपॉइंटमेंट जानकारी",
      "pdf_password_protected": "यह PDF पासवर्ड संरक्षित है",
     "enter_pdf_password": "PDF पासवर्ड दर्ज करें",
-    "view_pdf_fullscreen": "पूर्ण स्क्रीन में PDF देखें"
+    "view_pdf_fullscreen": "पूर्ण स्क्रीन में PDF देखें",
+    "rejected": "अस्वीकृत"
   },
   "common": {
     "submit": "जमा करें"
@@ -370,6 +386,28 @@
     "eligibility": "मेडिकल पात्रता",
     "eligibility_yes": "हाँ",
     "blood_group": "ब्लड ग्रुप"
-  }
+  },
+  "recent_medicine_requests": "हाल की दवा अनुरोध",
+   "prescription_upload_success": "प्रिस्क्रिप्शन और दवा सफलतापूर्वक अपलोड की गई",
+    "created_at": "बनाई गई तिथि",
+"load_more": "और लोड करें",
+  "medical_card_qr_title": "मेडिकल कार्ड QR कोड",
+  "qr_generating": "QR कोड तैयार किया जा रहा है...",
+  "qr_scan_subtitle": "मेडिकल विवरण देखने के लिए स्कैन करें",
+  "cancelled": "रद्द किया गया",
+    "validation_phone_number": "कृपया अपना फ़ोन नंबर दर्ज करें",
+  "invalid_phone_number": "कृपया एक मान्य फ़ोन नंबर दर्ज करें",
+  "send_otp": "OTP भेजें",
+  "dont_have_abha": "क्या आपके पास ABHA कार्ड नहीं है?",
+  "click_here_to_register": "रजिस्टर करने के लिए यहाँ क्लिक करें",
+  "otp_sent_to": "OTP भेजा गया",
+ 
+  "otp_send_failed": "OTP भेजने में विफल",
+  "otp_resent": "OTP सफलतापूर्वक पुनः भेजा गया",
+  "otp_verification_failed": "OTP सत्यापन विफल",
+
+  "auto_fill_otp": "OTP स्वतः भरें",
+  "close": "बंद करें"
+
 
 }

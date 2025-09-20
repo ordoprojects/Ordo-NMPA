@@ -24,7 +24,7 @@ import { getToken } from '../../navigation/auth';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-const ReferralRequestScreen = () => {
+const ReferralRequestScreen = ({route}) => {
   const { t } = useTranslation();
   const navigation = useNavigation();
   const [selectedPatient, setSelectedPatient] = useState(null);
@@ -39,46 +39,46 @@ const ReferralRequestScreen = () => {
   const [inOutPatient, setInOutPatient] = useState('in');
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [appointmentDate, setAppointmentDate] = useState(new Date());
+  const { referral } = route.params || {};
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [originalHospitalId, setOriginalHospitalId] = useState(null);
 
-  // Install react-native-paper-dates first: npm install react-native-paper-dates
+  console.log("referral data",JSON.stringify(referral,null,2))
 
- useEffect(() => {
-    const fetchPatients = async () => {
-      try {
-        setLoading(true);
-        const token = await getToken();
-        if (!token) {
-          Alert.alert(t('error'), t('referral_request.auth_error'));
-          return;
-        }
-
-        const response = await fetch(`${BASE_URL}/dependents/`, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
+  // Check if we're in edit mode (received referral data)
+  useEffect(() => {
+    if (referral) {
+      setIsEditMode(true);
+      setPatientType(referral.relation);
+      
+      // Set original hospital ID
+      if (referral.hospital_id) {
+        setOriginalHospitalId(referral.hospital_id);
+        setSelectedHospital({
+          id: referral.hospital_id,
+          name: referral.hospital_name
         });
-
-        if (!response.ok) {
-          throw new Error(t('referral_request.patients_fetch_error'));
-        }
-
-        const data = await response.json();
-        
-        if (data.dependents && Array.isArray(data.dependents)) {
-          setPatients(data.dependents);
-        } else {
-          throw new Error(t('referral_request.invalid_patients_data'));
-        }
-      } catch (error) {
-        console.error('Error fetching patients:', error);
-        Alert.alert(t('error'), t('referral_request.patients_load_error'));
-      } finally {
-        setLoading(false);
       }
-    };
+      
+      // Set appointment date from referral data
+      if (referral.appointment_time) {
+        setAppointmentDate(new Date(referral.appointment_time));
+      }
+      
+      // Set treatment description from referral data
+      if (referral.consultation_reason) {
+        setTreatmentDescription(referral.consultation_reason);
+      }
+      
+      // Set in/out patient status
+      if (referral.inoutpatient) {
+        setInOutPatient(referral.inoutpatient);
+      }
+    }
+  }, [referral]);
 
+  // Fetch hospitals for selection
+  useEffect(() => {
     const fetchHospitals = async () => {
       try {
         setLoading(true);
@@ -105,6 +105,14 @@ const ReferralRequestScreen = () => {
         
         if (data.hospitals && Array.isArray(data.hospitals)) {
           setHospitals(data.hospitals);
+          
+          // If in edit mode and we have a hospital ID, find and set the hospital
+          if (isEditMode && referral?.hospital_id) {
+            const currentHospital = data.hospitals.find(h => h.id === referral.hospital_id);
+            if (currentHospital) {
+              setSelectedHospital(currentHospital);
+            }
+          }
         } else {
           throw new Error(t('referral_request.invalid_hospitals_data'));
         }
@@ -117,8 +125,7 @@ const ReferralRequestScreen = () => {
     };
 
     fetchHospitals();
-    fetchPatients();
-  }, []);
+  }, [isEditMode, referral]);
 
   const onChangeDate = (event, selectedDate) => {
     const currentDate = selectedDate || appointmentDate;
@@ -126,72 +133,137 @@ const ReferralRequestScreen = () => {
     setAppointmentDate(currentDate);
   };
 
-  const handleSubmit = async () => {
-    if (!treatmentDescription) {
-      Toast.show(t('referral_request.no_treatment_error'), Toast.LONG);
-      return;
-    }
-    if (!selectedHospital) {
-      Toast.show(t('referral_request.no_hospital_error'), Toast.LONG);
-      return;
-    }
-    if (patientType === 'family' && !selectedPatient) {
-      Toast.show(t('referral_request.no_patient_error'), Toast.LONG);
-      return;
-    }
-
-    const referralData = {
-      patient_dependent_id: patientType === 'family' ? selectedPatient.id : null,
-      relation: patientType,
-      hospital_id: selectedHospital.id,
-      consultation_reason: treatmentDescription,
-      appointment_time: appointmentDate.toISOString(),
-      inoutpatient: inOutPatient
-    };
-
+  // Function to change hospital
+  const changeHospital = async (newHospitalId) => {
     try {
       const token = await getToken();
-      const response = await fetch(`${BASE_URL}/appointments/create`, {
+      const payload = {
+        appointmentId: referral?.id,
+        newHospitalId: newHospitalId,
+      };
+      console.log("📦 Request payload:", payload);
+
+      const response = await fetch(`${BASE_URL}/appointments/modify-hospital`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(referralData),
+        body: JSON.stringify(payload),
       });
 
+      console.log("response", response);
+      
       if (!response.ok) {
-        throw new Error(t('referral_request.submission_failed'));
+        throw new Error(t('referral_request.hospital_change_failed'));
       }
 
-      const responseData = await response.json();
-      Toast.show(t('referral_request.submission_success'), Toast.LONG);
-      navigation.goBack();
+      Toast.show(t('referral_request.hospital_change_success'), Toast.LONG);
+      // Update the selected hospital and original hospital ID
+      const newHospital = hospitals.find(h => h.id === newHospitalId);
+      if (newHospital) {
+        setSelectedHospital(newHospital);
+        setOriginalHospitalId(newHospitalId); // Update original hospital ID after successful change
+      }
+     navigation.navigate('History');
+
     } catch (error) {
-      console.error('Error submitting referral:', error);
-      Toast.show(t('referral_request.submission_error'), Toast.LONG);
+      console.error('Error changing hospital:', error);
+      Toast.show(t('referral_request.hospital_change_error'), Toast.LONG);
+    }
+  };
+
+  // Check if a different hospital is selected
+  const isDifferentHospitalSelected = () => {
+    return selectedHospital && selectedHospital.id !== originalHospitalId;
+  };
+
+  const handleSubmit = async () => {
+    if (!isEditMode) {
+      // Original submission logic for new referrals
+      if (!treatmentDescription) {
+        Toast.show(t('referral_request.no_treatment_error'), Toast.LONG);
+        return;
+      }
+      if (!selectedHospital) {
+        Toast.show(t('referral_request.no_hospital_error'), Toast.LONG);
+        return;
+      }
+      if (patientType === 'family' && !selectedPatient) {
+        Toast.show(t('referral_request.no_patient_error'), Toast.LONG);
+        return;
+      }
+
+      const referralData = {
+        patient_dependent_id: patientType === 'family' ? selectedPatient.id : null,
+        relation: patientType,
+        hospital_id: selectedHospital.id,
+        consultation_reason: treatmentDescription,
+        appointment_time: appointmentDate.toISOString(),
+        inoutpatient: inOutPatient
+      };
+
+      try {
+        const token = await getToken();
+        const response = await fetch(`${BASE_URL}/appointments/create`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(referralData),
+        });
+
+        if (!response.ok) {
+          throw new Error(t('referral_request.submission_failed'));
+        }
+
+        const responseData = await response.json();
+        Toast.show(t('referral_request.submission_success'), Toast.LONG);
+        navigation.goBack();
+      } catch (error) {
+        console.error('Error submitting referral:', error);
+        Toast.show(t('referral_request.submission_error'), Toast.LONG);
+      }
+    } else {
+      // In edit mode, we only allow changing the hospital
+      if (!selectedHospital) {
+        Toast.show(t('referral_request.no_hospital_error'), Toast.LONG);
+        return;
+      }
+      
+      // Check if a different hospital is selected
+      if (!isDifferentHospitalSelected()) {
+        Toast.show(t('referral_request.same_hospital_error'), Toast.LONG);
+        return;
+      }
+      
+      // Call the API to change hospital
+      await changeHospital(selectedHospital.id);
     }
   };
 
   return (
     <View style={styles.container}>
       {/* Header */}
-    <SafeAreaView edges={['top']} style={styles.header}>
-  <TouchableOpacity onPress={() => navigation.goBack()}>
-    <Icon name="arrow-back" size={24} color="#0e161b" />
-  </TouchableOpacity>
-  <Text style={styles.headerTitle}>{t('referral_request.title')}</Text>
-</SafeAreaView>
-
+      <SafeAreaView edges={['top']} style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Icon name="arrow-back" size={24} color="#0e161b" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>
+          {isEditMode ? t('referral_request.edit_title') : t('referral_request.title')}
+        </Text>
+      </SafeAreaView>
 
       <ScrollView style={styles.scrollView}>
-        {/* Patient Type Toggle */}
+        {/* Patient Type Toggle - Disabled in edit mode */}
         <View style={styles.inputContainer}>
           <Text style={styles.inputLabel}>{t('referral_request.patient_type')}</Text>
-          <View style={styles.toggleContainer}>
+          <View style={[styles.toggleContainer, isEditMode && styles.disabledContainer]}>
             <TouchableOpacity
               style={[styles.toggleButton, patientType === 'self' && styles.toggleButtonActive]}
-              onPress={() => setPatientType('self')}
+              onPress={() => !isEditMode && setPatientType('self')}
+              disabled={isEditMode}
             >
               <Text style={[styles.toggleButtonText, patientType === 'self' && styles.toggleButtonTextActive]}>
                 {t('referral_request.self')}
@@ -199,7 +271,8 @@ const ReferralRequestScreen = () => {
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.toggleButton, patientType === 'family' && styles.toggleButtonActive]}
-              onPress={() => setPatientType('family')}
+              onPress={() => !isEditMode && setPatientType('family')}
+              disabled={isEditMode}
             >
               <Text style={[styles.toggleButtonText, patientType === 'family' && styles.toggleButtonTextActive]}>
                 {t('referral_request.family')}
@@ -208,7 +281,7 @@ const ReferralRequestScreen = () => {
           </View>
         </View>
 
-        {/* Select Patient (only shown for family) */}
+        {/* Select Patient (only shown for family) - Disabled in edit mode */}
         {patientType === 'family' && (
           <View style={styles.inputContainer}>
             <Text style={styles.inputLabel}>{t('referral_request.select_patient')}</Text>
@@ -219,13 +292,14 @@ const ReferralRequestScreen = () => {
               </View>
             ) : (
               <TouchableOpacity 
-                style={styles.selectInput}
-                onPress={() => setShowPatientPicker(true)}
+                style={[styles.selectInput, isEditMode && styles.disabledContainer]}
+                onPress={() => !isEditMode && setShowPatientPicker(true)}
+                disabled={isEditMode}
               >
                 <Text style={selectedPatient ? styles.selectText : styles.placeholderText}>
                   {selectedPatient ? selectedPatient.full_name : t('referral_request.choose_patient')}
                 </Text>
-                <Icon name="keyboard-arrow-down" size={24} color="#4e7a97" />
+                {!isEditMode && <Icon name="keyboard-arrow-down" size={24} color="#4e7a97" />}
               </TouchableOpacity>
             )}
           </View>
@@ -252,14 +326,15 @@ const ReferralRequestScreen = () => {
           )}
         </View>
 
-        {/* In/Out Patient Radio Buttons */}
+        {/* In/Out Patient Radio Buttons - Disabled in edit mode */}
         {selectedHospital && (
           <View style={styles.inputContainer}>
             <Text style={styles.inputLabel}>{t('referral_request.patient_status')}</Text>
-            <View style={styles.radioContainer}>
+            <View style={[styles.radioContainer, isEditMode && styles.disabledContainer]}>
               <TouchableOpacity
                 style={styles.radioButton}
-                onPress={() => setInOutPatient('in')}
+                onPress={() => !isEditMode && setInOutPatient('in')}
+                disabled={isEditMode}
               >
                 <View style={styles.radioCircle}>
                   {inOutPatient === 'in' && <View style={styles.selectedRb} />}
@@ -268,7 +343,8 @@ const ReferralRequestScreen = () => {
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.radioButton}
-                onPress={() => setInOutPatient('out')}
+                onPress={() => !isEditMode && setInOutPatient('out')}
+                disabled={isEditMode}
               >
                 <View style={styles.radioCircle}>
                   {inOutPatient === 'out' && <View style={styles.selectedRb} />}
@@ -279,94 +355,65 @@ const ReferralRequestScreen = () => {
           </View>
         )}
 
-        {/* Treatment Description */}
-        <View style={styles.inputContainer}>
-          <Text style={styles.inputLabel}>{t('referral_request.treatment_description')}</Text>
-          <TextInput
-            style={[styles.input, styles.textArea]}
-            placeholder={t('referral_request.treatment_placeholder')}
-            multiline
-            numberOfLines={4}
-            maxLength={200}
-            value={treatmentDescription}
-            onChangeText={setTreatmentDescription}
-          />
-          <Text style={styles.charLimit}>
-            {t('referral_request.char_limit', { count: 200 - treatmentDescription.length })}
-          </Text>
-        </View>
-
-        {/* Appointment Date */}
-        <View style={styles.inputContainer}>
-          <Text style={styles.inputLabel}>{t('referral_request.appointment_date')}</Text>
-          <TouchableOpacity 
-            style={styles.dateInput}
-            onPress={() => setShowDatePicker(true)}
-          >
-            <Text style={styles.dateText}>
-              {appointmentDate ? moment(appointmentDate).format('DD/MM/YYYY') : 'DD/MM/YYYY'}
-            </Text>
-          </TouchableOpacity>
-          {showDatePicker && (
-            <DateTimePicker
-              value={appointmentDate}
-              mode="date"
-              display="default"
-              onChange={onChangeDate}
-               minimumDate={new Date()}
+        {/* Treatment Description - Hidden in edit mode */}
+        {!isEditMode && (
+          <View style={styles.inputContainer}>
+            <Text style={styles.inputLabel}>{t('referral_request.treatment_description')}</Text>
+            <TextInput
+              style={[styles.input, styles.textArea]}
+              placeholder={t('referral_request.treatment_placeholder')}
+              multiline
+              numberOfLines={4}
+              maxLength={200}
+              value={treatmentDescription}
+              onChangeText={setTreatmentDescription}
             />
-          )}
-        </View>
+            <Text style={styles.charLimit}>
+              {t('referral_request.char_limit', { count: 200 - treatmentDescription.length })}
+            </Text>
+          </View>
+        )}
+
+        {/* Appointment Date - Hidden in edit mode */}
+        {!isEditMode && (
+          <View style={styles.inputContainer}>
+            <Text style={styles.inputLabel}>{t('referral_request.appointment_date')}</Text>
+            <TouchableOpacity 
+              style={styles.dateInput}
+              onPress={() => setShowDatePicker(true)}
+            >
+              <Text style={styles.dateText}>
+                {appointmentDate ? moment(appointmentDate).format('DD/MM/YYYY') : 'DD/MM/YYYY'}
+              </Text>
+            </TouchableOpacity>
+            {showDatePicker && (
+              <DateTimePicker
+                value={appointmentDate}
+                mode="date"
+                display="default"
+                onChange={onChangeDate}
+                minimumDate={new Date()}
+              />
+            )}
+          </View>
+        )}
       </ScrollView>
 
       {/* Submit Button */}
       <View style={styles.submitButtonContainer}>
         <TouchableOpacity 
-          style={styles.submitButton}
+          style={[
+            styles.submitButton, 
+            isEditMode && !isDifferentHospitalSelected() && styles.submitButtonDisabled
+          ]}
           onPress={handleSubmit}
+          disabled={isEditMode && !isDifferentHospitalSelected()}
         >
-          <Text style={styles.submitButtonText}>{t('referral_request.submit_referral')}</Text>
+          <Text style={styles.submitButtonText}>
+            {isEditMode ? t('referral_request.update_hospital') : t('referral_request.submit_referral')}
+          </Text>
         </TouchableOpacity>
       </View>
-
-      {/* Patient Picker Modal */}
-      <Modal
-        visible={showPatientPicker}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() => setShowPatientPicker(false)}
-      >
-        <View style={styles.modalContainer}>
-          <TouchableWithoutFeedback onPress={() => setShowPatientPicker(false)}>
-            <View style={styles.modalOverlay} />
-          </TouchableWithoutFeedback>
-          <View style={styles.pickerContainer}>
-            <View style={styles.pickerHeader}>
-              <Text style={styles.pickerTitle}>{t('referral_request.select_patient')}</Text>
-              <TouchableOpacity 
-                style={styles.closeButton}
-                onPress={() => setShowPatientPicker(false)}
-              >
-                <Icon name="close" size={24} color="#0e161b" />
-              </TouchableOpacity>
-            </View>
-            <ScrollView style={styles.pickerScrollView}>
-              {patients.map(patient => (
-                <TouchableOpacity
-                  key={patient.id}
-                  style={styles.pickerItem}
-                  onPress={() => {
-                    setSelectedPatient(patient);
-                    setShowPatientPicker(false);
-                  }}
-                >
-                  <Text style={styles.pickerItemText}>{patient.full_name}</Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-          </View>
-        </View>
-      </Modal>
 
       {/* Hospital Picker Modal */}
       <Modal
@@ -555,53 +602,56 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  submitButtonDisabled: {
+    backgroundColor: '#cccccc',
+  },
   submitButtonText: {
     color: '#ffffff',
     fontSize: 16,
     fontWeight: 'bold',
   },
-modalContainer: {
-  flex: 1,
-},
-pickerContainer: {
-  position: 'absolute',
-  bottom: 0,
-  left: 0,
-  right: 0,
-  backgroundColor: 'white',
-  borderTopLeftRadius: 16,
-  borderTopRightRadius: 16,
-  maxHeight: '70%', // Limit the height to 70% of screen
-},
-pickerHeader: {
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  padding: 16,
-  borderBottomWidth: 1,
-  borderBottomColor: '#f0f3f4',
-},
-pickerTitle: {
-  fontSize: 18,
-  fontWeight: 'bold',
-  color: '#0e161b',
-},
-closeButton: {
-  padding: 8,
-},
-pickerScrollView: {
-  maxHeight: '100%', // Will be limited by parent's maxHeight
-},
-pickerItem: {
-  paddingVertical: 16,
-  paddingHorizontal: 16,
-  borderBottomWidth: 1,
-  borderBottomColor: '#f0f3f4',
-},
-pickerItemText: {
-  fontSize: 16,
-  color: '#0e161b',
-},
+  modalContainer: {
+    flex: 1,
+  },
+  pickerContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'white',
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    maxHeight: '70%',
+  },
+  pickerHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f3f4',
+  },
+  pickerTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#0e161b',
+  },
+  closeButton: {
+    padding: 8,
+  },
+  pickerScrollView: {
+    maxHeight: '100%',
+  },
+  pickerItem: {
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f3f4',
+  },
+  pickerItemText: {
+    fontSize: 16,
+    color: '#0e161b',
+  },
   loadingContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -615,7 +665,7 @@ pickerItemText: {
     marginLeft: 10,
     color: '#4e7a97',
   },
-    dateInput: {
+  dateInput: {
     width: '100%',
     minHeight: 56,
     borderWidth: 1,
@@ -630,6 +680,9 @@ pickerItemText: {
     fontWeight: 'normal',
     lineHeight: 24,
     color: '#0e161b',
+  },
+  disabledContainer: {
+    opacity: 0.6,
   },
 });
 

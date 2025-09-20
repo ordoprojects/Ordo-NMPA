@@ -148,9 +148,10 @@ useEffect(() => {
       });
 
       const data = await response.json();
+      console.log("dataaaaa",data)
       if (response.ok) {
            const pendingAppointments = data.appointments.filter(
-          appointment => appointment.status === 'pending'
+          appointment => appointment
         );
         setReferrals(pendingAppointments);
       } else {
@@ -162,6 +163,7 @@ useEffect(() => {
       setLoading(false);
     }
   };
+
 
 
 
@@ -191,6 +193,8 @@ useEffect(() => {
   };
 
 console.log("medice",JSON.stringify(medicineRequests,null,2))
+console.log("referral",JSON.stringify(referrals,null,2))
+
 
   useFocusEffect(
     React.useCallback(() => {
@@ -206,6 +210,7 @@ console.log("medice",JSON.stringify(medicineRequests,null,2))
       return () => {};
     }, [role])
   );
+
 
   const handleReferralPress = () => {
     if (role === "user") {
@@ -240,7 +245,7 @@ console.log("medice",JSON.stringify(medicineRequests,null,2))
 
   const handleViewMedicineRequest = (request) => {
     navigation.navigate('AppStack', {
-      screen: 'MedicineRequestDetails',
+      screen: 'MedicineReview',
       params: { request }
     });
   };
@@ -362,18 +367,21 @@ console.log("medice",JSON.stringify(medicineRequests,null,2))
 
 
   // Get recent 3 referrals sorted by appointment_time
-  const getRecentReferrals = () => {
-    return [...referrals]
-      .sort((a, b) => new Date(b.appointment_time) - new Date(a.appointment_time))
-      .slice(0, 3);
-  };
+// Get recent 2 referrals sorted by created_at
+const getRecentReferrals = () => {
+  return [...referrals]
+    .filter(r => r.status !== 'cancelled')   // 🚫 remove cancelled
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+    .slice(0, 2);
+};
 
   // Get recent 3 medicine requests sorted by requested_at
-  const getRecentMedicineRequests = () => {
-    return [...medicineRequests]
-      .sort((a, b) => new Date(b.requested_at) - new Date(a.requested_at))
-      .slice(0, 3);
-  };
+// Get recent 2 medicine requests sorted by requested_at
+const getRecentMedicineRequests = () => {
+  return [...medicineRequests]
+    .sort((a, b) => new Date(b.requested_at) - new Date(a.requested_at))
+    .slice(0, 2);
+};
 
   // Format date for display
   const formatDate = (dateString) => {
@@ -626,92 +634,161 @@ console.log("medice",JSON.stringify(medicineRequests,null,2))
           </TouchableOpacity>
         </View>
 
-        {role === "user" && (
-        <>
-          <Text style={styles.sectionTitle}>{t('active_requests')}</Text>
+   {role === "user" && (
+  <>
+    <Text style={styles.sectionTitle}>{t('active_requests')}</Text>
 
-          {/* Show recent referrals */}
-          {getRecentReferrals().map((referral, index) => (
-            <View key={`referral-${referral.id}`} style={styles.requestCard}>
-              <View style={styles.requestContent}>
-                <Text style={styles.requestType}>{t('referral')}</Text>
-                <Text style={[
-                  styles.requestStatus,
-                  referral.status === 'approved' && styles.approvedStatus,
-                  referral.status === 'rejected' && styles.rejectedStatus
-                ]}>
-                  {translateStatus(referral.status)}
-                </Text>
-                <Text style={styles.requestDetail}>
-                  {t('appointment')}: {formatDate(referral.appointment_time)} at {formatTime(referral.appointment_time)}
-                </Text>
-              </View>
-              <ImageBackground
-                source={{ uri: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBBnhmf0zUAiq6Ow-bwhB2iYbgkFdaskkiB_-uCJ1hcAXNLkCY_STqidee2Z85sJPNWP1lx_hIIVuud3ciHgtiAomgpGzHMuA-Crh83ZCwhTWGd-s5WeS-aAoDdRVMSIh-5F60wCQLIhA7SL9zQdQa5iDeE1KAnuB5PFm2W-NlrswYUHZI4PvzZVLjmLxMtpDq2k0z6edqQrQsic5ImzZRqXYfHLXZt2mj_341kTewMb77aj9wVZxI85S9zNCdik8a_1dmx4Kfw_4o' }}
-                style={styles.requestImage}
-                imageStyle={styles.requestImageStyle}
-              />
-            </View>
-          ))}
+    {/* Show recent referrals (max 2) */}
+    {getRecentReferrals().length > 0 ? (
+      getRecentReferrals().map((referral) => (
+        <View key={`referral-${referral.id}`} style={styles.requestCard}>
+          <View style={styles.requestContent}>
+            <Text style={styles.requestType}>{t('referral')}</Text>
+            <Text style={[
+              styles.requestStatus,
+              referral.status === 'approved' && styles.approvedStatus,
+              referral.status === 'rejected' && styles.rejectedStatus,
+              referral.status === 'assigned' && styles.assignedStatus
+            ]}>
+              {translateStatus(referral.status)}
+            </Text>
+            <Text style={styles.requestDetail}>
+              {t('appointment')}: {formatDate(referral.appointment_time)} at {formatTime(referral.appointment_time)}
+            </Text>
+            <Text style={styles.requestDetail}>
+              {t('created_at')}: {formatDate(referral.created_at)}
+            </Text>
+          </View>
+          <ImageBackground
+            source={{ uri: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBBnhmf0zUAiq6Ow-bwhB2iYbgkFdaskkiB_-uCJ1hcAXNLkCY_STqidee2Z85sJPNWP1lx_hIIVuud3ciHgtiAomgpGzHMuA-Crh83ZCwhTWGd-s5WeS-aAoDdRVMSIh-5F60wCQLIhA7SL9zQdQa5iDeE1KAnuB5PFm2W-NlrswYUHZI4PvzZVLjmLxMtpDq2k0z6edqQrQsic5ImzZRqXYfHLXZt2mj_341kTewMb77aj9wVZxI85S9zNCdik8a_1dmx4Kfw_4o' }}
+            style={styles.requestImage}
+            imageStyle={styles.requestImageStyle}
+          />
+        </View>
+      ))
+    ) : (
+      <Text style={styles.noRequestsText}>{t('no_referral_requests')}</Text>
+    )}
 
-          {/* Show recent medicine requests */}
-          {getRecentMedicineRequests().map((request, index) => (
-            <View key={`medicine-${request.id}`} style={styles.requestCard}>
-              <View style={styles.requestContent}>
-                <Text style={styles.requestType}>{t('medicine')}</Text>
-                <Text style={[
-                  styles.requestStatus,
-                  request.status === 'approved' && styles.approvedStatus,
-                  request.status === 'rejected' && styles.rejectedStatus
-                ]}>
-                  {translateStatus(request.status)}
-                </Text>
-                <Text style={styles.requestDetail}>
-                  {t('requested')}: {formatDate(request.requested_at)}
-                </Text>
-                {request.medicine_duration && (
-                  <Text style={styles.requestDetail}>
-                    {t('duration')}: {request.medicine_duration.months ?
-                      `${request.medicine_duration.months} ${t('month')}(s)` :
-                      `${request.medicine_duration.days} ${t('day')}(s)`}
-                  </Text>
-                )}
-              </View>
-              <ImageBackground
-                source={{ uri: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDtAs5x3xejc5W-Ce2QOFfKPx6mDUiPt_LR_UoNtHXCXjIELQZlvv1gva57m8ZufJRbxVwi7M0bFpHz3QOLcj-dMqDFdUO2_yCJrL7i5AKOPkag1MOAxjpx_CycT1EzbOiN0iH_ZDGVEr3RlGj_zG6K6czDU0K8r1s9TQ9WmoiZd8vEzx2MWAltursxY_IUoeE5bWzLGmz_GW1qkof1a58c9r7aL7EmXgdglSXjmIYxpIe8y5NkvsVt8guutcVBI2SbZDnUlOQ95NE' }}
-                style={styles.requestImage}
-                imageStyle={styles.requestImageStyle}
-              />
-            </View>
-          ))}
-        </>
-      )}
+    {/* Show recent medicine requests (max 2) */}
+    {getRecentMedicineRequests().length > 0 ? (
+      getRecentMedicineRequests().map((request) => (
+        <View key={`medicine-${request.id}`} style={styles.requestCard}>
+          <View style={styles.requestContent}>
+            <Text style={styles.requestType}>{t('medicine')}</Text>
+            <Text style={[
+              styles.requestStatus,
+              request.status === 'approved' && styles.approvedStatus,
+              request.status === 'rejected' && styles.rejectedStatus,
+              request.status === 'assigned_to_doctor' && styles.assignedStatus
+            ]}>
+              {translateStatus(request.status)}
+            </Text>
+            <Text style={styles.requestDetail}>
+              {t('requested')}: {formatDate(request.requested_at)}
+            </Text>
+            {request.medicine_duration && (
+              <Text style={styles.requestDetail}>
+                {t('duration')}: {request.medicine_duration.months ?
+                  `${request.medicine_duration.months} ${t('month')}(s)` :
+                  `${request.medicine_duration.days} ${t('day')}(s)`}
+              </Text>
+            )}
+          </View>
+          <ImageBackground
+            source={{ uri: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDtAs5x3xejc5W-Ce2QOFfKPx6mDUiPt_LR_UoNtHXCXjIELQZlvv1gva57m8ZufJRbxVwi7M0bFpHz3QOLcj-dMqDFdUO2_yCJrL7i5AKOPkag1MOAxjpx_CycT1EzbOiN0iH_ZDGVEr3RlGj_zG6K6czDU0K8r1s9TQ9WmoiZd8vEzx2MWAltursxY_IUoeE5bWzLGmz_GW1qkof1a58c9r7aL7EmXgdglSXjmIYxpIe8y5NkvsVt8guutcVBI2SbZDnUlOQ95NE' }}
+            style={styles.requestImage}
+            imageStyle={styles.requestImageStyle}
+          />
+        </View>
+      ))
+    ) : (
+      <Text style={styles.noRequestsText}>{t('no_medicine_requests')}</Text>
+    )}
+  </>
+)}
 
-      {role === "doctor" && (
-        <>
-          <Text style={styles.sectionTitle}>{t('recent_referral_requests')}</Text>
+    {role === "doctor" && (
+  <>
+    <Text style={styles.sectionTitle}>{t('recent_referral_requests')}</Text>
 
-          {getRecentReferrals().map((referral) => (
-            <View key={`doctor-referral-${referral.id}`} style={styles.requestItem}>
-              <View style={styles.requestInfo}>
-                <Text style={styles.patientName}>{referral.user?.first_name} {referral.user?.last_name}</Text>
-                <Text style={styles.requestDetail}>
-                  {t('appointment')}: {formatDate(referral.appointment_time)} at {formatTime(referral.appointment_time)}
-                </Text>
-                <Text style={styles.requestDetail}>
-                  {t('status')}: {translateStatus(referral.status)}
-                </Text>
-              </View>
-              <TouchableOpacity
-                style={styles.viewButton}
-                onPress={() => handleViewReferral(referral)}
-              >
-                <Text style={styles.viewButtonText}>{t('view')}</Text>
-              </TouchableOpacity>
-            </View>
-          ))}
-        </>
-      )}
+    {getRecentReferrals().length > 0 ? (
+      getRecentReferrals().map((referral) => (
+        <View key={`doctor-referral-${referral.id}`} style={styles.requestItem}>
+          <View style={styles.requestInfo}>
+            <Text style={styles.patientName}>
+              {referral.patient_name} {referral.patient_last_name}
+            </Text>
+            <Text style={styles.requestDetail}>
+              {t('appointment')}: {formatDate(referral.appointment_time)} at {formatTime(referral.appointment_time)}
+            </Text>
+            <Text style={styles.requestDetail}>
+              {t('created')}: {formatDate(referral.created_at)}
+            </Text>
+            <Text style={[
+              styles.requestDetail,
+              referral.status === 'approved' && {color: '#4CAF50'},
+              referral.status === 'rejected' && {color: '#F44336'},
+              referral.status === 'assigned' && {color: '#FFA500'}
+            ]}>
+              {t('status')}: {translateStatus(referral.status)}
+            </Text>
+          </View>
+          <TouchableOpacity
+            style={styles.viewButton}
+            onPress={() => handleViewReferral(referral)}
+          >
+            <Text style={styles.viewButtonText}>{t('view')}</Text>
+          </TouchableOpacity>
+        </View>
+      ))
+    ) : (
+      <Text style={styles.noRequestsText}>{t('no_referral_requests')}</Text>
+    )}
+
+    {/* Optional: Add recent medicine requests for doctors too if needed */}
+    <Text style={[styles.sectionTitle, {marginTop: 20}]}>{t('recent_medicine_requests')}</Text>
+    
+    {getRecentMedicineRequests().length > 0 ? (
+      getRecentMedicineRequests().map((request) => (
+        <View key={`doctor-medicine-${request.id}`} style={styles.requestItem}>
+          <View style={styles.requestInfo}>
+            <Text style={styles.patientName}>
+              {request.user_name}
+            </Text>
+            <Text style={styles.requestDetail}>
+              {t('requested')}: {formatDate(request.requested_at)}
+            </Text>
+            <Text style={[
+              styles.requestDetail,
+              request.status === 'approved' && {color: '#4CAF50'},
+              request.status === 'rejected' && {color: '#F44336'},
+              request.status === 'assigned_to_doctor' && {color: '#FFA500'}
+            ]}>
+              {t('status')}: {translateStatus(request.status)}
+            </Text>
+            {request.medicine_duration && (
+              <Text style={styles.requestDetail}>
+             {request.medicine_duration.months
+  ? `${request.medicine_duration.months} ${t(request.medicine_duration.months > 1 ? 'month_plural' : 'month')}`
+  : `${request.medicine_duration.days} ${t(request.medicine_duration.days > 1 ? 'day_plural' : 'day')}`}
+
+              </Text>
+            )}
+          </View>
+          <TouchableOpacity
+            style={styles.viewButton}
+            onPress={() => handleViewMedicineRequest(request)}
+          >
+            <Text style={styles.viewButtonText}>{t('view')}</Text>
+          </TouchableOpacity>
+        </View>
+      ))
+    ) : (
+      <Text style={styles.noRequestsText}>{t('no_medicine_requests')}</Text>
+    )}
+  </>
+)}
       </ScrollView>
           {/* QR Code Modal */}
       <Modal
@@ -722,51 +799,52 @@ console.log("medice",JSON.stringify(medicineRequests,null,2))
       >
         <View style={styles.modalCenteredView}>
           <View style={styles.modalView}>
-            <Text style={styles.modalTitle}>Medical Card QR Code</Text>
-            
-            {qrLoading ? (
-              <View style={styles.qrLoadingContainer}>
-                <ActivityIndicator size="large" color={Colors.darkBlue} />
-                <Text style={styles.qrLoadingText}>Generating QR Code...</Text>
-              </View>
-            ) : (
-              qrData && (
-                <QRCode
-                  data={qrData}
-                  size={200}
-                  padding={2}
-                  pieceSize={8}
-                  color={Colors.darkBlue}
-                  backgroundColor="white"
-                  outerEyesOptions={{
-                    topLeft: { color: Colors.darkBlue },
-                    topRight: { color: Colors.darkBlue },
-                    bottomLeft: { color: Colors.darkBlue },
-                    bottomRight: { color: Colors.darkBlue },
-                  }}
-                  innerEyesOptions={{
-                    topLeft: { color: '#0a7eb8' },
-                    topRight: { color: '#0a7eb8' },
-                    bottomLeft: { color: '#0a7eb8' },
-                    bottomRight: { color: '#0a7eb8' },
-                  }}
-                  logo={{
-                    href: require('../../assets/images/LogoNmpa.png'),
-                    scale: 0.5,
-                    padding: 2,
-                  }}
-                />
-              )
-            )}
-            
-            <Text style={styles.modalSubtitle}>Scan to view medical details</Text>
-            
-            <Pressable
-              style={[styles.modalButton, styles.modalButtonClose]}
-              onPress={() => setQrModalVisible(false)}
-            >
-              <Text style={styles.modalButtonText}>Close</Text>
-            </Pressable>
+           <Text style={styles.modalTitle}>{t('medical_card_qr_title')}</Text>
+
+{qrLoading ? (
+  <View style={styles.qrLoadingContainer}>
+    <ActivityIndicator size="large" color={Colors.darkBlue} />
+    <Text style={styles.qrLoadingText}>{t('qr_generating')}</Text>
+  </View>
+) : (
+  qrData && (
+    <QRCode
+      data={qrData}
+      size={200}
+      padding={2}
+      pieceSize={8}
+      color={Colors.darkBlue}
+      backgroundColor="white"
+      outerEyesOptions={{
+        topLeft: { color: Colors.darkBlue },
+        topRight: { color: Colors.darkBlue },
+        bottomLeft: { color: Colors.darkBlue },
+        bottomRight: { color: Colors.darkBlue },
+      }}
+      innerEyesOptions={{
+        topLeft: { color: '#0a7eb8' },
+        topRight: { color: '#0a7eb8' },
+        bottomLeft: { color: '#0a7eb8' },
+        bottomRight: { color: '#0a7eb8' },
+      }}
+      logo={{
+        href: require('../../assets/images/LogoNmpa.png'),
+        scale: 0.5,
+        padding: 2,
+      }}
+    />
+  )
+)}
+
+<Text style={styles.modalSubtitle}>{t('qr_scan_subtitle')}</Text>
+
+<Pressable
+  style={[styles.modalButton, styles.modalButtonClose]}
+  onPress={() => setQrModalVisible(false)}
+>
+  <Text style={styles.modalButtonText}>{t('close')}</Text>
+</Pressable>
+
           </View>
         </View>
       </Modal>
@@ -1320,6 +1398,10 @@ fullCardText: {
     fontSize: 14,
     color: Colors.darkBlue,
   },
+  noRequestsText:{
+    textAlign:'center',
+    paddingVertical:'5%'
+  }
 });
 
 export default HomeScreen;

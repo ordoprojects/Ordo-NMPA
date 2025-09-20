@@ -1,5 +1,5 @@
 {
-  "welcome": "NMPA ವೈದ್ಯಕೀಯ ಸೇವೆಗಳಿಗೆ ಸುಸ್ವಾಗತ",
+  "welcome": "NMPA ಚಿಕಿತ್ಸಾ\nಮಿತ್ರಗೆ ಸ್ವಾಗತ",
   "username": "ಬಳಕೆದಾರಹೆಸರು",
   "password": "ಪಾಸ್ವರ್ಡ್",
   "enter_username": "ನಿಮ್ಮ ಬಳಕೆದಾರಹೆಸರನ್ನು ನಮೂದಿಸಿ",
@@ -60,9 +60,13 @@
   "appointment": "ಭೇಟಿ",
   "requested": "ವಿನಂತಿಸಲಾಗಿದೆ",
   "duration": "ಕಾಲಾವಧಿ",
-  "month": "ತಿಂಗಳು",
-  "day": "ದಿನ",
+ "month": "ತಿಂಗಳು",
+"month_plural": "ತಿಂಗಳುಗಳು",
+"day": "ದಿನ",
+"day_plural": "ದಿನಗಳು",
   "recent_referral_requests": "ಇತ್ತೀಚಿನ ರೆಫರಲ್ ವಿನಂತಿಗಳು",
+  "no_referral_requests": "ಯಾವುದೇ ರೆಫರಲ್ ವಿನಂತಿಗಳು ಇಲ್ಲ",
+  "no_medicine_requests": "ಯಾವುದೇ ಔಷಧಿ ವಿನಂತಿಗಳು ಇಲ್ಲ",
   "status": "ಸ್ಥಿತಿ",
   "view": "ವೀಕ್ಷಿಸಿ",
   "logout_confirmation": "ನೀವು ಖಚಿತವಾಗಿ ಲಾಗ್ ಔಟ್ ಮಾಡಲು ಬಯಸುವಿರಾ?",
@@ -151,7 +155,12 @@
     "hospitals_load_error": "ಆಸ್ಪತ್ರೆಗಳನ್ನು ಲೋಡ್ ಮಾಡಲು ವಿಫಲವಾಗಿದೆ",
     "submission_failed": "ರೆಫರಲ್ ಸಲ್ಲಿಸಲು ವಿಫಲವಾಗಿದೆ",
     "submission_success": "ಭೇಟಿ ಯಶಸ್ವಿಯಾಗಿ ರಚಿಸಲಾಗಿದೆ",
-    "submission_error": "ಭೇಟಿಯನ್ನು ಸಲ್ಲಿಸಲು ವಿಫಲವಾಗಿದೆ"
+    "submission_error": "ಭೇಟಿಯನ್ನು ಸಲ್ಲಿಸಲು ವಿಫಲವಾಗಿದೆ",
+    "edit_title": "ರೆಫರಲ್ ಸಂಪಾದಿಸಿ",
+    "update_hospital": "ಆಸ್ಪತ್ರೆಯನ್ನು ನವೀಕರಿಸಿ",
+    "hospital_change_success": "ಆಸ್ಪತ್ರೆಯನ್ನು ಯಶಸ್ವಿಯಾಗಿ ಬದಲಾಯಿಸಲಾಗಿದೆ",
+    "hospital_change_error": "ಆಸ್ಪತ್ರೆಯನ್ನು ಬದಲಾಯಿಸಲು ವಿಫಲವಾಗಿದೆ",
+    "hospital_change_failed": "ಆಸ್ಪತ್ರೆ ಬದಲಾವಣೆ ವಿಫಲಗೊಂಡಿದೆ"
   },
   "medicine_request_list": {
     "title": "ಔಷಧಿ ವಿನಂತಿ ಪಟ್ಟಿ",
@@ -242,8 +251,14 @@
     "months_duration": "{{count}} ತಿಂಗಳು(ಗಳು)",
     "doctor": "ವೈದ್ಯರು",
     "not_available": "ಲಭ್ಯವಿಲ್ಲ",
-    "status_approved": "ಅನುಮೋದಿತ",
-    "status_pending": "ಬಾಕಿ",
+       "status_approved": "ಅನುಮೋದಿಸಲಾಗಿದೆ",
+    "status_rejected": "ತಿರಸ್ಕರಿಸಲಾಗಿದೆ",
+    "status_pending": "ಬಾಕಿಯಿದೆ",
+    "status_assigned_to_doctor": "ವೈದ್ಯರಿಗೆ ನಿಯೋಜಿಸಲಾಗಿದೆ",
+    "status_unknown": "ಅಜ್ಞಾತ ಸ್ಥಿತಿ",
+    "status_completed": "ಪೂರ್ಣಗೊಂಡಿದೆ",
+    "status_dispatched": "ರವಾನಿಸಲಾಗಿದೆ",
+    "load_more": "ಇನ್ನಷ್ಟು ಲೋಡ್ ಮಾಡಿ",
     "reject": "ತಿರಸ್ಕರಿಸಿ",
     "approve": "ಅನುಮೋದಿಸಿ",
     "approval_notes_title": "ಅನುಮೋದನೆ ಟಿಪ್ಪಣಿಗಳು",
@@ -311,7 +326,7 @@
     "doctor_approval": "ವೈದ್ಯರ ಅನುಮೋದನೆ",
     "approved": "ಅನುಮೋದಿತ",
     "pending": "ಬಾಕಿ",
-    "approval_notes": "ಅನುಮೋದನೆ ಟಿಪ್ಪಣಿಗಳು",
+    "approval_notes": "ಟಿಪ್ಪಣಿಗಳು",
     "delivery_info": "ವಿತರಣಾ ಮಾಹಿತಿ",
     "approved_at": "ಅನುಮೋದಿಸಿದ ಸಮಯ",
     "tracking_id": "ಟ್ರ್ಯಾಕಿಂಗ್ ID",
@@ -342,7 +357,8 @@
     "appointment_info": "ಭೇಟಿ ಮಾಹಿತಿ",
     "pdf_password_protected": "ಈ PDF ಪಾಸ್ವರ್ಡ್ ಸಂರಕ್ಷಿತವಾಗಿದೆ",
     "enter_pdf_password": "PDF ಪಾಸ್ವರ್ಡ್ ನಮೂದಿಸಿ",
-    "view_pdf_fullscreen": "ಪೂರ್ಣ ಸ್ಕ್ರೀನ್‌ನಲ್ಲಿ PDF ವೀಕ್ಷಿಸಿ"
+    "view_pdf_fullscreen": "ಪೂರ್ಣ ಸ್ಕ್ರೀನ್‌ನಲ್ಲಿ PDF ವೀಕ್ಷಿಸಿ",
+    "rejected": "ನಿರಾಕರಿಸಲಾಗಿದೆ"
   },
   "common": {
     "submit": "ಸಲ್ಲಿಸು"
@@ -368,5 +384,25 @@
     "eligibility": "ವೈದ್ಯಕೀಯ ಅರ್ಹತೆ",
     "eligibility_yes": "ಹೌದು",
     "blood_group": "ರಕ್ತದ ಗುಂಪು"
-  }
+  },
+  "recent_medicine_requests": "ಇತ್ತೀಚಿನ ಔಷಧಿ ವಿನಂತಿಗಳು",
+  "prescription_upload_success": "ಪ್ರಿಸ್ಕ್ರಿಪ್ಷನ್ ಮತ್ತು ಔಷಧಿ ಯಶಸ್ವಿಯಾಗಿ ಅಪ್ಲೋಡ್ ಮಾಡಲಾಗಿದೆ",
+  "created_at": "ರಚಿಸಿದ ಸಮಯ",
+  "load_more": "ಇನ್ನಷ್ಟು ಲೋಡ್ ಮಾಡಿ",
+  "medical_card_qr_title": "ಮೆಡಿಕಲ್ ಕಾರ್ಡ್ QR ಕೋಡ್",
+  "qr_generating": "QR ಕೋಡ್ ಸೃಷ್ಟಿಸಲಾಗುತ್ತಿದೆ...",
+  "qr_scan_subtitle": "ವೈದ್ಯಕೀಯ ವಿವರಗಳನ್ನು ವೀಕ್ಷಿಸಲು ಸ್ಕ್ಯಾನ್ ಮಾಡಿ",
+  "cancelled": "ರದ್ದು ಮಾಡಲಾಗಿದೆ",
+  "validation_phone_number": "ದಯವಿಟ್ಟು ನಿಮ್ಮ ದೂರವಾಣಿ ಸಂಖ್ಯೆಯನ್ನು ನಮೂದಿಸಿ",
+  "invalid_phone_number": "ದಯವಿಟ್ಟು ಮಾನ್ಯ ದೂರವಾಣಿ ಸಂಖ್ಯೆಯನ್ನು ನಮೂದಿಸಿ",
+  "send_otp": "OTP ಕಳುಹಿಸಿ",
+  "dont_have_abha": "ನಿಮ್ಮ ಬಳಿ ABHA ಕಾರ್ಡ್ ಇಲ್ಲವೇ?",
+  "click_here_to_register": "ನೋಂದಣಿ ಮಾಡಲು ಇಲ್ಲಿ ಕ್ಲಿಕ್ ಮಾಡಿ",
+  "otp_sent_to": "OTP ಕಳುಹಿಸಲಾಗಿದೆ",
+  "otp_send_failed": "OTP ಕಳುಹಿಸುವಲ್ಲಿ ವಿಫಲವಾಗಿದೆ",
+  "otp_resent": "OTP ಯಶಸ್ವಿಯಾಗಿ ಮತ್ತೆ ಕಳುಹಿಸಲಾಗಿದೆ",
+  "otp_verification_failed": "OTP ದೃಢೀಕರಣ ವಿಫಲವಾಗಿದೆ",
+  "auto_fill_otp": "OTP ಸ್ವಯಂ-ಭರ್ತಿ",
+  "close": "ಮುಚ್ಚಿ"
+
 }

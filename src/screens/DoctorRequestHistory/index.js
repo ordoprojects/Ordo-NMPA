@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView,Modal, TouchableOpacity, Image, ActivityIndicator,Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Modal, TouchableOpacity, Image, ActivityIndicator, Alert, RefreshControl } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -35,6 +35,10 @@ const [medicineRequests, setMedicineRequests] = useState([]);
 const [loading, setLoading] = useState(false);
 const [refreshing, setRefreshing] = useState(false);
 const[user,setUser]=useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
 
 const fetchUser = async () => {
     try {
@@ -76,91 +80,186 @@ setUser(data);
 // console.log("user",user)
 
   // Fetch data based on active tab
+  // Update your useEffect to handle initial load
+  useFocusEffect(
+    React.useCallback(() => {
+      // Reset to first page and refresh
+      setCurrentPage(1);
+      if (activeMainTab === 'Referral') {
+        fetchReferrals(1);
+      } else {
+        fetchMedicineRequests(1);
+      }
+      
+      return () => {};
+    }, [activeMainTab])
+  );
+
+
+    // Reset pagination when filters change
   useEffect(() => {
-    if (activeMainTab === 'Referral') {
-      fetchReferrals();
-    } else {
-      fetchMedicineRequests();
-    }
+    setCurrentPage(1);
+    setTotalPages(1);
+    setHasMore(true);
   }, [activeMainTab, activeStatusFilter]);
 
-  const fetchReferrals = async () => {
-    try {
+const fetchReferrals = async (page = 1, isLoadMore = false) => {
+  try {
+    if (isLoadMore) {
+      setIsLoadingMore(true);
+    } else {
       setLoading(true);
-      const token = await getToken();
-      const response = await fetch(`${BASE_URL}/appointments/list/`, {
+    }
+    
+    const token = await getToken();
+    
+    // Build query parameters
+    const params = new URLSearchParams();
+    params.append('page', page.toString());
+    
+    // Only add status parameter if not "All"
+    if (activeStatusFilter !== 'All') {
+      params.append('status', activeStatusFilter.toLowerCase());
+    }
+    
+    const response = await fetch(
+      `${BASE_URL}/appointments/list/?${params.toString()}`,
+      {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-      });
- 
-      const data = await response.json();
-      if (response.ok) {
-        // Filter by status if not 'All'
-        const filtered = activeStatusFilter === 'All' 
-          ? data.appointments 
-          : data.appointments.filter(appt => 
-              activeStatusFilter === 'Approved' ? appt.doctor_approval :
-              activeStatusFilter === 'Pending' ? !appt.doctor_approval && appt.status === 'pending' :
-              appt.status.toLowerCase() === activeStatusFilter.toLowerCase()
-            );
-        setReferrals(filtered);
-      } else {
-        console.error('Failed to fetch referrals:', data);
       }
-    } catch (error) {
-      console.error('Error fetching referrals:', error);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
+    );
+
+    const data = await response.json();
+    if (response.ok) {
+      if (isLoadMore) {
+        setReferrals(prev => [...prev, ...data.appointments]);
+      } else {
+        setReferrals(data.appointments);
+      }
+      
+      // Update pagination info
+      setCurrentPage(data.pagination?.currentPage || 1);
+      setTotalPages(data.pagination?.totalPages || 1);
+      setHasMore((data.pagination?.currentPage || 1) < (data.pagination?.totalPages || 1));
+    } else {
+      console.error('Failed to fetch referrals:', data);
     }
-  };
+  } catch (error) {
+    console.error('Error fetching referrals:', error);
+  } finally {
+    setLoading(false);
+    setIsLoadingMore(false);
+    setRefreshing(false);
+  }
+};
 
-
-  console.log("refferal data",JSON.stringify(referrals,null,2))
-  // console.log("medicine data",JSON.stringify(medicineRequests,null,2))
-
-
-  const fetchMedicineRequests = async () => {
-    try {
+const fetchMedicineRequests = async (page = 1, isLoadMore = false) => {
+  try {
+    if (isLoadMore) {
+      setIsLoadingMore(true);
+    } else {
       setLoading(true);
-      const token = await getToken();
-      const response = await fetch(`${BASE_URL}/medicine-requests/list/`, {
+    }
+    
+    const token = await getToken();
+    
+    // Build query parameters
+    const params = new URLSearchParams();
+    params.append('page', page.toString());
+    
+    // Only add status parameter if not "All"
+    if (activeStatusFilter !== 'All') {
+      // Map the filter name to the actual API status value
+      let statusValue = activeStatusFilter.toLowerCase();
+      
+      if (activeStatusFilter === 'Assigned') {
+        statusValue = 'assigned_to_doctor'; // Map "Assigned" to "assigned_to_doctor"
+      }
+      
+      params.append('status', statusValue);
+    }
+    
+    const response = await fetch(
+      `${BASE_URL}/medicine-requests/list/?${params.toString()}`,
+      {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-      });
-
-
-      const data = await response.json();
-      if (response.ok) {
-        // Filter by status if not 'All'
-     // Update the filtering logic in fetchMedicineRequests
-  const filtered = activeStatusFilter === 'All' 
-  ? data.medicine_requests 
-  : data.medicine_requests.filter(req => {
-      if (activeStatusFilter === 'Approved') return req.doctor_approval && req.status === 'approved';
-      if (activeStatusFilter === 'Pending') return !req.doctor_approval && req.status === 'pending';
-      if (activeStatusFilter === 'Assigned') return req.status.toLowerCase() === 'assigned_to_doctor';
-      return req.status.toLowerCase() === activeStatusFilter.toLowerCase();
-    });
-        setMedicineRequests(filtered);
-      } else {
-        console.error('Failed to fetch medicine requests:', data);
       }
-    } catch (error) {
-      console.error('Error fetching medicine requests:', error);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
+    );
+
+    const data = await response.json();
+    console.log("Raw API data:", JSON.stringify(data, null, 2));
+
+    if (response.ok) {
+      if (isLoadMore) {
+        setMedicineRequests(prev => [...prev, ...data.medicine_requests]);
+      } else {
+        setMedicineRequests(data.medicine_requests);
+      }
+      
+      // Update pagination info
+      setCurrentPage(data.pagination?.currentPage || 1);
+      setTotalPages(data.pagination?.totalPages || 1);
+      setHasMore((data.pagination?.currentPage || 1) < (data.pagination?.totalPages || 1));
+    } else {
+      console.error('Failed to fetch medicine requests:', data);
+    }
+  } catch (error) {
+    console.error('Error fetching medicine requests:', error);
+  } finally {
+    setLoading(false);
+    setIsLoadingMore(false);
+    setRefreshing(false);
+  }
+};
+
+  const loadMore = () => {
+    if (!isLoadingMore && hasMore) {
+      const nextPage = currentPage + 1;
+      if (activeMainTab === 'Referral') {
+        fetchReferrals(nextPage, true);
+      } else {
+        fetchMedicineRequests(nextPage, true);
+      }
+    }
+  };
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    setCurrentPage(1);
+    if (activeMainTab === 'Referral') {
+      fetchReferrals(1);
+    } else {
+      fetchMedicineRequests(1);
     }
   };
 
 
+  const renderFooter = () => {
+    if (!hasMore) return null;
+    
+    return (
+      <View style={styles.footerContainer}>
+        {isLoadingMore ? (
+          <ActivityIndicator size="small" color="#101518" />
+        ) : (
+          <TouchableOpacity 
+            style={styles.loadMoreButton}
+            onPress={loadMore}
+          >
+            <Text style={styles.loadMoreText}>{t('load_more')}</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+    );
+  };
 
   const handleCancelAppointment = async (referral) => {
     try {
@@ -191,37 +290,39 @@ setUser(data);
     }
   };
 
-  const getStatusColor = (status, isMedicine = false) => {
-    if (isMedicine) {
-      switch(status.toLowerCase()) {
-        case 'approved':
-        case 'completed': return '#4CAF50B3'; // Green
-        case 'pending':
-        case 'assigned_to_doctor': return '#e3ad0ab3'; // Amber
-        case 'rejected': return '#F44336B3'; // Red
-        case 'dispatched': return '#2196F3B3'; // Blue
-        default: return '#9E9E9EB3'; // Gray
-      }
-    } else {
-      switch(status.toLowerCase()) {
-        case 'approved': return '#4CAF50B3'; // Green
-        case 'pending': return '#e3ad0ab3'; // Amber
-        case 'rejected': return '#F44336B3'; // Red
-        default: return '#9E9E9EB3'; // Gray
-      }
+const getStatusColor = (status, isMedicine = false) => {
+  if (isMedicine) {
+    switch(status.toLowerCase()) {
+      case 'approved':
+      case 'completed': return '#4CAF50B3'; // Green
+      case 'pending':
+      case 'assigned_to_doctor': return '#e3ad0ab3'; // Amber
+      case 'rejected': 
+      case 'cancelled': return '#F44336B3'; // Red
+      case 'dispatched': return '#2196F3B3'; // Blue
+      default: return '#9E9E9EB3'; // Gray
     }
-  };
+  } else {
+    switch(status.toLowerCase()) {
+      case 'approved': return '#4CAF50B3'; // Green
+      case 'pending': return '#e3ad0ab3'; // Amber
+      case 'rejected': 
+      case 'cancelled': return '#F44336B3'; // Red
+      default: return '#9E9E9EB3'; // Gray
+    }
+  }
+};
 
-  const getStatusText = (status, isMedicine = false) => {
-    if (isMedicine) {
-      switch(status.toLowerCase()) {
-        case 'assigned_to_doctor': return t('assigned');
-        case 'completed': return t('completed');
-        default: return t(status.toLowerCase());
-      }
+const getStatusText = (status, isMedicine = false) => {
+  if (isMedicine) {
+    switch(status.toLowerCase()) {
+      case 'assigned_to_doctor': return t('assigned');
+      case 'completed': return t('completed');
+      default: return t(status.toLowerCase());
     }
-    return t(status.toLowerCase());
-  };
+  }
+  return t(status.toLowerCase());
+};
 
  const handleViewPdf = async (fileUrl) => {
         try {
@@ -412,13 +513,13 @@ onPress={() => navigation.navigate('AppStack', {
   };
 
 
-  const getStatusFilters = () => {
-    if (activeMainTab === 'Referral') {
-      return ['All', 'Pending', 'Approved', 'Rejected'];
-    } else {
-      return ['All', 'Pending', 'Assigned', 'Approved', 'Dispatched', 'Completed', 'Rejected'];
-    }
-  };
+const getStatusFilters = () => {
+  if (activeMainTab === 'Referral') {
+    return ['All', 'Pending', 'Approved', 'Rejected', 'Cancelled'];
+  } else {
+    return ['All', 'Pending', 'Assigned', 'Approved', 'Dispatched', 'Completed', 'Rejected'];
+  }
+};
 
   return (
  <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
@@ -486,21 +587,43 @@ onPress={() => navigation.navigate('AppStack', {
             <ActivityIndicator size="large" color="#101518" />
           </View>
         ) : (
-          <ScrollView style={styles.requestsContainer}>
-            {activeMainTab === 'Referral' ? (
-              referrals.length > 0 ? (
-                referrals.map(renderReferralItem)
-              ) : (
-                <Text style={styles.emptyText}>{t('no_referrals_found')}</Text>
-              )
-            ) : (
-              medicineRequests.length > 0 ? (
-                medicineRequests.map(renderMedicineItem)
-              ) : (
-                <Text style={styles.emptyText}>{t('no_medicine_requests_found')}</Text>
-              )
-            )}
-          </ScrollView>
+   <ScrollView 
+    style={styles.requestsContainer}
+    refreshControl={
+      <RefreshControl
+        refreshing={refreshing}
+        onRefresh={onRefresh}
+      />
+    }
+    onScroll={({nativeEvent}) => {
+      // Optional: Auto load more when scrolling near bottom
+      const {layoutMeasurement, contentOffset, contentSize} = nativeEvent;
+      const paddingToBottom = 20;
+      if (layoutMeasurement.height + contentOffset.y >= 
+          contentSize.height - paddingToBottom && 
+          !isLoadingMore && hasMore) {
+        loadMore();
+      }
+    }}
+    scrollEventThrottle={400}
+  >
+    {activeMainTab === 'Referral' ? (
+      referrals.length > 0 ? (
+        referrals.map(renderReferralItem)
+      ) : (
+        <Text style={styles.emptyText}>{t('no_referrals_found')}</Text>
+      )
+    ) : (
+      medicineRequests.length > 0 ? (
+        medicineRequests.map(renderMedicineItem)
+      ) : (
+        <Text style={styles.emptyText}>{t('no_medicine_requests_found')}</Text>
+      )
+    )}
+    {renderFooter()}
+  </ScrollView>
+
+
         )}
       </View>
            {/* PDF Modal */}
@@ -763,6 +886,21 @@ cancelButtonText: {
     },
     webview: {
         flex: 1,
+    },
+      footerContainer: {
+      padding: 16,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    loadMoreButton: {
+      backgroundColor: Colors.darkBlue,
+      paddingHorizontal: 20,
+      paddingVertical: 10,
+      borderRadius: 8,
+    },
+    loadMoreText: {
+      color: '#ffffff',
+      fontWeight: '600',
     },
 });
 

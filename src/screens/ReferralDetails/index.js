@@ -11,6 +11,9 @@ import { useRole } from '../../Context/RoleContext';
 import { getToken } from '../../navigation/auth';
 import Pdf from 'react-native-pdf';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import { request } from 'react-native-permissions';
+
 
 const ReferralDetails = ({ navigation, route }) => {
   const { t } = useTranslation();
@@ -114,6 +117,7 @@ const ReferralDetails = ({ navigation, route }) => {
     );
   }
 
+      console.log(' referral user:', JSON.stringify(referral,null,2));
 
 
   return (
@@ -126,7 +130,14 @@ const ReferralDetails = ({ navigation, route }) => {
   <View style={styles.headerTitleContainer}>
     <Text style={styles.headerTitle}>{t('referral_details.title')}</Text>
   </View>
-  <View style={{ width: 24 }} />
+  {referral?.status=="pending"&& (
+   <TouchableOpacity onPress={() => navigation.navigate('AppStack', { 
+  screen: 'ReferralRequest', 
+  params: { referral: referral }
+})}>
+    <AntDesign name="edit" size={24} color="#0d141c" />
+  </TouchableOpacity>)
+}
 </SafeAreaView>
 
 
@@ -200,6 +211,8 @@ const ReferralDetails = ({ navigation, route }) => {
         </View>
 
         {/* Doctor Approval Status */}
+        {referral?.status !== "cancelled" && referral?.status !== "pending" && (
+          <>
         <Text style={styles.sectionTitle}>{t('referral_details.approval_status')}</Text>
         <View style={styles.detailsContainer}>
             <View style={styles.detailRow}>
@@ -217,17 +230,20 @@ const ReferralDetails = ({ navigation, route }) => {
               <Text>{referral.duty_doctor_ecno ? referral.duty_doctor_ecno : t('N/A')}</Text>
             </Text>
           </View>
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>{t('referral_details.doctor_approval')}</Text>
-            <Text style={[styles.detailValue, { 
-              color: referral.doctor_approval ? Colors.darkBlue : '#FFA500',
-              fontWeight: '500'
-            }]}>
-              {referral.doctor_approval ? t('referral_details.approved') : t('referral_details.pending')}
-            </Text>
-          </View>
+     <View style={styles.detailRow}>
+  <Text style={styles.detailLabel}>{t('referral_details.doctor_approval')}</Text>
+  <Text style={[styles.detailValue, { 
+    color: referral.status === 'rejected' ? '#F44336' : 
+           (referral.doctor_approval ? Colors.darkBlue : '#FFA500'),
+    fontWeight: '500'
+  }]}>
+    {referral.status === 'rejected' ? t('referral_details.rejected') : 
+     (referral.doctor_approval ? t('referral_details.approved') : t('referral_details.pending'))}
+  </Text>
+</View>
         </View>
-
+        </>
+)}
         {/* Referral File (PDF with password protection) */}
         {referral.file_url && isPdf && (
           <>

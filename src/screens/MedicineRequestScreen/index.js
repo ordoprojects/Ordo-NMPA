@@ -163,12 +163,12 @@ const validateDuration = (text) => {
 
       const responseData = await response.json();
 
-      if (!response.ok) {
-        throw new Error(responseData.message || t('medicine_request.submission_failed'));
-      }
+  if (!response.ok) {
+  throw new Error(responseData.message || t('medicine_request.submission_failed'));
+}
 
-      Alert.alert(t('success'), responseData.message || t('medicine_request.submission_success'));
-      navigation.goBack();
+Alert.alert(t('success'), t('prescription_upload_success'));
+navigation.goBack();
 
     } catch (error) {
       console.error('Submission error:', error);

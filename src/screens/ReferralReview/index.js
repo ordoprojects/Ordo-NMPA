@@ -268,10 +268,15 @@ const ReferralReview = ({ navigation, route }) => {
               {t('referral_review.ec_number')}: {appointment.patient_ecno}
             </Text>
           </View>
-          <Image 
-            source={{ uri: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBhBePTxmpYnHhfVENWmEQh75_64sOxmlbgGBE14g93FiAdaiSTHFHlhaf7aa_Jm6NyMvFoBUobo1xADs6GWJFDODYdt3IxoFWwjSoz516RLB3ynQnNB_3tdsLc3dc6oeQyBwUoStu9YVkpDyDP6HHcOAggB44p5FSqnB4yqDNCh6Gy_SgMS92chHL8qoVy4FQPIBYmF3oxcB00p2tWq5bahgsyIj3xtrdEAZ5e_Gp95CXVU90ax-bqo-cRlOrsP2cPYem23Wo6pQZD' }} 
-            style={styles.patientImage} 
-          />
+           <Image 
+                    style={styles.patientImage} 
+                    source={{ 
+                      uri: appointment.patient_photo_url
+                        ? `${BASE_URL}${appointment.patient_photo_url.replace(/^\/api/, '')}`
+                        : 'https://lh3.googleusercontent.com/aida-public/AB6AXuD6iCqF0CKSARpJEMpI54q4W7czcfALHbNpBWTrRDz-Vwtoozz8Wn6wta1rIBmfy6wAM_5G52PkYydwL3T52x8IXfD8V_noYfr5Eamzd8nfGhRX5Z--UM_QMVjPmtivJjWHyCoZVDWklaAvR17aKdLSAghbeKHUoCyQ0sbEbKXVWd2VJj0aSvoZ_HU0dx-u7H0QKc8FhHiA4lgTgYZRbxSUpf1VudZvjIhTPtGOg7-Gangk-55GxD_mOulCKItluIvJrnPhcAXCDHoW' 
+                    }} 
+                    resizeMethod='contain'
+                  />
         </View>
 
         {/* Treatment Details */}

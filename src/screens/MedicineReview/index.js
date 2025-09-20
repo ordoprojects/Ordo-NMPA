@@ -27,8 +27,11 @@ const MedicineReview = ({ navigation, route }) => {
   const [isPdf, setIsPdf] = useState(false);
   const [isImageViewVisible, setIsImageViewVisible] = useState(false);
   const [fileUrl, setFileUrl] = useState('');
+  const [visibleCount, setVisibleCount] = useState(4);
+
 
 console.log("request",request)
+console.log("past requests",JSON.stringify(pastRequests,null,2))
 
   useEffect(() => {
     if (request.file_url) {
@@ -57,6 +60,9 @@ console.log("request",request)
             'Content-Type': 'application/json',
           },
         });
+
+
+        console.log("token",token);
 
         const responseData = await response.json();
 
@@ -114,14 +120,46 @@ console.log("request",request)
 
     return (
       <View style={styles.pastRequestsContainer}>
-     {pastRequests.slice(0, 4).map((req, index) => {
+   {pastRequests.slice(0, visibleCount).map((req, index) => {
+
   const duration = formatDuration(req.medicine_duration);
 
-  const status = req.doctor_approval
-    ? t('medicine_review.status_approved')
-    : t('medicine_review.status_pending');
+const statusMap = {
+  approved: {
+    text: t('medicine_review.status_approved'),
+    color: 'green',
+  },
+  rejected: {
+    text: t('medicine_review.status_rejected'),
+    color: 'red',
+  },
+  pending: {
+    text: t('medicine_review.status_pending'),
+    color: '#FFA500', // orange
+  },
+  assigned_to_doctor: {
+    text: t('medicine_review.status_assigned_to_doctor'),
+    color: '#FFA500', // orange
+  },
+  completed: {
+    text: t('medicine_review.status_completed'),
+    color: 'green',
+  },
+  dispatched: {
+    text: t('medicine_review.status_dispatched'),
+    color: 'blue',
+  }
+};
 
-  const statusColor = req.doctor_approval ? Colors.darkBlue : '#FFA500';
+
+const currentStatus = statusMap[req.status] || {
+  text: t('medicine_review.status_unknown'),
+  color: 'gray',
+};
+
+const status = currentStatus.text;
+const statusColor = currentStatus.color;
+
 
   return (
     <View key={`past-req-${index}`} style={styles.pastRequestItem}>
@@ -130,8 +168,8 @@ console.log("request",request)
     {t('medicine_review.issued_date')}:
   </Text>
   <Text style={styles.pastRequestValue}>
-    { moment(req?.issue_date).format('MMM D, YYYY')
-      ?    moment(req?.issue_date).format('MMM D, YYYY')
+    { moment(req?.requested_at).format('MMM D, YYYY')
+      ?    moment(req?.requested_at).format('MMM D, YYYY')
       : t('medicine_review.not_available')}
   </Text>
 </View>
@@ -153,6 +191,7 @@ console.log("request",request)
           {req.doctor_name || t('medicine_review.not_available')}
         </Text>
       </View>
+      
     </View>
   );
 })}
@@ -184,7 +223,7 @@ console.log("request",request)
 
       const payload = {
         request_id: request.id.toString(),
-        approval_note: approvalNote
+        doctor_approval_notes: approvalNote
       };
 
       const response = await fetch(`${BASE_URL}/medicine-requests/approve/`, {
@@ -356,7 +395,7 @@ console.log("request",request)
         <View style={styles.detailsContainer}>
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>{t('medicine_review.issued_date')}</Text>
-            <Text style={styles.detailValue}>{moment(request.issue_date.split('T')[0]).format("MMMM D, YYYY")}</Text>
+            <Text style={styles.detailValue}>{moment(request.requested_at.split('T')[0]).format("MMMM D, YYYY")}</Text>
           </View>
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>{t('medicine_review.requested_duration')}</Text>
@@ -371,6 +410,16 @@ console.log("request",request)
         {/* Past Requests */}
         <Text style={styles.sectionTitle}>{t('medicine_review.past_requests')}</Text>
         {renderPastRequests()}
+            {visibleCount < pastRequests.length && (
+  <TouchableOpacity 
+    style={{ padding: 4, alignItems: 'center' }} 
+    onPress={() => setVisibleCount(prev => prev + 4)}
+  >
+    <Text style={{ color: Colors.darkBlue, fontWeight: '600' }}>
+      {t('medicine_review.load_more')}
+    </Text>
+  </TouchableOpacity>
+)}
       </ScrollView>
 {request?.status==="assigned_to_doctor" && (
       <View style={styles.buttonContainer}>
@@ -500,7 +549,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    paddingBottom: 80,
+    paddingBottom: 20,
   },
   sectionTitle: {
     fontSize: 18,
