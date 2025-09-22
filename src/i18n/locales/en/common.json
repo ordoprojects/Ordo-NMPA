@@ -1,5 +1,5 @@
 {
- "welcome": "Welcome to NMPA Chikitsa\nMitra",
+ "welcome": "Welcome to Test Chikitsa\nMitra",
   "username": "Username",
   "password": "Password",
   "enter_username": "Enter your username",
@@ -232,7 +232,8 @@
     "request_failed": "Failed to process request",
     "rejection_reason_error": "Please enter reason for rejection",
     "rejection_failed": "Rejection failed",
-    "rejection_success": "Appointment Rejected"
+    "rejection_success": "Appointment Rejected",
+    "select_hospital": "Select Hospital"
   },
   "confirm": "Confirm",
   "medicine_review": {

@@ -1,5 +1,5 @@
 {
-  "welcome": "NMPA चिकित्सा\nमित्र में आपका स्वागत है",
+  "welcome": "टेस्ट चिकित्सा\nमित्र में आपका स्वागत है",
   "username": "उपयोगकर्ता नाम",
   "password": "पासवर्ड",
   "enter_username": "अपना उपयोगकर्ता नाम दर्ज करें",
@@ -233,7 +233,8 @@
     "request_failed": "अनुरोध प्रसंस्करण में विफल",
     "rejection_reason_error": "कृपया अस्वीकरण का कारण दर्ज करें",
     "rejection_failed": "अस्वीकरण विफल",
-    "rejection_success": "अपॉइंटमेंट अस्वीकृत"
+    "rejection_success": "अपॉइंटमेंट अस्वीकृत",
+    "select_hospital": "अस्पताल चुनें"
   },
   "confirm": "पुष्टि करें",
   "medicine_review": {

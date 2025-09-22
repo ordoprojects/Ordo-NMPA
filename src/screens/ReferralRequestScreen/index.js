@@ -127,6 +127,47 @@ const ReferralRequestScreen = ({route}) => {
     fetchHospitals();
   }, [isEditMode, referral]);
 
+
+useEffect(() => {
+  const fetchPatients = async () => {
+    try {
+      setLoading(true);
+      const token = await getToken();
+      const response = await fetch(`${BASE_URL}/dependents/`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch patients');
+      }
+
+      const data = await response.json();
+
+      // ✅ handle both cases: array or { dependents: [...] }
+      if (Array.isArray(data)) {
+        setPatients(data);
+      } else if (Array.isArray(data.dependents)) {
+        setPatients(data.dependents);
+      } else {
+        console.warn("Unexpected patients response:", data);
+      }
+    } catch (error) {
+      console.error('Error fetching patients:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchPatients();
+}, []);
+
+
+console.log("pateints",patients)
+
   const onChangeDate = (event, selectedDate) => {
     const currentDate = selectedDate || appointmentDate;
     setShowDatePicker(Platform.OS === 'ios');
@@ -453,6 +494,46 @@ const ReferralRequestScreen = ({route}) => {
           </View>
         </View>
       </Modal>
+
+      {/* Patient Picker Modal */}
+<Modal
+  visible={showPatientPicker}
+  transparent={true}
+  animationType="slide"
+  onRequestClose={() => setShowPatientPicker(false)}
+>
+  <View style={styles.modalContainer}>
+    <TouchableWithoutFeedback onPress={() => setShowPatientPicker(false)}>
+      <View style={styles.modalOverlay} />
+    </TouchableWithoutFeedback>
+    <View style={styles.pickerContainer}>
+      <View style={styles.pickerHeader}>
+        <Text style={styles.pickerTitle}>{t('referral_request.select_patient')}</Text>
+        <TouchableOpacity 
+          style={styles.closeButton}
+          onPress={() => setShowPatientPicker(false)}
+        >
+          <Icon name="close" size={24} color="#0e161b" />
+        </TouchableOpacity>
+      </View>
+      <ScrollView style={styles.pickerScrollView}>
+        {patients.map(patient => (
+          <TouchableOpacity
+            key={patient.id}
+            style={styles.pickerItem}
+            onPress={() => {
+              setSelectedPatient(patient);
+              setShowPatientPicker(false);
+            }}
+          >
+            <Text style={styles.pickerItemText}>{patient.full_name}</Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+    </View>
+  </View>
+</Modal>
+
     </View>
   );
 };

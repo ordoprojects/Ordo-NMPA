@@ -30,11 +30,20 @@ const MedicineRequestList = ({ navigation }) => {
   const [totalPages, setTotalPages] = useState(1);
   const [refreshing, setRefreshing] = useState(false);
 
+useEffect(() => {
+  const delayDebounce = setTimeout(() => {
+    fetchMedicineRequests(1, searchQuery);
+  }, 400);
+  return () => clearTimeout(delayDebounce);
+}, [searchQuery]);
+
+
+
   const fetchMedicineRequests = async (page = 1, search = '') => {
     try {
       setLoading(true);
       const token = await getToken();
-      const response = await fetch(`${BASE_URL}/medicine-requests/list/?page=${page}&search=${search}`, {
+      const response = await fetch(`${BASE_URL}/medicine-requests/list/?page=${page}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -43,13 +52,24 @@ const MedicineRequestList = ({ navigation }) => {
       });
 
       const data = await response.json();
-      if (response.ok) {
-        setRequests(data.medicine_requests);
-        setTotalPages(data.pagination.totalPages);
-        setCurrentPage(data.pagination.currentPage);
-      } else {
-        console.error(t('medicine_request_list.fetch_failed'), data);
-      }
+if (response.ok) {
+  let meds = data.medicine_requests || [];
+
+  // 🔍 Local filter by prescription_id
+  if (search) {
+    meds = meds.filter(r =>
+      r.prescription_id?.toString().includes(search.trim())
+    );
+  }
+
+  setRequests(meds);
+  setTotalPages(data.pagination?.totalPages || 1);
+  setCurrentPage(data.pagination?.currentPage || 1);
+} else {
+  console.error(t('medicine_request_list.fetch_failed'), data);
+}
+
+
     } catch (error) {
       console.error(t('medicine_request_list.fetch_error'), error);
     } finally {

@@ -162,6 +162,7 @@ const ProfileScreen = () => {
         <Text style={styles.headerTitle}>{t('profile')}</Text>
       </View>
 
+
       <ScrollView style={styles.scrollView}>
         {/* Profile Picture and Name */}
         <View style={styles.profileHeader}>

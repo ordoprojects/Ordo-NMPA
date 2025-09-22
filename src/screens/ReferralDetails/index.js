@@ -147,11 +147,11 @@ const ReferralDetails = ({ navigation, route }) => {
           <>
             <Text style={styles.sectionTitle}>{t('referral_details.patient_info')}</Text>
             <View style={styles.patientInfoContainer}>
-              {user?.photo_url ? (
+              {referral?.patient_photo_url ? (
                 <ImageBackground
                   source={{ 
-                    uri: user?.photo_url 
-                      ? `${BASE_URL}${user?.photo_url?.replace(/^\/api/, '')}`
+                    uri: referral?.patient_photo_url 
+                      ? `${BASE_URL}${referral?.patient_photo_url?.replace(/^\/api/, '')}`
                       : 'https://lh3.googleusercontent.com/aida-public/AB6AXuD6iCqF0CKSARpJEMpI54q4W7czcfALHbNpBWTrRDz-Vwtoozz8Wn6wta1rIBmfy6wAM_5G52PkYydwL3T52x8IXfD8V_noYfr5Eamzd8nfGhRX5Z--UM_QMVjPmtivJjWHyCoZVDWklaAvR17aKdLSAghbeKHUoCyQ0sbEbKXVWd2VJj0aSvoZ_HU0dx-u7H0QKc8FhHiA4lgTgYZRbxSUpf1VudZvjIhTPtGOg7-Gangk-55GxD_mOulCKItluIvJrnPhcAXCDHoW' 
                   }} 
                   style={styles.patientImage}
@@ -218,7 +218,7 @@ const ReferralDetails = ({ navigation, route }) => {
             <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>{t('duty_doctor')}</Text>
             <Text style={styles.detailValue}>
-              {`${referral?.duty_doctor_first_name} ${referral?.duty_doctor_last_name}`|| t('referral_details.not_available')}
+              {`${referral?.duty_doctor_first_name}`|| t('referral_details.not_available')}
             </Text>
           </View>
               <View style={styles.detailRow}>

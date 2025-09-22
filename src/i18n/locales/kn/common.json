@@ -1,5 +1,5 @@
 {
-  "welcome": "NMPA ಚಿಕಿತ್ಸಾ\nಮಿತ್ರಗೆ ಸ್ವಾಗತ",
+  "welcome": "ಟೆಸ್ಟ್ ಚಿಕಿತ್ಸೆ\nಮಿತ್ರಗೆ ಸ್ವಾಗತ",
   "username": "ಬಳಕೆದಾರಹೆಸರು",
   "password": "ಪಾಸ್ವರ್ಡ್",
   "enter_username": "ನಿಮ್ಮ ಬಳಕೆದಾರಹೆಸರನ್ನು ನಮೂದಿಸಿ",
@@ -231,7 +231,8 @@
     "request_failed": "ವಿನಂತಿಯನ್ನು ಪ್ರಕ್ರಿಯೆಗೊಳಿಸಲು ವಿಫಲವಾಗಿದೆ",
     "rejection_reason_error": "ದಯವಿಟ್ಟು ತಿರಸ್ಕರಣೆಯ ಕಾರಣವನ್ನು ನಮೂದಿಸಿ",
     "rejection_failed": "ತಿರಸ್ಕರಣೆ ವಿಫಲವಾಗಿದೆ",
-    "rejection_success": "ಭೇಟಿ ತಿರಸ್ಕರಿಸಲಾಗಿದೆ"
+    "rejection_success": "ಭೇಟಿ ತಿರಸ್ಕರಿಸಲಾಗಿದೆ",
+    "select_hospital": "ಆಸ್ಪತ್ರೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ"
   },
   "confirm": "ಖಚಿತಪಡಿಸಿ",
   "medicine_review": {

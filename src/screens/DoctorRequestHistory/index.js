@@ -92,7 +92,7 @@ setUser(data);
       }
       
       return () => {};
-    }, [activeMainTab])
+    }, [activeMainTab ,activeStatusFilter])
   );
 
 
@@ -541,7 +541,7 @@ const getStatusFilters = () => {
               styles.mainTab,
               activeMainTab === (tab === t('referral') ? 'Referral' : 'Medicine') && styles.activeMainTab
             ]}
-            onPress={() => setActiveMainTab(tab === t('referral') ? 'Referral' : 'Medicine')}
+           onPress={() => {setActiveStatusFilter('All'); setActiveMainTab(tab === t('referral') ? 'Referral' : 'Medicine'); tab === t('referral') ? fetchReferrals() : fetchMedicineRequests()}}
           >
             <Text style={[
               styles.mainTabText,

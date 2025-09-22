@@ -9,6 +9,7 @@ import Toast from 'react-native-simple-toast';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRole } from '../../Context/RoleContext';
 
+
 const OTPScreen = ({ route }) => {
   const navigation = useNavigation();
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
@@ -69,10 +70,7 @@ const OTPScreen = ({ route }) => {
   const handleVerifyOTP = async () => {
     // Validate OTP (should be 6 digits)
     const otpCode = otp.join('');
-    if (otpCode.length !== 6) {
-      Alert.alert('Error', t('validation_otp'));
-      return;
-    }
+    // 6
     
     setIsLoading(true);
 
@@ -207,11 +205,12 @@ const OTPScreen = ({ route }) => {
     }
   };
 
-  const fillFixedOtp = () => {
-    const fixedOtp = '123456'.split('');
-    setOtp(fixedOtp);
-    setShowOtpModal(false);
-  };
+ const fillFixedOtp = () => {
+  const fixedOtp = '092025'.split('');
+  setOtp(fixedOtp);
+  setShowOtpModal(false);
+};
+
 
   return (
     <View style={styles.container}>
@@ -290,7 +289,8 @@ const OTPScreen = ({ route }) => {
             <Text style={styles.modalText}>
               {t('otp_sent_message')}
             </Text>
-            <Text style={styles.otpCode}>123456</Text>
+            <Text style={styles.otpCode}>092025</Text>
+
             
             <TouchableOpacity 
               style={styles.modalButton}

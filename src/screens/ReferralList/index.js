@@ -19,6 +19,16 @@ const ReferralList = ({ navigation }) => {
   const [totalPages, setTotalPages] = useState(1);
   const [refreshing, setRefreshing] = useState(false);
 
+  useEffect(() => {
+  // Trigger search automatically when user types
+  const delayDebounce = setTimeout(() => {
+    fetchReferrals(1, searchQuery);
+  }, 400); // small delay to avoid too many API calls
+
+  return () => clearTimeout(delayDebounce);
+}, [searchQuery]);
+
+
 const fetchReferrals = async (page = 1, search = '') => {
   try {
     setLoading(true);
@@ -45,16 +55,23 @@ const fetchReferrals = async (page = 1, search = '') => {
 
     const data = await response.json();
 
-    if (response.ok) {
-      // Now the server should only return pending appointments
-      setAppointments(data.appointments);
-      setTotalPages(data.pagination.totalPages);
-      setCurrentPage(data.pagination.currentPage);
-    } else {
-      console.error(t('referral_list.fetch_failed'), data);
-    }
-  } catch (error) {
-    console.error(t('referral_list.fetch_error'), error);
+   if (response.ok) {
+  let appts = data.appointments || [];
+
+  // ✅ Apply frontend filtering for patient name
+  if (search) {
+    appts = appts.filter(a =>
+      a.patient_name?.toLowerCase().includes(search.toLowerCase())
+    );
+  }
+
+  setAppointments(appts);
+  setTotalPages(data.pagination?.totalPages || 1);
+  setCurrentPage(data.pagination?.currentPage || 1);
+} else {
+  console.error(t('referral_list.fetch_failed'), data);
+}
+
   } finally {
     setLoading(false);
     setRefreshing(false);
@@ -69,11 +86,11 @@ const fetchReferrals = async (page = 1, search = '') => {
   );
 
   console.log("appp",JSON.stringify(appointments,null,2))
+const handleSearch = () => {
+  setCurrentPage(1);
+  fetchReferrals(1, searchQuery);
+};
 
-  const handleSearch = () => {
-    setCurrentPage(1);
-    fetchReferrals(1, searchQuery);
-  };
 
   const handleRefresh = () => {
     setRefreshing(true);

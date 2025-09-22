@@ -97,10 +97,10 @@ const LoginScreen = ({ navigation }) => {
         <LanguageSelector />
       </View>
       
-      <KeyboardAvoidingView
+        <KeyboardAvoidingView
         style={styles.keyboardAvoidingView}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
       >
         <ScrollView 
           contentContainerStyle={[styles.scrollContent, {minHeight: height}]}
