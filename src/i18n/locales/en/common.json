@@ -1,5 +1,5 @@
 {
- "welcome": "Welcome to Test Chikitsa\nMitra",
+ "welcome": "Welcome to NMPA Chikitsa\nMitra",
   "username": "Username",
   "password": "Password",
   "enter_username": "Enter your username",
@@ -122,7 +122,28 @@
     "submission_failed": "Failed to submit request",
     "submission_success": "Request submitted successfully",
     "duplicate_error": "This prescription has already been submitted",
-    "corrupted_file_error": "The file is corrupted or invalid. Please upload a valid prescription."
+    "corrupted_file_error": "The file is corrupted or invalid. Please upload a valid prescription.",
+      "delivery_address": "Delivery Address",
+    "full_name": "Full Name",
+    "phone_number": "Phone Number",
+    "address_line1": "Address Line 1",
+    "address_line2": "Address Line 2",
+    "city": "City",
+    "state": "State",
+    "postal_code": "Postal Code",
+    "country": "Country",
+    "address_line1_placeholder": "Enter your street address",
+    "address_line2_placeholder": "Apartment, suite, unit, etc. (optional)",
+    "city_placeholder": "Enter your city",
+    "state_placeholder": "Enter your state",
+    "postal_code_placeholder": "Enter your postal code",
+    "country_placeholder": "Enter your country",
+    "address_line1_required": "Address Line 1 is required",
+    "city_required": "City is required",
+    "state_required": "State is required",
+    "postal_code_required": "Postal code is required",
+    "country_required": "Country is required",
+    "address_submission_failed": "Failed to save delivery address"
   },
   "referral_request": {
     "title": "Referral Request",
@@ -408,7 +429,9 @@
   "otp_sent_to": "OTP sent to",
   "otp_resent": "OTP resent successfully",
   "otp_verification_failed": "OTP verification failed",
-  "auto_fill_otp": "Auto-fill OTP"
+  "auto_fill_otp": "Auto-fill OTP",
+  "loading": "Loading..."
+
   
 
 }

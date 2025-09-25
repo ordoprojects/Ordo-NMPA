@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     minWidth: 84,
-    maxWidth: 480,
+    // maxWidth: 480,
     width: '100%',
   },
   continueButtonText: {

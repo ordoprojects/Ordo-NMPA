@@ -195,8 +195,8 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   nmpaLogo: {
-    width: 150,
-    height: 100,
+    width: 250,
+    height: 150,
     resizeMode: 'contain',
   },
   nmpaLogoSmall: {

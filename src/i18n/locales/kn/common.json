@@ -1,5 +1,5 @@
 {
-  "welcome": "ಟೆಸ್ಟ್ ಚಿಕಿತ್ಸೆ\nಮಿತ್ರಗೆ ಸ್ವಾಗತ",
+  "welcome": "NMPA ಚಿಕಿತ್ಸಾ ಮಿತ್ರಕ್ಕೆ ಸ್ವಾಗತ",
   "username": "ಬಳಕೆದಾರಹೆಸರು",
   "password": "ಪಾಸ್ವರ್ಡ್",
   "enter_username": "ನಿಮ್ಮ ಬಳಕೆದಾರಹೆಸರನ್ನು ನಮೂದಿಸಿ",
@@ -122,7 +122,28 @@
     "submission_failed": "ವಿನಂತಿಯನ್ನು ಸಲ್ಲಿಸಲು ವಿಫಲವಾಗಿದೆ",
     "submission_success": "ವಿನಂತಿ ಯಶಸ್ವಿಯಾಗಿ ಸಲ್ಲಿಸಲಾಗಿದೆ",
     "duplicate_error": "ಈ ಪ್ರಿಸ್ಕ್ರಿಪ್ಷನ್ ಈಗಾಗಲೇ ಸಲ್ಲಿಸಲಾಗಿದೆ",
-    "corrupted_file_error": "ಫೈಲ್ ಹಾಳಾಗಿದೆ ಅಥವಾ ಅಮಾನ್ಯವಾಗಿದೆ. ದಯವಿಟ್ಟು ಮಾನ್ಯ ಪ್ರಿಸ್ಕ್ರಿಪ್ಷನ್ ಅನ್ನು ಅಪ್ಲೋಡ್ ಮಾಡಿ."
+    "corrupted_file_error": "ಫೈಲ್ ಹಾಳಾಗಿದೆ ಅಥವಾ ಅಮಾನ್ಯವಾಗಿದೆ. ದಯವಿಟ್ಟು ಮಾನ್ಯ ಪ್ರಿಸ್ಕ್ರಿಪ್ಷನ್ ಅನ್ನು ಅಪ್ಲೋಡ್ ಮಾಡಿ.",
+        "delivery_address": "ವಿತರಣಾ ವಿಳಾಸ",
+    "full_name": "ಪೂರ್ಣ ಹೆಸರು",
+    "phone_number": "ದೂರವಾಣಿ ಸಂಖ್ಯೆ",
+    "address_line1": "ವಿಳಾಸ ಸಾಲು 1",
+    "address_line2": "ವಿಳಾಸ ಸಾಲು 2",
+    "city": "ನಗರ",
+    "state": "ರಾಜ್ಯ",
+    "postal_code": "ಅಂಚೆ ಕೋಡ್",
+    "country": "ದೇಶ",
+    "address_line1_placeholder": "ನಿಮ್ಮ ಬೀದಿ ವಿಳಾಸವನ್ನು ನಮೂದಿಸಿ",
+    "address_line2_placeholder": "ಅಪಾರ್ಟ್‌ಮೆಂಟ್, ಸೂಟ್, ಘಟಕ ಇತ್ಯಾದಿ (ಐಚ್ಛಿಕ)",
+    "city_placeholder": "ನಿಮ್ಮ ನಗರವನ್ನು ನಮೂದಿಸಿ",
+    "state_placeholder": "ನಿಮ್ಮ ರಾಜ್ಯವನ್ನು ನಮೂದಿಸಿ",
+    "postal_code_placeholder": "ನಿಮ್ಮ ಅಂಚೆ ಕೋಡ್ ನಮೂದಿಸಿ",
+    "country_placeholder": "ನಿಮ್ಮ ದೇಶವನ್ನು ನಮೂದಿಸಿ",
+    "address_line1_required": "ವಿಳಾಸ ಸಾಲು 1 ಅಗತ್ಯವಿದೆ",
+    "city_required": "ನಗರ ಅಗತ್ಯವಿದೆ",
+    "state_required": "ರಾಜ್ಯ ಅಗತ್ಯವಿದೆ",
+    "postal_code_required": "ಅಂಚೆ ಕೋಡ್ ಅಗತ್ಯವಿದೆ",
+    "country_required": "ದೇಶ ಅಗತ್ಯವಿದೆ",
+    "address_submission_failed": "ವಿತರಣಾ ವಿಳಾಸವನ್ನು ಉಳಿಸಲು ವಿಫಲವಾಗಿದೆ"
   },
   "referral_request": {
     "title": "ರೆಫರಲ್ ವಿನಂತಿ",
@@ -404,6 +425,7 @@
   "otp_resent": "OTP ಯಶಸ್ವಿಯಾಗಿ ಮತ್ತೆ ಕಳುಹಿಸಲಾಗಿದೆ",
   "otp_verification_failed": "OTP ದೃಢೀಕರಣ ವಿಫಲವಾಗಿದೆ",
   "auto_fill_otp": "OTP ಸ್ವಯಂ-ಭರ್ತಿ",
-  "close": "ಮುಚ್ಚಿ"
+  "close": "ಮುಚ್ಚಿ",
+  "loading": "ಲೋಡ್ ಆಗುತ್ತಿದೆ..."
 
 }

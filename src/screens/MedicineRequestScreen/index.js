@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   View, 
   Text, 
@@ -31,11 +31,55 @@ const MedicineRequestScreen = () => {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [duration, setDuration] = useState('');
   const [showDurationPicker, setShowDurationPicker] = useState(false);
-  const [address, setAddress] = useState('');
   const [isDragging, setIsDragging] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // User data state
+  const [user, setUser] = useState(null);
+  const [pageLoading, setPageLoading] = useState(true);
+  
+  // Delivery address fields
+  const [addressLine1, setAddressLine1] = useState('');
+  const [addressLine2, setAddressLine2] = useState('');
+  const [city, setCity] = useState('');
+  const [state, setState] = useState('');
+  const [postalCode, setPostalCode] = useState('');
+  const [country, setCountry] = useState('');
 
   const durationOptions = ['7 days', '14 days', '1 month', '2 months'];
+
+  // Fetch user data on component mount
+  useEffect(() => {
+    fetchUser();
+  }, []);
+
+  const fetchUser = async () => {
+    try {
+      setPageLoading(true);
+      const token = await getToken();
+      
+      const response = await fetch(`${BASE_URL}/me/`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const data = await response.json();
+      setUser(data);
+
+      if (response.ok) {
+        console.log("User data fetched successfully");
+      } else {
+        console.error('Failed to fetch user:', data);
+      }
+    } catch (error) {
+      console.error('Error fetching user:', error);
+    } finally {
+      setPageLoading(false);
+    }
+  };
 
   const pickDocument = async () => {
     try {
@@ -80,114 +124,204 @@ const MedicineRequestScreen = () => {
     setDate(currentDate);
   };
 
-
-const validateDuration = (text) => {
-  // Allow any input while typing, but validate on submit
-  setDuration(text);
-};
-  const handleSubmit = async () => {
-    // Required fields
-    if (!selectedFile) {
-      Alert.alert(t('error'), t('medicine_request.no_file_error'));
-      return;
-    }
-
-    if (!date) {
-      Alert.alert(t('error'), t('medicine_request.no_date_error'));
-      return;
-    }
-
-    if (!duration) {
-      Alert.alert(t('error'), t('medicine_request.no_duration_error'));
-      return;
-    }
-
-    // Validate duration format
-    if (!/^\d+\s*(days?|months?)$/i.test(duration)) {
-      Alert.alert(t('error'), t('medicine_request.duration_format_error'));
-      return;
-    }
-
-    // Validate date is within last 6 days
-    const sixDaysAgo = moment().subtract(6, 'days');
-    if (moment(date).isBefore(sixDaysAgo)) {
-      Alert.alert(t('error'), t('medicine_request.old_prescription_error'));
-      return;
-    }
-
-    // Validate not in future
-    if (moment(date).isAfter(moment())) {
-      Alert.alert(t('error'), t('medicine_request.future_date_error'));
-      return;
-    }
-
-    // Validate file type
-    const validTypes = ['image/jpeg', 'image/png', 'application/pdf'];
-    if (!validTypes.includes(selectedFile.type)) {
-      Alert.alert(t('error'), t('medicine_request.invalid_file_type_error'));
-      return;
-    }
-
-    // Validate file size (max 20MB)
-    if (selectedFile.size > 20 * 1024 * 1024) {
-      Alert.alert(t('error'), t('medicine_request.large_file_error'));
-      return;
-    }
-
-    try {
-      setIsSubmitting(true);
-
-      // Read file as base64
-      const fileContent = await RNFS.readFile(selectedFile.uri, 'base64');
-      const base64String = `data:${selectedFile.type};base64,${fileContent}`;
-
-      // Prepare request body
-      const requestBody = {
-        file_base64: base64String,
-        file_name: selectedFile.name || `prescription_${Date.now()}.${getFileExtension(selectedFile.type)}`,
-        file_type: selectedFile.type || 'application/octet-stream',
-        issue_date: moment(date).format('YYYY-MM-DD HH:mm:ss'),
-        duration: duration.toLowerCase()
-      };
-
-      const token = await getToken();
-
-      const response = await fetch(`${BASE_URL}/medicine-requests`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestBody),
-      });
-
-      const responseData = await response.json();
-
-  if (!response.ok) {
-  throw new Error(responseData.message || t('medicine_request.submission_failed'));
-}
-
-Alert.alert(t('success'), t('prescription_upload_success'));
-navigation.goBack();
-
-    } catch (error) {
-      console.error('Submission error:', error);
-      let errorMessage = error.message || t('medicine_request.submission_failed');
-      
-      // Enhanced error messages
-      if (error.message.includes('Duplicate')) {
-        errorMessage = t('medicine_request.duplicate_error');
-      } else if (error.message.includes('Invalid file')) {
-        errorMessage = t('medicine_request.corrupted_file_error');
-      } else if (error.message.includes('File too large')) {
-        errorMessage = t('medicine_request.large_file_error');
-      }
-      
-      Alert.alert(t('error'), errorMessage);
-    } finally {
-      setIsSubmitting(false);
-    }
+  const validateDuration = (text) => {
+    setDuration(text);
   };
+
+  const validateAddressFields = () => {
+    if (!addressLine1.trim()) {
+      Alert.alert(t('error'), t('medicine_request.address_line1_required'));
+      return false;
+    }
+    if (!city.trim()) {
+      Alert.alert(t('error'), t('medicine_request.city_required'));
+      return false;
+    }
+    if (!state.trim()) {
+      Alert.alert(t('error'), t('medicine_request.state_required'));
+      return false;
+    }
+    if (!postalCode.trim()) {
+      Alert.alert(t('error'), t('medicine_request.postal_code_required'));
+      return false;
+    }
+    if (!country.trim()) {
+      Alert.alert(t('error'), t('medicine_request.country_required'));
+      return false;
+    }
+    return true;
+  };
+
+const handleSubmit = async () => {
+  // Required fields validation
+  if (!selectedFile) {
+    Alert.alert(t('error'), t('medicine_request.no_file_error'));
+    return;
+  }
+
+  if (!date) {
+    Alert.alert(t('error'), t('medicine_request.no_date_error'));
+    return;
+  }
+
+  if (!duration) {
+    Alert.alert(t('error'), t('medicine_request.no_duration_error'));
+    return;
+  }
+
+  // Validate duration format
+  if (!/^\d+\s*(days?|months?)$/i.test(duration)) {
+    Alert.alert(t('error'), t('medicine_request.duration_format_error'));
+    return;
+  }
+
+  // Validate date is within last 6 days
+  const sixDaysAgo = moment().subtract(6, 'days');
+  if (moment(date).isBefore(sixDaysAgo)) {
+    Alert.alert(t('error'), t('medicine_request.old_prescription_error'));
+    return;
+  }
+
+  // Validate not in future
+  if (moment(date).isAfter(moment())) {
+    Alert.alert(t('error'), t('medicine_request.future_date_error'));
+    return;
+  }
+
+  // Validate address fields
+  if (!validateAddressFields()) {
+    return;
+  }
+
+  // Validate file type
+  const validTypes = ['image/jpeg', 'image/png', 'application/pdf'];
+  if (!validTypes.includes(selectedFile.type)) {
+    Alert.alert(t('error'), t('medicine_request.invalid_file_type_error'));
+    return;
+  }
+
+  // Validate file size (max 20MB)
+  if (selectedFile.size > 20 * 1024 * 1024) {
+    Alert.alert(t('error'), t('medicine_request.large_file_error'));
+    return;
+  }
+
+  try {
+    setIsSubmitting(true);
+
+    // Read file as base64
+    const fileContent = await RNFS.readFile(selectedFile.uri, 'base64');
+    const base64String = `data:${selectedFile.type};base64,${fileContent}`;
+
+    // Prepare medicine request body
+    const medicineRequestBody = {
+      file_base64: base64String,
+      file_name: selectedFile.name || `prescription_${Date.now()}.${getFileExtension(selectedFile.type)}`,
+      file_type: selectedFile.type || 'application/octet-stream',
+      issue_date: moment(date).format('YYYY-MM-DD HH:mm:ss'),
+      duration: duration.toLowerCase()
+    };
+
+    // Log medicine request payload
+    console.log('=== MEDICINE REQUEST PAYLOAD ===');
+    console.log('URL:', `${BASE_URL}/medicine-requests`);
+    console.log('Payload:', {
+      ...medicineRequestBody,
+      file_base64: `${medicineRequestBody.file_base64.substring(0, 100)}...` // Truncate base64 for readability
+    });
+    console.log('File size:', selectedFile.size);
+    console.log('File type:', selectedFile.type);
+    console.log('File name:', selectedFile.name);
+    console.log('===============================');
+
+    const token = await getToken();
+
+    // First, submit the medicine request
+    const medicineResponse = await fetch(`${BASE_URL}/medicine-requests`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(medicineRequestBody),
+    });
+
+    const medicineResponseData = await medicineResponse.json();
+
+    // Log medicine request response
+    console.log('=== MEDICINE REQUEST RESPONSE ===');
+    console.log('Status:', medicineResponse.status);
+    console.log('Response:', medicineResponseData);
+    console.log('===============================');
+
+    if (!medicineResponse.ok) {
+      throw new Error(medicineResponseData.message || t('medicine_request.submission_failed'));
+    }
+
+    // Then, submit the delivery address
+    const addressRequestBody = {
+      full_name: user?.first_name || '',
+      phone_number: user?.phone_number || '',
+      address_line1: addressLine1,
+      address_line2: addressLine2,
+      city: city,
+      state: state,
+      postal_code: postalCode,
+      country: country
+    };
+
+    // Log delivery address payload
+    console.log('=== DELIVERY ADDRESS PAYLOAD ===');
+    console.log('URL:', `${BASE_URL}/medicine-requests/delivery-address`);
+    console.log('Payload:', addressRequestBody);
+    console.log('User data used:', {
+      full_name: user?.first_name,
+      phone_number: user?.phone_number
+    });
+    console.log('===============================');
+
+    const addressResponse = await fetch(`${BASE_URL}/medicine-requests/delivery-address`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(addressRequestBody),
+    });
+
+    const addressResponseData = await addressResponse.json();
+
+    // Log delivery address response
+    console.log('=== DELIVERY ADDRESS RESPONSE ===');
+    console.log('Status:', addressResponse.status);
+    console.log('Response:', addressResponseData);
+    console.log('===============================');
+
+    if (!addressResponse.ok) {
+      throw new Error(addressResponseData.message || t('medicine_request.address_submission_failed'));
+    }
+
+    Alert.alert(t('success'), t('prescription_upload_success'));
+    navigation.goBack();
+
+  } catch (error) {
+    console.error('Submission error:', error);
+    let errorMessage = error.message || t('medicine_request.submission_failed');
+    
+    // Enhanced error messages
+    if (error.message.includes('Duplicate')) {
+      errorMessage = t('medicine_request.duplicate_error');
+    } else if (error.message.includes('Invalid file')) {
+      errorMessage = t('medicine_request.corrupted_file_error');
+    } else if (error.message.includes('File too large')) {
+      errorMessage = t('medicine_request.large_file_error');
+    }
+    
+    Alert.alert(t('error'), errorMessage);
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   const getFileExtension = (mimeType) => {
     if (!mimeType) return 'pdf';
@@ -196,6 +330,17 @@ navigation.goBack();
     if (mimeType.includes('pdf')) return 'pdf';
     return mimeType.split('/')[1] || 'pdf';
   };
+
+  if (pageLoading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={Colors.darkBlue} />
+          <Text style={styles.loadingText}>{t('loading')}</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -282,16 +427,82 @@ navigation.goBack();
           <Text style={styles.hintText}>{t('medicine_request.duration_hint')}</Text>
         </View>
 
-        {/* Delivery Address */}
+        {/* Delivery Address Section */}
+        {/* <Text style={styles.sectionTitle}>{t('medicine_request.delivery_address')}</Text> */}
+        
+        {/* User Info Display */}
+        {/* <View style={styles.userInfoContainer}>
+          <Text style={styles.userInfoLabel}>{t('medicine_request.full_name')}:</Text>
+          <Text style={styles.userInfoText}>{user?.first_name || 'N/A'}</Text>
+          
+          <Text style={styles.userInfoLabel}>{t('medicine_request.phone_number')}:</Text>
+          <Text style={styles.userInfoText}>{user?.phone_number || 'N/A'}</Text>
+        </View> */}
+
+        {/* Address Line 1 */}
         <View style={styles.inputContainer}>
-          <Text style={styles.inputLabel}>{t('delivery_address')}</Text>
+          <Text style={styles.inputLabel}>{t('medicine_request.address_line1')}</Text>
           <TextInput
-            style={[styles.input, styles.textArea]}
-            placeholder={t('medicine_request.address_placeholder')}
-            multiline
-            numberOfLines={4}
-            value={address}
-            onChangeText={setAddress}
+            style={styles.input}
+            placeholder={t('medicine_request.address_line1_placeholder')}
+            value={addressLine1}
+            onChangeText={setAddressLine1}
+          />
+        </View>
+
+        {/* Address Line 2 */}
+        <View style={styles.inputContainer}>
+          <Text style={styles.inputLabel}>{t('medicine_request.address_line2')}</Text>
+          <TextInput
+            style={styles.input}
+            placeholder={t('medicine_request.address_line2_placeholder')}
+            value={addressLine2}
+            onChangeText={setAddressLine2}
+          />
+        </View>
+
+        {/* City */}
+        <View style={styles.inputContainer}>
+          <Text style={styles.inputLabel}>{t('medicine_request.city')}</Text>
+          <TextInput
+            style={styles.input}
+            placeholder={t('medicine_request.city_placeholder')}
+            value={city}
+            onChangeText={setCity}
+          />
+        </View>
+
+        {/* State */}
+        <View style={styles.inputContainer}>
+          <Text style={styles.inputLabel}>{t('medicine_request.state')}</Text>
+          <TextInput
+            style={styles.input}
+            placeholder={t('medicine_request.state_placeholder')}
+            value={state}
+            onChangeText={setState}
+          />
+        </View>
+
+        {/* Postal Code */}
+        <View style={styles.inputContainer}>
+          <Text style={styles.inputLabel}>{t('medicine_request.postal_code')}</Text>
+          <TextInput
+            style={styles.input}
+            placeholder={t('medicine_request.postal_code_placeholder')}
+            value={postalCode}
+            onChangeText={setPostalCode}
+            keyboardType="numeric"
+          />
+        </View>
+
+        {/* Country */}
+        <View style={styles.inputContainer}>
+          <Text style={styles.inputLabel}>{t('medicine_request.country')}</Text>
+          <TextInput
+            style={styles.input}
+            placeholder={t('medicine_request.country_placeholder')}
+            value={country}
+            onChangeText={setCountry}
           />
         </View>
       </ScrollView>
@@ -437,18 +648,6 @@ const styles = StyleSheet.create({
     color: '#0e161b',
     justifyContent: 'center',
   },
-  inputText: {
-    fontSize: 16,
-    color: '#0e161b',
-  },
-  placeholderText: {
-    fontSize: 16,
-    color: '#a0aec0',
-  },
-  textArea: {
-    minHeight: 144,
-    textAlignVertical: 'top',
-  },
   dateInput: {
     width: '100%',
     minHeight: 56,
@@ -485,46 +684,13 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     letterSpacing: 0.015,
   },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-  },
-  modalContent: {
-    width: '80%',
-    backgroundColor: 'white',
-    borderRadius: 10,
-    padding: 20,
-  },
-  optionButton: {
-    padding: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
-  optionText: {
-    fontSize: 16,
-    textAlign: 'center',
-  },
-  cancelButton: {
-    padding: 15,
-    marginTop: 10,
-    backgroundColor: '#f8fafc',
-    borderRadius: 8,
-  },
-  cancelButtonText: {
-    fontSize: 16,
-    textAlign: 'center',
-    color: Colors.darkBlue,
-    fontWeight: 'bold',
-  },
-    hintText: {
+  hintText: {
     fontSize: 12,
     color: '#666',
     marginTop: 4,
     fontStyle: 'italic',
   },
-    durationInput: {
+  durationInput: {
     width: '100%',
     minHeight: 56,
     borderWidth: 1,
@@ -536,6 +702,35 @@ const styles = StyleSheet.create({
     fontWeight: 'normal',
     lineHeight: 24,
     color: '#0e161b',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#666',
+  },
+  userInfoContainer: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: '#f0f9ff',
+    marginHorizontal: 16,
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+  userInfoLabel: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#0e161b',
+    marginBottom: 4,
+  },
+  userInfoText: {
+    fontSize: 14,
+    color: '#0e161b',
+    marginBottom: 12,
   },
 });
 

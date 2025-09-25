@@ -1,5 +1,5 @@
 {
-  "welcome": "टेस्ट चिकित्सा\nमित्र में आपका स्वागत है",
+ "welcome": "NMPA चिकित्सा मित्र में आपका स्वागत है",
   "username": "उपयोगकर्ता नाम",
   "password": "पासवर्ड",
   "enter_username": "अपना उपयोगकर्ता नाम दर्ज करें",
@@ -123,7 +123,28 @@
     "submission_failed": "अनुरोध सबमिट करने में विफल",
     "submission_success": "अनुरोध सफलतापूर्वक सबमिट हो गया",
     "duplicate_error": "यह पर्चा पहले ही सबमिट किया जा चुका है",
-    "corrupted_file_error": "फ़ाइल खराब या अमान्य है। कृपया एक वैध पर्चा अपलोड करें।"
+    "corrupted_file_error": "फ़ाइल खराब या अमान्य है। कृपया एक वैध पर्चा अपलोड करें।",
+        "delivery_address": "डिलीवरी पता",
+    "full_name": "पूरा नाम",
+    "phone_number": "फ़ोन नंबर",
+    "address_line1": "पता पंक्ति 1",
+    "address_line2": "पता पंक्ति 2",
+    "city": "शहर",
+    "state": "राज्य",
+    "postal_code": "पिन कोड",
+    "country": "देश",
+    "address_line1_placeholder": "अपना गली/सड़क का पता दर्ज करें",
+    "address_line2_placeholder": "अपार्टमेंट, सूट, यूनिट आदि (वैकल्पिक)",
+    "city_placeholder": "अपना शहर दर्ज करें",
+    "state_placeholder": "अपना राज्य दर्ज करें",
+    "postal_code_placeholder": "अपना पिन कोड दर्ज करें",
+    "country_placeholder": "अपना देश दर्ज करें",
+    "address_line1_required": "पता पंक्ति 1 आवश्यक है",
+    "city_required": "शहर आवश्यक है",
+    "state_required": "राज्य आवश्यक है",
+    "postal_code_required": "पिन कोड आवश्यक है",
+    "country_required": "देश आवश्यक है",
+    "address_submission_failed": "डिलीवरी पता सहेजने में विफल"
   },
   "referral_request": {
     "title": "रेफरल अनुरोध",
@@ -408,7 +429,8 @@
   "otp_verification_failed": "OTP सत्यापन विफल",
 
   "auto_fill_otp": "OTP स्वतः भरें",
-  "close": "बंद करें"
+  "close": "बंद करें",
+  "loading": "लोड हो रहा है..."
 
 
 }

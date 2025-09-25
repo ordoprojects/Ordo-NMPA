@@ -447,7 +447,7 @@ const getRecentMedicineRequests = () => {
               </View>
               <Image
                 style={[styles.nmpaLogo, isSmallDevice && styles.smallNmpaLogo]}
-                source={require('../../assets/images/LogoNmpa.png')}
+                source={require('../../assets/images/Nmpa.png')}
               />
             </View>
           </View>
@@ -566,7 +566,7 @@ const getRecentMedicineRequests = () => {
         },
       }}
       logo={{
-        href: require('../../assets/images/LogoNmpa.png'),
+        href: require('../../assets/images/Nmpa.png'),
         scale: 0.5,
         padding: 0,
       }}
@@ -828,7 +828,7 @@ const getRecentMedicineRequests = () => {
         bottomRight: { color: '#0a7eb8' },
       }}
       logo={{
-        href: require('../../assets/images/LogoNmpa.png'),
+        href: require('../../assets/images/Nmpa.png'),
         scale: 0.5,
         padding: 2,
       }}
@@ -975,8 +975,8 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
   subimage: {
-    height: 50,
-    width: 50
+    height: 55,
+    width: 55
   },
   
   // Medical Card Styles
