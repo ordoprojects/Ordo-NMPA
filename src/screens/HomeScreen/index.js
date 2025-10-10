@@ -16,6 +16,7 @@ import Toast from 'react-native-simple-toast';
 import { setupNotifications, setupNotificationHandlers ,registerFCMToken} from '../../services/notificationService';
 import { useTranslation } from 'react-i18next'; 
 import QRCode from 'react-native-qrcode-styled';
+import { useApi } from '../../hooks/useApi';
 
 const { width } = Dimensions.get('window');
 const isSmallDevice = width < 375; 
@@ -33,20 +34,30 @@ const HomeScreen = () => {
   const [qrLoading, setQrLoading] = useState(false); // Add this state for QR loading
   const [pageLoading, setPageLoading] = useState(true);
 
-    const translateStatus = (status) => {
-    const statusTranslations = {
-      'pending': t('pending'),
-      'approved': t('approved'),
-      'rejected': t('rejected'),
-      'assigned': t('assigned'),
-      'dispatched': t('dispatched'),
-      'completed': t('completed'),
-      'assigned_to_doctor':t('medicine_request_list.status_assigned')
+    const { get } = useApi();
 
-    };
-    
-    return statusTranslations[status] || status.charAt(0).toUpperCase() + status.slice(1);
+  console.log("role",role)
+
+const translateStatus = (status) => {
+  // Special case for doctors
+  if (role === "doctor" && status === "assigned_to_doctor") {
+    return t('medicine_request_list.status_assigned_to_you'); // Add this key in your translation files
+  }
+
+  const statusTranslations = {
+    'pending': t('pending'),
+    'approved': t('approved'),
+    'rejected': t('rejected'),
+    'assigned': t('assigned'),
+    'dispatched': t('dispatched'),
+    'completed': t('completed'),
+    'assigned_to_doctor': t('medicine_request_list.status_assigned') // fallback for other roles
   };
+
+  return statusTranslations[status] || status.charAt(0).toUpperCase() + status.slice(1);
+};
+
+
 
   // Function to translate status with special handling for "assigned to doctor"
   const translateStatusWithContext = (status, context = '') => {
@@ -59,14 +70,14 @@ const HomeScreen = () => {
 
 // Replace your useEffect for QR data generation with this:
 useEffect(() => {
-  if (user && user.first_name) {
+  if (user && user.full_name) {
     const formattedData =
       `${t('card.title1')}\n` +
       `${t('card.title2')}\n` +
       `------------------------------------------------------\n` +
       `${t('card.header')}\n` +
       `------------------------------------------------------\n` +
-      `◉ ${t('card.name')}: ${user.first_name} ${user.last_name}\n` +
+      `◉ ${t('card.name')}: ${user.full_name}\n` +
       `◉ ${t('card.ecno')}: ${user.ecno}\n` +
       `◉ ${t('card.class')}: ${user.class}\n` +
       `◉ ${t('card.mobile')}: ${user.phone_number}\n` +
@@ -94,31 +105,19 @@ useEffect(() => {
    // Update your fetchUser function to handle loading
   const fetchUser = async () => {
     try {
-      setPageLoading(true); // Start loading
-      const token = await getToken();
-      
-      const response = await fetch(`${BASE_URL}/me/`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      const data = await response.json();
+      setPageLoading(true);
+      const data = await get('/me/');
       setUser(data);
-
-      if (response.ok) {
-        console.log("got user");
-      } else {
-        console.error('Failed to fetch user:', data);
-      }
+      console.log("got user");
     } catch (error) {
-      console.error('Error fetching user:', error);
+      if (error.message !== 'SESSION_EXPIRED') {
+        console.error('Error fetching user:', error);
+      }
     } finally {
-      setPageLoading(false); // Stop loading
+      setPageLoading(false);
     }
   };
+
 
   // Update your useFocusEffect to handle initial loading
 
@@ -138,62 +137,36 @@ useEffect(() => {
   const fetchReferrals = async () => {
     try {
       setLoading(true);
-      const token = await getToken();
-      const response = await fetch(`${BASE_URL}/appointments/list/`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      const data = await response.json();
-      console.log("dataaaaa",data)
-      if (response.ok) {
-           const pendingAppointments = data.appointments.filter(
-          appointment => appointment
-        );
-        setReferrals(pendingAppointments);
-      } else {
-        console.error('Failed to fetch referrals:', data);
-      }
+      const data = await get('/appointments/list/');
+      const pendingAppointments = data.appointments.filter(
+        appointment => appointment
+      );
+      setReferrals(pendingAppointments);
     } catch (error) {
-      console.error('Error fetching referrals:', error);
+      if (error.message !== 'SESSION_EXPIRED') {
+        console.error('Error fetching referrals:', error);
+      }
     } finally {
       setLoading(false);
     }
   };
-
-
-
 
   const fetchMedicineRequests = async () => {
     try {
       setLoading(true);
-      const token = await getToken();
-      const response = await fetch(`${BASE_URL}/medicine-requests/list/`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      const data = await response.json();
-      if (response.ok) {
-        setMedicineRequests(data.medicine_requests);
-      } else {
-        console.error('Failed to fetch medicine requests:', data);
-      }
+      const data = await get('/medicine-requests/list/');
+      setMedicineRequests(data.medicine_requests);
     } catch (error) {
-      console.error('Error fetching medicine requests:', error);
+      if (error.message !== 'SESSION_EXPIRED') {
+        console.error('Error fetching medicine requests:', error);
+      }
     } finally {
       setLoading(false);
     }
   };
 
-console.log("medice",JSON.stringify(medicineRequests,null,2))
-console.log("referral",JSON.stringify(referrals,null,2))
+// console.log("medice",JSON.stringify(medicineRequests,null,2))
+// console.log("referral",JSON.stringify(referrals,null,2))
 
 
   useFocusEffect(
@@ -424,158 +397,152 @@ const getRecentMedicineRequests = () => {
       <ScrollView style={styles.scrollView}>
         {/* Greeting */}
         <Text style={styles.greeting}>
-          {t('hello', { name: user?.first_name })}
+          {t('hello', { name: user?.full_name })}
         </Text>
 
         {/* Medical Card - UPDATED LAYOUT */}
-        <View style={styles.cardContainer}>
-          {/* Yellow Header */}
-          <View style={styles.cardYellowHeader}>
-            <View style={styles.cardHeaderContent}>
-              <Image
-                style={styles.govLogo}
-                source={require('../../assets/images/gov.png')}
-                resizeMode='contain'
-              />
-              <View style={styles.cardHeaderText}>
-                <Text style={[styles.cardTitle, isSmallDevice && styles.smallCardTitle]}>
-                  {t('new_mangalore_port_authority')}
-                </Text>
-                <Text style={[styles.cardSubtitle, isSmallDevice && styles.smallCardSubtitle]}>
-                  {t('govt_of_india')}
-                </Text>
-              </View>
-              <Image
-                style={[styles.nmpaLogo, isSmallDevice && styles.smallNmpaLogo]}
-                source={require('../../assets/images/Nmpa.png')}
-              />
-            </View>
-          </View>
+<View style={styles.cardContainer}>
+  {/* Yellow Header */}
+  <View style={styles.cardYellowHeader}>
+    <View style={styles.cardHeaderContent}>
+      <Image
+        style={styles.govLogo}
+        source={require('../../assets/images/gov.png')}
+        resizeMode='contain'
+      />
+      <View style={styles.cardHeaderText}>
+        <Text style={[styles.cardTitle, isSmallDevice && styles.smallCardTitle]}>
+          {t('new_mangalore_port_authority')}
+        </Text>
+        <Text style={[styles.cardSubtitle, isSmallDevice && styles.smallCardSubtitle]}>
+          {t('govt_of_india')}
+        </Text>
+      </View>
+      <Image
+        style={[styles.nmpaLogo, isSmallDevice && styles.smallNmpaLogo]}
+        source={require('../../assets/images/Nmpa.png')}
+        resizeMode='contain'
+      />
+    </View>
+  </View>
 
-          {/* Blue Title */}
-          <View style={styles.cardBlueTitle}>
-            <Text style={[styles.cardBlueTitleText, isSmallDevice && styles.smallCardBlueTitleText]}>
-              {t('employees_medical_card')}
-            </Text>
-          </View>
+  {/* Blue Title */}
+  <View style={styles.cardBlueTitle}>
+    <Text style={[styles.cardBlueTitleText, isSmallDevice && styles.smallCardBlueTitleText]}>
+      {t('employees_medical_card')}
+    </Text>
+  </View>
 
-          {/* Card Content - UPDATED FOR SMALL DEVICES */}
-          <View style={[styles.cardContent, isSmallDevice && styles.smallCardContent]}>
-            <View style={[styles.cardMainContent, isSmallDevice && styles.smallCardMainContent]}>
-              <Text style={[styles.cardName, isSmallDevice && styles.smallCardName]}>
-                {user?.first_name} {user?.last_name}
-              </Text>
+  {/* Card Content - FIXED LAYOUT */}
+  <View style={[styles.cardContent, isSmallDevice && styles.smallCardContent]}>
+    {/* Left Side - User Details */}
+    <View style={[styles.cardMainContent, isSmallDevice && styles.smallCardMainContent]}>
+      <Text style={[styles.cardName, isSmallDevice && styles.smallCardName]}>
+        {user?.full_name} 
+      </Text>
 
-              <View style={styles.cardDetails}>
-                <View style={styles.detailRow}>
-                  <Text style={[styles.detailLabel, isSmallDevice && styles.smallDetailLabel]}>
-                    {t('ec_no')}
-                  </Text>
-                  <Text style={[styles.detailValue, isSmallDevice && styles.smallDetailValue]}>
-                    : {user?.ecno}
-                  </Text>
-                </View>
-                <View style={styles.detailRow}>
-                  <Text style={[styles.detailLabel, isSmallDevice && styles.smallDetailLabel]}>
-                    {t('class')}
-                  </Text>
-                  <Text style={[styles.detailValue, isSmallDevice && styles.smallDetailValue]}>
-                    : {user?.class}
-                  </Text>
-                </View>
-                <View style={styles.detailRow}>
-                  <Text style={[styles.detailLabel, isSmallDevice && styles.smallDetailLabel]}>
-                    {t('mobile_no')}
-                  </Text>
-                  <Text style={[styles.detailValue, isSmallDevice && styles.smallDetailValue]}>
-                    : {user?.phone_number}
-                  </Text>
-                </View>
-                <View style={styles.detailRow}>
-                  <Text style={[styles.detailLabel, isSmallDevice && styles.smallDetailLabel]}>
-                    {t('medical_eligibility')}
-                  </Text>
-                  <Text style={[styles.detailValue, isSmallDevice && styles.smallDetailValue]}>
-                    : {t('yes')}
-                  </Text>
-                </View>
-              </View>
-            </View>
+      <View style={styles.cardDetails}>
+        <View style={styles.detailRow}>
+          <Text style={[styles.detailLabel, isSmallDevice && styles.smallDetailLabel]}>
+            {t('ec_no')}
+          </Text>
+          <Text style={[styles.detailValue, isSmallDevice && styles.smallDetailValue]}>
+            : {user?.ecno}
+          </Text>
+        </View>
+        <View style={styles.detailRow}>
+          <Text style={[styles.detailLabel, isSmallDevice && styles.smallDetailLabel]}>
+            {t('class')}
+          </Text>
+          <Text style={[styles.detailValue, isSmallDevice && styles.smallDetailValue]}>
+            : {user?.class}
+          </Text>
+        </View>
+        <View style={styles.detailRow}>
+          <Text style={[styles.detailLabel, isSmallDevice && styles.smallDetailLabel]}>
+            {t('mobile_no')}
+          </Text>
+          <Text style={[styles.detailValue, isSmallDevice && styles.smallDetailValue]}>
+            : {user?.phone_number}
+          </Text>
+        </View>
+        <View style={styles.detailRow}>
+          <Text style={[styles.detailLabel, isSmallDevice && styles.smallDetailLabel]}>
+            {t('medical_eligibility')}
+          </Text>
+          <Text style={[styles.detailValue, isSmallDevice && styles.smallDetailValue]}>
+            : {t('yes')}
+          </Text>
+        </View>
+      </View>
+    </View>
 
-            <View style={[styles.cardSideContent, isSmallDevice && styles.smallCardSideContent]}>
-              <View style={{flexDirection:'row',justifyContent:'center',alignItems:'center'}}>
-              <Image
-                style={[styles.profileImage, isSmallDevice && styles.smallProfileImage]}
-                source={{
-                  uri: user?.photo_url
-                    ? `${BASE_URL}${user.photo_url.replace(/^\/api/, '')}`
-                    : 'https://lh3.googleusercontent.com/aida-public/AB6AXuD6iCqF0CKSARpJEMpI54q4W7czcfALHbNpBWTrRDz-Vwtoozz8Wn6wta1rIBmfy6wAM_5G52PkYydwL3T52x8IXfD8V_noYfr5Eamzd8nfGhRX5Z--UM_QMVjPmtivJjWHyCoZVDWklaAvR17aKdLSAghbeKHUoCyQ0sbEbKXVWd2VJj0aSvoZ_HU0dx-u7H0QKc8FhHiA4lgTgYZRbxSUpf1VudZvjIhTPtGOg7-Gangk-55GxD_mOulCKItluIvJrnPhcAXCDHoW'
-                }}
-                resizeMode='contain'
-              />
-              <View style={[styles.bloodTypeContainer, isSmallDevice && styles.smallBloodTypeContainer]}>
-                <Image
-                  style={[styles.bloodIcon, isSmallDevice && styles.smallBloodIcon]}
-                  source={{ uri: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCCGguCGfShWeboGLMlQaExSSbn8fY0Hl19KnZdnmb9IGWRkq4xD0ca9N-94ODBSl16zPHLv8gLr0j6kxpErEdHb7hNIEpNcTgxyfAeOGJKVTIWeXoBSwjZIAsAUHJe7XE4ji6kVufc41DtjLJ0kvBDMbaLbWh3UNvTlLJOyj8oVGgkjli9-3Vf7QHAI3MXT-CWRG0ELvJ6IhrybXCkCr3oEtMkDKzrE79pefrxxpZBln_0UETXJZAfAj2-DqepdDbvS6pHaTt5zQTY' }}
-                />
-                <Text style={[styles.bloodType, isSmallDevice && styles.smallBloodType]}>
-                  {user?.blood_group}
-                </Text>
-              </View>
-</View>
-                 {/* Add Styled QR Code */}
- {qrData ? (
-  <TouchableOpacity 
+    {/* Right Side - Profile Image, Blood Group & QR Code */}
+    <View style={[styles.cardSideContent, isSmallDevice && styles.smallCardSideContent]}>
+      {/* Profile Image and Blood Group in a row */}
+      <View style={styles.profileBloodContainer}>
+        {user?.photo_url ? (
+          <Image
+            source={{ uri: `${BASE_URL}${user.photo_url.replace(/^\/api/, '')}` }}
+            style={[styles.profileImage, isSmallDevice && styles.smallProfileImage]}
+            resizeMode='cover'
+          />
+        ) : (
+          <Image
+            source={require('../../assets/images/profile.png')}
+            style={[styles.profileImage, isSmallDevice && styles.smallProfileImage]}
+            resizeMode='cover'
+          />
+        )}
+        
+        <View style={[styles.bloodTypeContainer, isSmallDevice && styles.smallBloodTypeContainer]}>
+          <Image
+            style={[styles.bloodIcon, isSmallDevice && styles.smallBloodIcon]}
+            source={{ uri: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCCGguCGfShWeboGLMlQaExSSbn8fY0Hl19KnZdnmb9IGWRkq4xD0ca9N-94ODBSl16zPHLv8gLr0j6kxpErEdHb7hNIEpNcTgxyfAeOGJKVTIWeXoBSwjZIAsAUHJe7XE4ji6kVufc41DtjLJ0kvBDMbaLbWh3UNvTlLJOyj8oVGgkjli9-3Vf7QHAI3MXT-CWRG0ELvJ6IhrybXCkCr3oEtMkDKzrE79pefrxxpZBln_0UETXJZAfAj2-DqepdDbvS6pHaTt5zQTY' }}
+            resizeMode='contain'
+          />
+          <Text style={[styles.bloodType, isSmallDevice && styles.smallBloodType]}>
+            {user?.blood_group}
+          </Text>
+        </View>
+      </View>
+
+      {/* QR Code */}
+      {qrData ? (
+        <TouchableOpacity 
           style={styles.qrCodeContainer}
           onPress={handleQrCodePress}
         >
-    <QRCode
-      data={qrData}
-      // style={styles.qrCode}
-      size={60} 
-      padding={1}
-      pieceSize={2}
-      color={Colors.darkBlue}
-      backgroundColor="transparent"
-      outerEyesOptions={{
-        topLeft: {
-          color: Colors.darkBlue,
-        },
-        topRight: {
-          color: Colors.darkBlue,
-        },
-        bottomLeft: {
-          color: Colors.darkBlue,
-        },
-         bottomRight: {
-          color: Colors.darkBlue,
-        },
-      }}
-      innerEyesOptions={{
-        topLeft: {
-          color: '#0a7eb8',
-        },
-        topRight: {
-          color: '#0a7eb8',
-        },
-        bottomLeft: {
-          color: '#0a7eb8',
-        },
-         bottomRight: {
-          color: '#0a7eb8',
-        },
-      }}
-      logo={{
-        href: require('../../assets/images/Nmpa.png'),
-        scale: 0.5,
-        padding: 0,
-      }}
-    />
-  </TouchableOpacity>
-) : null}
-          </View>
-        </View>
-            </View>
+          <QRCode
+            data={qrData}
+            size={isSmallDevice ? 50 : 60}
+            padding={1}
+            pieceSize={2}
+            color={Colors.darkBlue}
+            backgroundColor="transparent"
+            outerEyesOptions={{
+              topLeft: { color: Colors.darkBlue },
+              topRight: { color: Colors.darkBlue },
+              bottomLeft: { color: Colors.darkBlue },
+              bottomRight: { color: Colors.darkBlue },
+            }}
+            innerEyesOptions={{
+              topLeft: { color: '#0a7eb8' },
+              topRight: { color: '#0a7eb8' },
+              bottomLeft: { color: '#0a7eb8' },
+              bottomRight: { color: '#0a7eb8' },
+            }}
+            logo={{
+              href: require('../../assets/images/Nmpa.png'),
+              scale: 0.5,
+              padding: 0,
+            }}
+          />
+        </TouchableOpacity>
+      ) : null}
+    </View>
+  </View>
+</View>
 
         {/* Action Buttons */}
         <Text style={styles.sectionTitle}>{t('quick_actions')}</Text>
@@ -987,14 +954,15 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     overflow: 'hidden',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 0 },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 2,
+    elevation: 3,
   },
   cardYellowHeader: {
-    backgroundColor: '#FFD700', // Yellow color
-    padding: 16,
+    backgroundColor: '#FFD700',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
   },
   cardHeaderContent: {
     flexDirection: 'row',
@@ -1002,98 +970,107 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   govLogo: {
-    width: 45,
-    height: 45,
-    marginRight: 8,
-    borderRadius:50
+    width: 40,
+    height: 40,
   },
   cardHeaderText: {
     flex: 1,
-    marginRight: 8,
+    marginHorizontal: 12,
+    alignItems: 'center',
   },
   cardTitle: {
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: 'bold',
     color: '#111518',
+    textAlign: 'center',
   },
   cardSubtitle: {
     fontSize: 12,
     color: '#111518',
+    textAlign: 'center',
+    marginTop: 2,
   },
   nmpaLogo: {
-    width: 48,
-    height: 48,
-    borderRadius:50
+    width: 45,
+    height: 45,
   },
   cardBlueTitle: {
-    backgroundColor: '#1E88E5', // Blue color
+    backgroundColor: '#1E88E5',
     paddingVertical: 8,
     alignItems: 'center',
   },
   cardBlueTitleText: {
     color: 'white',
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '600',
   },
   cardContent: {
     padding: 16,
     backgroundColor: '#F8F9FA',
     flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
   },
   cardMainContent: {
-    flex: 2,
+    flex: 1,
+    marginRight: 16,
   },
   cardName: {
-    fontSize: 13,
+    fontSize: 16,
     fontWeight: 'bold',
     color: '#111518',
-    marginBottom: 16,
+    marginBottom: 12,
   },
   cardDetails: {
-    gap: 9,
+    gap: 8,
   },
   detailRow: {
     flexDirection: 'row',
+    alignItems: 'flex-start',
   },
   detailLabel: {
-    width: 120,
+    width: 110,
     fontSize: 12,
     color: '#637988',
-    fontWeight: '900',
+    fontWeight: '600',
   },
   detailValue: {
+    flex: 1,
     fontSize: 12,
     color: '#111518',
+    fontWeight: '500',
   },
   cardSideContent: {
-    flex: 1,
     alignItems: 'center',
-    flexDirection: 'column',
     justifyContent: 'flex-start',
-    gap: 4,
+  },
+  profileBloodContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
   },
   profileImage: {
-    width: 100,
-    height: 100,
+    width: 80,
+    height: 80,
     borderRadius: 8,
-    marginBottom: 8,
+    borderWidth: 2,
+    borderColor: '#E0E0E0',
   },
   bloodTypeContainer: {
     flexDirection: 'column',
     alignItems: 'center',
-    marginBottom: 8,
-    marginLeft:5
+    marginLeft: 8,
   },
   bloodIcon: {
-    width: 20,
-    height: 20,
-    marginRight: 4,
+    width: 24,
+    height: 24,
+    marginBottom: 4,
   },
   bloodType: {
-    color: '#F44336',
+    fontSize: 14,
     fontWeight: 'bold',
+    color: '#F44336',
   },
- 
     requestItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -1241,74 +1218,62 @@ fullCardText: {
   textShadowOffset: { width: 1, height: 1 },
   textShadowRadius: 10,
 },
-  smallCardTitle: {
-    fontSize: 11,
+ smallCardTitle: {
+    fontSize: 12,
   },
   smallCardSubtitle: {
     fontSize: 10,
   },
   smallNmpaLogo: {
-    width: 40,
-    height: 40,
+    width: 35,
+    height: 35,
   },
   smallCardBlueTitleText: {
     fontSize: 11,
   },
   smallCardContent: {
     padding: 12,
-    flexDirection: isSmallDevice ? 'column' : 'row',
+    flexDirection: 'row',
   },
   smallCardMainContent: {
-    flex: isSmallDevice ? 1 : 2,
-    marginBottom: isSmallDevice ? 12 : 0,
+    flex: 1,
+    marginRight: 12,
   },
   smallCardName: {
-    fontSize: 12,
-    marginBottom: 12,
+    fontSize: 14,
+    marginBottom: 8,
   },
   smallDetailLabel: {
-    width: 100,
-    fontSize: 11,
+    width: 90,
+    fontSize: 10,
   },
   smallDetailValue: {
-    fontSize: 11,
+    fontSize: 10,
   },
- smallCardSideContent: {
-    flex: 1,
+  smallCardSideContent: {
     alignItems: 'center',
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-  },
-  smallQrCode: {
-    width: 35,
-    height: 35,
-  },
-  smallQrText: {
-    fontSize: 7,
   },
   smallProfileImage: {
-    width: 80,
-    height: 80,
+    width: 65,
+    height: 65,
   },
   smallBloodTypeContainer: {
-    flexDirection: 'column',
-    alignItems: 'center',
-    marginLeft: isSmallDevice ? 0 : 5,
+    marginLeft: 6,
   },
   smallBloodIcon: {
-    width: 16,
-    height: 16,
+    width: 20,
+    height: 20,
   },
   smallBloodType: {
     fontSize: 12,
-    fontWeight: 'bold',
   },
   qrCodeContainer: {
-    marginTop: 0,
-    padding: 2,
-    borderRadius: 2,
-    alignSelf: 'flex-start',
-    marginLeft: '7%',
+    padding: 4,
+    backgroundColor: 'white',
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    alignSelf:'flex-start'
   },
   qrCode: {
     width: 40,

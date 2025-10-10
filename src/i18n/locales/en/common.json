@@ -11,6 +11,7 @@
   "otp_sent": "OTP sent to your registered mobile",
   "resend_otp": "Resend OTP",
   "resend_in":"Resend OTP in",
+  "otp_auto_filled": "OTP auto-filled!",
   "seconds": "s",
   "otp_sent_title": "OTP Sent",
   "otp_sent_message": "A new OTP has been sent to your number",
@@ -20,6 +21,14 @@
   "login_success": "Logged In Successfully",
   "validation_username_password": "Please enter both username and password",
   "login_failed": "Login failed. Please try again.",
+  "otp_sent_successfully": "OTP sent successfully",
+  "please_enter_valid_otp": "Please enter a valid 6-digit OTP",
+  "no_auth_token_received": "No authentication token received",
+  "invalid_token_format": "Invalid token format",
+  "failed_to_process_user_data": "Failed to process user data",
+  "invalid_user_data": "Invalid user data in token",
+  "android_autofill_message": "OTP will be auto-filled if you have SMS permissions granted.",
+  "ios_autofill_message": "OTP can be auto-filled from your messages.",
   "select_role": "Select Role",
   "user": "User",
   "doctor": "Doctor",
@@ -143,7 +152,25 @@
     "state_required": "State is required",
     "postal_code_required": "Postal code is required",
     "country_required": "Country is required",
-    "address_submission_failed": "Failed to save delivery address"
+    "address_submission_failed": "Failed to save delivery address",
+        "select_address": "Select Delivery Address",
+    "choose_address": "Choose an address",
+    "add_new_address": "Add New Address",
+    "no_saved_address": "No saved addresses. Please add a delivery address.",
+    "selected_address": "Selected Address",
+    "select_delivery_address": "Select Delivery Address",
+    "no_saved_addresses": "No saved addresses found",
+    "address_saved": "Address saved successfully",
+    "address_save_failed": "Failed to save address",
+   
+    "modal": {
+      "select_address_title": "Select Delivery Address",
+      "add_new_address_title": "Add New Address",
+      "cancel_button": "Cancel",
+      "save_address_button": "Save Address",
+      "no_addresses_text": "No saved addresses found",
+      "add_new_address_button": "+ Add New Address"
+    }
   },
   "referral_request": {
     "title": "Referral Request",
@@ -204,7 +231,8 @@
     "status_pending": "Pending",
     "status_rejected": "Rejected",
     "status_approved": "Approved",
-    "status_dispatched": "Dispatched"
+    "status_dispatched": "Dispatched",
+    "status_assigned_to_you": "Assigned to You"
 
   },
   "referral_list": {
@@ -278,6 +306,7 @@
     "status_rejected": "Rejected",
     "status_pending": "Pending",
     "status_assigned_to_doctor": "Assigned to Doctor",
+    "status_assigned_to_you": "Assigned to You",
     "status_unknown": "Unknown Status",
     "status_completed": "Completed",
      "status_dispatched": "Dispatched",
@@ -430,7 +459,8 @@
   "otp_resent": "OTP resent successfully",
   "otp_verification_failed": "OTP verification failed",
   "auto_fill_otp": "Auto-fill OTP",
-  "loading": "Loading..."
+  "loading": "Loading...",
+  "save": "Save"
 
   
 

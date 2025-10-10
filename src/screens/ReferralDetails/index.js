@@ -31,11 +31,13 @@ const ReferralDetails = ({ navigation, route }) => {
   const [inputPassword, setInputPassword] = useState('');
   const [showPasswordInput, setShowPasswordInput] = useState(false);
   const [pdfError, setPdfError] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
+  console.log("role",role)
 
   useEffect(() => {
     fetchUser();
     // Check if file is PDF and set up password input if needed
-    if (referral.file_url && referral.file_url.toLowerCase().endsWith('.pdf')) {
+    if (referral.referral_letter_url && referral.referral_letter_url.toLowerCase().endsWith('.pdf')) {
       setIsPdf(true);
       setShowPasswordInput(true);
     }
@@ -218,18 +220,10 @@ const ReferralDetails = ({ navigation, route }) => {
             <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>{t('duty_doctor')}</Text>
             <Text style={styles.detailValue}>
-              {`${referral?.duty_doctor_first_name}`|| t('referral_details.not_available')}
+              {`${referral?.duty_doctor_name}`|| t('referral_details.not_available')}
             </Text>
           </View>
-              <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>{t('doctor_ec_no')}</Text>
-            <Text style={[styles.detailValue, { 
-              color: 'black',
-              // fontWeight: '500'
-            }]}>
-              <Text>{referral.duty_doctor_ecno ? referral.duty_doctor_ecno : t('N/A')}</Text>
-            </Text>
-          </View>
+  
      <View style={styles.detailRow}>
   <Text style={styles.detailLabel}>{t('referral_details.doctor_approval')}</Text>
   <Text style={[styles.detailValue, { 
@@ -245,91 +239,103 @@ const ReferralDetails = ({ navigation, route }) => {
         </>
 )}
         {/* Referral File (PDF with password protection) */}
-        {referral.file_url && isPdf && (
-          <>
-            <Text style={styles.sectionTitle}>{t('referral_details.referral_document')}</Text>
-          <View style={styles.pdfContainer}>
-  {showPasswordInput && (
-    <View style={styles.passwordContainer}>
-      <Text style={styles.passwordTitle}>{t('referral_details.pdf_password_protected')}</Text>
-      <TextInput
-        style={styles.input}
-         placeholder={t('referral_details.enter_pdf_password')}
-        value={inputPassword}
-        onChangeText={setInputPassword}
-        secureTextEntry
-                autoCapitalize="none"                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
-      />
-      {pdfError && <Text style={styles.errorText}>{pdfError}</Text>}
-      <TouchableOpacity 
-        style={{
-          backgroundColor: Colors.darkBlue,
-          paddingVertical: 12,
-          paddingHorizontal: 20,
-          borderRadius: 8,
-          alignItems: 'center',
-          marginTop: 10
-        }}
-        onPress={submitPassword}
-      >
-       <Text style={{ color: 'white', fontWeight: '600' }}>{t('common.submit')}</Text>
-      </TouchableOpacity>
-    </View>
-  )}
+    {referral.referral_letter_url && isPdf && (
+  <>
+    <Text style={styles.sectionTitle}>{t('referral_details.referral_document')}</Text>
+    <View style={styles.pdfContainer}>
+      {showPasswordInput && (
+        <View style={styles.passwordContainer}>
+          <Text style={styles.passwordTitle}>{t('referral_details.pdf_password_protected')}</Text>
+          
+          {/* Password Input with Eye Icon */}
+          <View style={styles.passwordInputContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder={t('referral_details.enter_pdf_password')}
+              value={inputPassword}
+              onChangeText={setInputPassword}
+              secureTextEntry={!showPassword} // Toggle based on showPassword state
+              autoCapitalize="none"
+            />
+            <TouchableOpacity 
+              style={styles.eyeIcon}
+              onPress={() => setShowPassword(!showPassword)}
+            >
+              <Ionicons 
+                name={showPassword ? "eye-off" : "eye"} 
+                size={24} 
+                color={Colors.darkGray} 
+              />
+            </TouchableOpacity>
+          </View>
+          
+          {pdfError && <Text style={styles.errorText}>{pdfError}</Text>}
+          <TouchableOpacity 
+            style={{
+              backgroundColor: Colors.darkBlue,
+              paddingVertical: 12,
+              paddingHorizontal: 20,
+              borderRadius: 8,
+              alignItems: 'center',
+              marginTop: 10
+            }}
+            onPress={submitPassword}
+          >
+            <Text style={{ color: 'white', fontWeight: '600' }}>{t('common.submit')}</Text>
+          </TouchableOpacity>
+        </View>
+      )}
 
-  {/* Show fullscreen open button only after password is correct */}
-{/* PDF Preview with overlay button */}
-{!showPasswordInput && !pdfError && (
-  <View style={{ height: 500, position: 'relative' }}>
-    {/* Background PDF with reduced opacity */}
-<Pdf
-  trustAllCerts={false} // Add this line
-  source={{
-    uri: `${BASE_URL}${referral.file_url.replace(/^\/api/, '')}`,
-    cache: true,
-  }}
-  password={password}
-  onError={handlePdfError}
-  style={{ flex: 1, width: '100%', height: '100%', opacity: 0.7 }}
-/>
+      {/* Show fullscreen open button only after password is correct */}
+      {!showPasswordInput && !pdfError && (
+        <View style={{ height: 500, position: 'relative' }}>
+          {/* Background PDF with reduced opacity */}
+          <Pdf
+            trustAllCerts={false}
+            source={{
+              uri: `${BASE_URL}${referral.referral_letter_url.replace(/^\/api/, '')}`,
+              cache: true,
+            }}
+            password={password}
+            onError={handlePdfError}
+            style={{ flex: 1, width: '100%', height: '100%', opacity: 0.7 }}
+          />
 
-    {/* Overlay Button */}
-    <View style={{
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      justifyContent: 'center',
-      alignItems: 'center',
-    }}>
-      <TouchableOpacity 
-        style={{
-          backgroundColor: Colors.darkBlue,
-          paddingVertical: 12,
-          paddingHorizontal: 24,
-          borderRadius: 8,
-        }}
-        onPress={() => setIsPdfFullScreen(true)}
-      >
-     <Text style={{ color: 'white', fontWeight: '600' }}>{t('referral_details.view_pdf_fullscreen')}</Text>
-      </TouchableOpacity>
+          {/* Overlay Button */}
+          <View style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+            <TouchableOpacity 
+              style={{
+                backgroundColor: Colors.darkBlue,
+                paddingVertical: 12,
+                paddingHorizontal: 24,
+                borderRadius: 8,
+              }}
+              onPress={() => setIsPdfFullScreen(true)}
+            >
+              <Text style={{ color: 'white', fontWeight: '600' }}>{t('referral_details.view_pdf_fullscreen')}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
     </View>
-  </View>
+  </>
 )}
 
-</View>
-
-          </>
-        )}
-
         {/* For non-PDF files */}
-        {referral.file_url && !isPdf && (
+        {referral.referral_letter_url && !isPdf && (
           <>
             <Text style={styles.sectionTitle}>{t('referral_details.referral_document')}</Text>
             <View style={styles.pdfContainer}>
               <WebView
-                source={{ uri: `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(`${BASE_URL}${referral.file_url.replace(/^\/api/, '')}`)}` }}
+                source={{ uri: `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(`${BASE_URL}${referral.referral_letter_url.replace(/^\/api/, '')}`)}` }}
                 style={styles.pdfView}
                 scalesPageToFit={true}
               />
@@ -347,9 +353,9 @@ const ReferralDetails = ({ navigation, route }) => {
       <Ionicons name="close" size={24} color="white" />
     </TouchableOpacity>
 
-    {!showPasswordInput && referral?.file_url && (
+    {!showPasswordInput && referral?.referral_letter_url && (
       <Pdf
-        source={{ uri: `${BASE_URL}${referral?.file_url.replace(/^\/api/, '')}`, cache: true }}
+        source={{ uri: `${BASE_URL}${referral?.referral_letter_url.replace(/^\/api/, '')}`, cache: true }}
         password={password}
         onError={handlePdfError}
         style={{ flex: 1, width: '100%', height: '100%' }}
@@ -511,6 +517,25 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.5)',
     borderRadius: 15,
     padding: 5,
+  },
+    passwordInputContainer: {
+    position: 'relative',
+    width: '100%',
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: Colors.lightGray,
+    borderRadius: 8,
+    padding: 12,
+    paddingRight: 50, // Make space for the eye icon
+    fontSize: 16,
+    backgroundColor: 'white',
+  },
+  eyeIcon: {
+    position: 'absolute',
+    right: 12,
+    top: 12,
+    padding: 4,
   },
 });
 

@@ -11,6 +11,7 @@ import { WebView } from 'react-native-webview';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRole } from '../../Context/RoleContext';
 
 const MedicineReview = ({ navigation, route }) => {
   const { t } = useTranslation();
@@ -28,6 +29,7 @@ const MedicineReview = ({ navigation, route }) => {
   const [isImageViewVisible, setIsImageViewVisible] = useState(false);
   const [fileUrl, setFileUrl] = useState('');
   const [visibleCount, setVisibleCount] = useState(4);
+  const { role } = useRole();
 
 
 console.log("request",request)
@@ -138,7 +140,7 @@ const statusMap = {
     color: '#FFA500', // orange
   },
   assigned_to_doctor: {
-    text: t('medicine_review.status_assigned_to_doctor'),
+    text: t('medicine_review.status_assigned_to_you'),
     color: '#FFA500', // orange
   },
   completed: {
@@ -329,16 +331,23 @@ const statusColor = currentStatus.color;
         {/* Patient Information */}
         <Text style={styles.sectionTitle}>{t('medicine_review.patient_info')}</Text>
         <View style={styles.patientInfoContainer}>
-          <ImageBackground
-   source={{ 
-                    uri: request?.photo_url 
-                      ? `${BASE_URL}${request?.photo_url.replace(/^\/api/, '')}`
-                      : 'https://lh3.googleusercontent.com/aida-public/AB6AXuD6iCqF0CKSARpJEMpI54q4W7czcfALHbNpBWTrRDz-Vwtoozz8Wn6wta1rIBmfy6wAM_5G52PkYydwL3T52x8IXfD8V_noYfr5Eamzd8nfGhRX5Z--UM_QMVjPmtivJjWHyCoZVDWklaAvR17aKdLSAghbeKHUoCyQ0sbEbKXVWd2VJj0aSvoZ_HU0dx-u7H0QKc8FhHiA4lgTgYZRbxSUpf1VudZvjIhTPtGOg7-Gangk-55GxD_mOulCKItluIvJrnPhcAXCDHoW' 
-                  }} 
-            resizeMode='contain'
-            style={styles.patientImage}
-            imageStyle={{ borderRadius: 28 }}
-          />
+{request?.photo_url ? (
+  <ImageBackground
+    source={{ 
+      uri: `${BASE_URL}${request?.photo_url.replace(/^\/api/, '')}`
+    }} 
+    resizeMode='contain'
+    style={styles.patientImage}
+    imageStyle={{ borderRadius: 28 }}
+  />
+) : (
+  <ImageBackground
+    source={require('../../assets/images/profile.png')}
+    resizeMode='contain'
+    style={styles.patientImage}
+    imageStyle={{ borderRadius: 28 }}
+  />
+)}
           <View style={styles.patientTextContainer}>
             <Text style={styles.patientName}>{request.user_name}</Text>
             <Text style={styles.patientAge}>{t('medicine_review.age', { years: 35 })}</Text>

@@ -8,6 +8,7 @@ import { WebView } from 'react-native-webview';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRole } from '../../Context/RoleContext';
 
 const MedicineDetails = ({ navigation, route }) => {
   const { t } = useTranslation();
@@ -16,6 +17,9 @@ const MedicineDetails = ({ navigation, route }) => {
   const [isImageViewVisible, setIsImageViewVisible] = useState(false);
   const [fileUrl, setFileUrl] = useState('');
   const [loading, setLoading] = useState(false);
+  const { role } = useRole();
+
+  console.log("role",role)
 
   useEffect(() => {
     if (medicine.file_url) {
@@ -98,13 +102,22 @@ const MedicineDetails = ({ navigation, route }) => {
 };
 
 
-const currentStatus = statusMap[medicine.status] || {
+let currentStatus = statusMap[medicine.status] || {
   text: t('medicine_review.status_unknown'),
   color: 'gray',
 };
 
+// Override for doctors
+if (role === 'doctor' && medicine.status === 'assigned_to_doctor') {
+  currentStatus = {
+    ...currentStatus,
+    text: t('medicine_review.status_assigned_to_you'), // Make sure you add this translation
+  };
+}
+
 const status = currentStatus.text;
 const statusColor = currentStatus.color;
+
 
   return (
     <SafeAreaView style={styles.container}>

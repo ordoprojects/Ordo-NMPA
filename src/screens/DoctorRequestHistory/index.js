@@ -403,7 +403,7 @@ const getStatusText = (status, isMedicine = false) => {
     />
     <View style={styles.requestInfo}>
       <Text style={styles.patientName}>
-        {item.patient_name ? item.patient_name : `${user?.first_name} ${user?.last_name}`}
+        {item.patient_name ? item.patient_name : `${user?.full_name}`}
       </Text>
 
       <View style={styles.requestMeta}>

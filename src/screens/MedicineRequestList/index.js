@@ -129,7 +129,7 @@ if (response.ok) {
 const getStatusTranslation = (status) => {
   const statusMap = {
     'completed': t('medicine_request_list.status_completed'),
-    'assigned_to_doctor': t('medicine_request_list.status_assigned'),
+    'assigned_to_doctor': t('medicine_request_list.status_assigned_to_you'),
     'pending': t('medicine_request_list.status_pending'),
     'rejected': t('medicine_request_list.status_rejected'),
     'approved': t('medicine_request_list.status_approved'),

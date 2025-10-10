@@ -166,16 +166,22 @@ const ProfileScreen = () => {
       <ScrollView style={styles.scrollView}>
         {/* Profile Picture and Name */}
         <View style={styles.profileHeader}>
-          <Image 
-            style={styles.profileImage} 
-            source={{ 
-              uri: user?.photo_url 
-                ? `${BASE_URL}${user.photo_url.replace(/^\/api/, '')}`
-                : 'https://lh3.googleusercontent.com/aida-public/AB6AXuD6iCqF0CKSARpJEMpI54q4W7czcfALHbNpBWTrRDz-Vwtoozz8Wn6wta1rIBmfy6wAM_5G52PkYydwL3T52x8IXfD8V_noYfr5Eamzd8nfGhRX5Z--UM_QMVjPmtivJjWHyCoZVDWklaAvR17aKdLSAghbeKHUoCyQ0sbEbKXVWd2VJj0aSvoZ_HU0dx-u7H0QKc8FhHiA4lgTgYZRbxSUpf1VudZvjIhTPtGOg7-Gangk-55GxD_mOulCKItluIvJrnPhcAXCDHoW' 
-            }} 
-            resizeMethod='contain'
-          />
-          <Text style={styles.profileName}>{user.first_name} {user.last_name}</Text>
+      {user?.photo_url ? (
+  <Image 
+    style={styles.profileImage} 
+    source={{ 
+      uri: `${BASE_URL}${user.photo_url.replace(/^\/api/, '')}`
+    }} 
+    resizeMethod='contain'
+  />
+) : (
+  <Image 
+    style={styles.profileImage} 
+    source={require('../../assets/images/profile.png')} 
+    resizeMethod='contain'
+  />
+)}
+          <Text style={styles.profileName}>{user.full_name}</Text>
           <Text style={styles.profileEc}>
             {t('ec_number', { ecno: user.ecno })}
           </Text>
@@ -268,14 +274,19 @@ const ProfileScreen = () => {
                     styles.dependentCard,
                     index === patients.length - 1 && styles.lastDependentCard
                   ]}>
-                    <Image 
-                      style={styles.dependentImage} 
-                      source={{ 
-                        uri: patient.photo_url 
-                          ? `${BASE_URL}${patient.photo_url.replace(/^\/api/, '')}`
-                          : 'https://lh3.googleusercontent.com/aida-public/AB6AXuD6iCqF0CKSARpJEMpI54q4W7czcfALHbNpBWTrRDz-Vwtoozz8Wn6wta1rIBmfy6wAM_5G52PkYydwL3T52x8IXfD8V_noYfr5Eamzd8nfGhRX5Z--UM_QMVjPmtivJjWHyCoZVDWklaAvR17aKdLSAghbeKHUoCyQ0sbEbKXVWd2VJj0aSvoZ_HU0dx-u7H0QKc8FhHiA4lgTgYZRbxSUpf1VudZvjIhTPtGOg7-Gangk-55GxD_mOulCKItluIvJrnPhcAXCDHoW' 
-                      }} 
-                    />
+                {patient.photo_url ? (
+  <Image 
+    style={styles.dependentImage} 
+    source={{ 
+      uri: `${BASE_URL}${patient.photo_url.replace(/^\/api/, '')}`
+    }} 
+  />
+) : (
+  <Image 
+    style={styles.dependentImage} 
+    source={require('../../assets/images/profile.png')} 
+  />
+)}
                     
                     <View style={styles.dependentInfo}>
                       <Text style={styles.dependentName}>{patient.full_name}</Text>
