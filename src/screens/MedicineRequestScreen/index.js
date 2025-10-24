@@ -597,6 +597,8 @@ const handleAddAddress = async () => {
 
       {/* ✅ Address Selection Modal */}
       <Modal visible={addressModalVisible} animationType="slide">
+          <SafeAreaView style={{ flex: 1,paddingTop:'10%' }}>
+
         <View style={{ flex: 1, padding: 16 }}>
           <View style={styles.modalHeader}>
             <TouchableOpacity onPress={() => setAddressModalVisible(false)}>
@@ -632,10 +634,12 @@ const handleAddAddress = async () => {
 </Text>
           </TouchableOpacity>
         </View>
+        </SafeAreaView>
       </Modal>
 
       {/* ✅ Add New Address Modal */}
       <Modal visible={newAddressModalVisible} animationType="slide">
+          <SafeAreaView style={{ flex: 1 ,paddingTop:'10%'}}>
         <View style={{ flex: 1, padding: 16 }}>
           <View style={styles.modalHeader}>
             <TouchableOpacity onPress={() => setNewAddressModalVisible(false)}>
@@ -715,6 +719,7 @@ const handleAddAddress = async () => {
             </TouchableOpacity>
           </View>
         </View>
+        </SafeAreaView>
       </Modal>
     </SafeAreaView>
   );
