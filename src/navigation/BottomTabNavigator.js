@@ -8,13 +8,16 @@ import Colors from '../constants/Colors';
 import DoctorRequestHistory from '../screens/DoctorRequestHistory';
 import { useRole } from '../Context/RoleContext';
 import { useTranslation } from 'react-i18next';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const Tab = createBottomTabNavigator();
 
 const BottomTabNavigator = () => {
   const { role } = useRole();
   const { t } = useTranslation();
-  
+  const insets = useSafeAreaInsets();
+
+  console.log('Bottom inset:', insets.bottom);
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -34,8 +37,8 @@ const BottomTabNavigator = () => {
         tabBarActiveTintColor: Colors.darkBlue,
         tabBarInactiveTintColor: 'gray',
         tabBarStyle: {
-          paddingBottom: 5,
-          height: 60,
+          paddingBottom: insets.bottom > 0 ? insets.bottom : 10,
+height: 60 + (insets.bottom > 0 ? insets.bottom : 10),
         },
         headerShown: false,
       })}

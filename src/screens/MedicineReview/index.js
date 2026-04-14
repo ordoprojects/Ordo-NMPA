@@ -412,7 +412,7 @@ const statusColor = currentStatus.color;
           </View>
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>{t('medicine_review.delivery_address')}</Text>
-            <Text style={styles.detailValue}>{t('medicine_review.sample_address')}</Text>
+            <Text style={styles.detailValue}>{request?.delivery_address}</Text>
           </View>
         </View>
 

@@ -468,7 +468,16 @@
   "auto_fill_otp": "OTP स्वतः भरें",
   "close": "बंद करें",
   "loading": "लोड हो रहा है...",
-   "save": "सहेजें"
+   "save": "सहेजें",
+     "edit_email_address": "ईमेल पता संपादित करें",
+  "enter_new_email": "नया ईमेल पता दर्ज करें",
+  "please_enter_valid_email": "कृपया एक मान्य ईमेल पता दर्ज करें",
+  "email_updated_successfully": "ईमेल सफलतापूर्वक अपडेट हो गया",
+  "email_update_failed": "ईमेल अपडेट करने में विफल",
+  "network_error": "नेटवर्क त्रुटि। कृपया पुनः प्रयास करें।",
+  "not_provided": "प्रदान नहीं किया गया",
+  "email_already_registered": "यह ईमेल पहले से ही किसी अन्य उपयोगकर्ता के साथ पंजीकृत है",
+  "user_not_found": "उपयोगकर्ता नहीं मिला"
 
 
 }

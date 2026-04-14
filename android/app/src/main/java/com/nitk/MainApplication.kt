@@ -1,4 +1,4 @@
-package com.ordosolution.nmpa
+package com.nitk.nmpa
 
 import android.app.Application
 import com.facebook.react.PackageList

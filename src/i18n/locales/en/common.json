@@ -460,7 +460,16 @@
   "otp_verification_failed": "OTP verification failed",
   "auto_fill_otp": "Auto-fill OTP",
   "loading": "Loading...",
-  "save": "Save"
+  "save": "Save",
+    "edit_email_address": "Edit Email Address",
+  "enter_new_email": "Enter new email address",
+  "please_enter_valid_email": "Please enter a valid email address",
+  "email_updated_successfully": "Email updated successfully",
+  "email_update_failed": "Failed to update email",
+  "network_error": "Network error. Please try again.",
+  "not_provided": "Not Provided",
+  "email_already_registered": "This email is already registered to another user",
+  "user_not_found": "User not found"
 
   
 

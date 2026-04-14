@@ -7,9 +7,28 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:572918908865:android:4ca0e24bec754980c35140",
+        "android_client_info": {
+          "package_name": "com.nitk.nmpa"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBLC-KlkXrpGtQs-XcsE96iDZlk2VW2iso"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:572918908865:android:7135a7901aaaa80ac35140",
         "android_client_info": {
-          "package_name": "com.ordosolution.nmpa"
+          "package_name": "com.nitk.nmpa"
         }
       },
       "oauth_client": [],

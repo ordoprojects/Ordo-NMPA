@@ -1,4 +1,4 @@
-package com.ordosolution.nmpa
+package com.nitk.nmpa
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

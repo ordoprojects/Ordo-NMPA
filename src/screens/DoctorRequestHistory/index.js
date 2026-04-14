@@ -12,7 +12,7 @@ import Toast from 'react-native-simple-toast';
 import { getToken } from '../../navigation/auth';
 import { useFocusEffect } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next'; 
-import { WebView } from 'react-native-webview';import Pdf from 'react-native-pdf';
+import { WebView } from 'react-native-webview';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 

@@ -16,14 +16,27 @@ android {
     ndkVersion rootProject.ext.ndkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
+    namespace "com.nitk.nmpa"
 
-    namespace "com.ordosolution.nmpa"
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging true
+        }
+    }
+
+    buildFeatures {
+        prefab true
+    }
+    
     defaultConfig {
-        applicationId "com.ordosolution.nmpa"
+        applicationId "com.nitk.nmpa"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0.0"
+        versionCode 12
+        versionName "1.1.2"
+        ndk {
+            abiFilters "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
+        }
     }
 
     signingConfigs {
@@ -49,7 +62,7 @@ android {
 
 dependencies {
     implementation("com.facebook.react:react-android")
-implementation project(':react-native-pdf')
+    implementation project(':react-native-pdf')
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")
     } else {

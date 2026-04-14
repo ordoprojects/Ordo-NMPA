@@ -956,8 +956,6 @@ PODS:
   - BVLinearGradient (2.8.3):
     - React-Core
   - DoubleConversion (1.1.6)
-  - FaceSDK (5.2.1624):
-    - RegulaCommon (= 6.9.344)
   - FBLazyVector (0.74.3)
   - Firebase/Core (10.29.0):
     - Firebase/CoreOnly
@@ -2346,8 +2344,9 @@ PODS:
     - React-logger (= 0.74.3)
     - React-perflogger (= 0.74.3)
     - React-utils (= 0.74.3)
-  - RegulaCommon (6.9.344)
   - RNCAsyncStorage (1.24.0):
+    - React-Core
+  - RNCClipboard (1.16.3):
     - React-Core
   - RNCMaskedView (0.3.1):
     - React-Core
@@ -2357,9 +2356,6 @@ PODS:
     - React-Core
   - RNDeviceInfo (10.14.0):
     - React-Core
-  - RNFaceApi (5.2.4):
-    - FaceSDK (= 5.2.1624)
-    - React
   - RNFBApp (20.3.0):
     - Firebase/CoreOnly (= 10.29.0)
     - React-Core
@@ -2565,11 +2561,11 @@ DEPENDENCIES:
   - React-utils (from `../node_modules/react-native/ReactCommon/react/utils`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
+  - "RNCClipboard (from `../node_modules/@react-native-clipboard/clipboard`)"
   - "RNCMaskedView (from `../node_modules/@react-native-masked-view/masked-view`)"
   - "RNCPicker (from `../node_modules/@react-native-picker/picker`)"
   - "RNDateTimePicker (from `../node_modules/@react-native-community/datetimepicker`)"
   - RNDeviceInfo (from `../node_modules/react-native-device-info`)
-  - "RNFaceApi (from `../node_modules/@regulaforensics/react-native-face-api`)"
   - "RNFBApp (from `../node_modules/@react-native-firebase/app`)"
   - "RNFBFirestore (from `../node_modules/@react-native-firebase/firestore`)"
   - "RNFBMessaging (from `../node_modules/@react-native-firebase/messaging`)"
@@ -2588,7 +2584,6 @@ SPEC REPOS:
   trunk:
     - abseil
     - BoringSSL-GRPC
-    - FaceSDK
     - Firebase
     - FirebaseAnalytics
     - FirebaseAppCheckInterop
@@ -2608,7 +2603,6 @@ SPEC REPOS:
     - leveldb-library
     - nanopb
     - PromisesObjC
-    - RegulaCommon
     - SocketRocket
     - Toast
 
@@ -2741,6 +2735,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon"
   RNCAsyncStorage:
     :path: "../node_modules/@react-native-async-storage/async-storage"
+  RNCClipboard:
+    :path: "../node_modules/@react-native-clipboard/clipboard"
   RNCMaskedView:
     :path: "../node_modules/@react-native-masked-view/masked-view"
   RNCPicker:
@@ -2749,8 +2745,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-community/datetimepicker"
   RNDeviceInfo:
     :path: "../node_modules/react-native-device-info"
-  RNFaceApi:
-    :path: "../node_modules/@regulaforensics/react-native-face-api"
   RNFBApp:
     :path: "../node_modules/@react-native-firebase/app"
   RNFBFirestore:
@@ -2784,7 +2778,6 @@ SPEC CHECKSUMS:
   BoringSSL-GRPC: 1e2348957acdbcad360b80a264a90799984b2ba6
   BVLinearGradient: cb006ba232a1f3e4f341bb62c42d1098c284da70
   DoubleConversion: 76ab83afb40bddeeee456813d9c04f67f78771b5
-  FaceSDK: ba72d58fbedb0badc8741388f522f4f3facde70c
   FBLazyVector: 7e977dd099937dc5458851233141583abba49ff2
   Firebase: cec914dab6fd7b1bd8ab56ea07ce4e03dd251c2d
   FirebaseAnalytics: 23717de130b779aa506e757edb9713d24b6ffeda
@@ -2864,13 +2857,12 @@ SPEC CHECKSUMS:
   React-runtimescheduler: ef60c7fa274227fe166bd4442f1fc33863055012
   React-utils: 12aae46f6c2958e99984a992386092341fafc303
   ReactCommon: 72df09c833a965098e7686b5a423e9b85d880b6c
-  RegulaCommon: 3421ad9a79af499cf3a0210ce15408f31032874f
   RNCAsyncStorage: b6410dead2732b5c72a7fdb1ecb5651bbcf4674b
+  RNCClipboard: f6679d470d0da2bce2a37b0af7b9e0bf369ecda5
   RNCMaskedView: de80352547bd4f0d607bf6bab363d826822bd126
   RNCPicker: da0f1c9411208c1ca52bc98383db54a06e0a3862
   RNDateTimePicker: 818460dc31b0dc5ec58289003e27dd8d022fb79c
   RNDeviceInfo: 98bb51ba1519cd3f19f14e7236b5bb1c312c780f
-  RNFaceApi: b9eb239f992a1456c6081a9bfce7d93d2eadbdfd
   RNFBApp: 9b390ca6026fb1c589fb1f7e33acca0517576bc7
   RNFBFirestore: dea4abf7a2988a89fd7ecb3637bc9b16d111f7de
   RNFBMessaging: 2c67c83791fa6846e0dfda7505ddad84a04987b6

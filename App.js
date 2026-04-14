@@ -10,7 +10,7 @@ import { LanguageProvider, useLanguage } from './src/Context/LanguageContext';
 import { fontMap } from './src/constants/fontMap';
 import { setupNotifications, setupNotificationHandlers } from './src/services/notificationService';
 import initializeI18n from './src/i18n';
-
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 // Screens
 import LoginScreen from './src/screens/LoginScreen';
 import OTPScreen from './src/screens/OTPScreen';
@@ -127,12 +127,16 @@ const App = () => {
   }
 
   return (
+    <SafeAreaProvider>
     <LanguageProvider>
       <RoleProvider>
         <AppContent initialRoute={initialRoute} />
       </RoleProvider>
     </LanguageProvider>
+    </SafeAreaProvider>
   );
 };
 
 export default App;
+
+
