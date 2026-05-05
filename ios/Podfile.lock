@@ -2102,7 +2102,7 @@ PODS:
     - React
   - react-native-get-random-values (1.11.0):
     - React-Core
-  - react-native-pdf (6.7.7):
+  - react-native-pdf (7.0.4):
     - React-Core
   - react-native-safe-area-context (4.10.8):
     - React-Core
@@ -2420,7 +2420,52 @@ PODS:
     - React-Core
   - RNPermissions (4.1.5):
     - React-Core
-  - RNReanimated (3.14.0):
+  - RNReanimated (3.16.1):
+    - DoubleConversion
+    - glog
+    - RCT-Folly (= 2024.01.01.00)
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Codegen
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-rendererdebug
+    - React-utils
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - RNReanimated/reanimated (= 3.16.1)
+    - RNReanimated/worklets (= 3.16.1)
+    - Yoga
+  - RNReanimated/reanimated (3.16.1):
+    - DoubleConversion
+    - glog
+    - RCT-Folly (= 2024.01.01.00)
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Codegen
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-rendererdebug
+    - React-utils
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - RNReanimated/reanimated/apple (= 3.16.1)
+    - Yoga
+  - RNReanimated/reanimated/apple (3.16.1):
     - DoubleConversion
     - glog
     - RCT-Folly (= 2024.01.01.00)
@@ -2441,7 +2486,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNScreens (3.32.0):
+  - RNReanimated/worklets (3.16.1):
     - DoubleConversion
     - glog
     - RCT-Folly (= 2024.01.01.00)
@@ -2457,7 +2502,27 @@ PODS:
     - React-jsi
     - React-NativeModulesApple
     - React-RCTFabric
-    - React-RCTImage
+    - React-rendererdebug
+    - React-utils
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - Yoga
+  - RNScreens (3.29.0):
+    - DoubleConversion
+    - glog
+    - RCT-Folly (= 2024.01.01.00)
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Codegen
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
     - React-rendererdebug
     - React-utils
     - ReactCommon/turbomodule/bridging
@@ -2830,7 +2895,7 @@ SPEC CHECKSUMS:
   react-native-document-picker: 6b08d834d4e4252bb8aad13d852e27666294b5b9
   react-native-geolocation-service: 32b2c2a3b91e70ce2a8d0c684801aaeb0a07e0ec
   react-native-get-random-values: d16467cf726c618e9c7a8c3c39c31faa2244bbba
-  react-native-pdf: 6a51a22ccefb23eb93298771e4bf090913e86d70
+  react-native-pdf: f5056f44e4e64a34f9f2ed1bd5c6cde710a5900a
   react-native-safe-area-context: b72c4611af2e86d80a59ac76279043d8f75f454c
   react-native-simple-toast: f6316baf3870934e6e92cf48dbc9e330a5c8eb82
   react-native-voice: 908a0eba96c8c3d643e4f98b7232c6557d0a6f9c
@@ -2871,8 +2936,8 @@ SPEC CHECKSUMS:
   RNKeychain: 25fc437827bb2a19706956a05971769a5eb6bc26
   RNNotifee: 8768d065bf1e2f9f8f347b4bd79147431c7eacd6
   RNPermissions: 5728574d118349641cc8f2082602fe8f1d1358f4
-  RNReanimated: ba9b9c2d875a816cffe075b0612a7a9f12be8573
-  RNScreens: 3cae715fe80b65a38187b7bb1ad406cc9f29d8d3
+  RNReanimated: bee64a94e5351b2f4c3bec063218131f9eb91f8d
+  RNScreens: 1e48ecd8519fd1a65a92b72917b87cc68b1ea260
   RNSVG: 4cab00c621b328a4a2fedaaedc15d8822216723e
   RNVectorIcons: 4d8319f335651716a857261358046c05c225a5eb
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d

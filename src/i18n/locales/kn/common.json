@@ -162,7 +162,13 @@
     "no_saved_addresses": "ಯಾವುದೇ ಉಳಿಸಿದ ವಿಳಾಸಗಳು ಕಂಡುಬಂದಿಲ್ಲ",
     "address_saved": "ವಿಳಾಸವನ್ನು ಯಶಸ್ವಿಯಾಗಿ ಉಳಿಸಲಾಗಿದೆ",
     "address_save_failed": "ವಿಳಾಸವನ್ನು ಉಳಿಸಲು ವಿಫಲವಾಗಿದೆ",
-    
+     "multiple_files_support": "ಅನೇಕ ಫೈಲ್ಗಳನ್ನು ಸೇರಿಸಬಹುದು (JPG, PNG, PDF, ಪ್ರತಿ ಫೈಲ್ ಗರಿಷ್ಠ 20MB)",
+  "selected_files": "ಆಯ್ಕೆ ಮಾಡಿದ ಫೈಲ್ಗಳು",
+  "add_more_files": "ಇನ್ನಷ್ಟು ಫೈಲ್ಗಳನ್ನು ಸೇರಿಸಿ",
+  "remove_file_confirm": "ಈ ಫೈಲ್ ಅನ್ನು ತೆಗೆದುಹಾಲುತ್ತೀರಾ?",
+  "remove": "ತೆಗೆದುಹಾಕಿ",
+  "max_active_requests_error": "ನೀವು ಒಂದು ಸಮಯದಲ್ಲಿ ಗರಿಷ್ಠ {{maxLimit}} ಸಕ್ರಿಯ ಔಷಧಿ ವಿನಂತಿಗಳನ್ನು ಹೊಂದಬಹುದು. ನೀವು ಪ್ರಸ್ತುತ {{currentActive}} ಸಕ್ರಿಯ ವಿನಂತಿ(ಗಳನ್ನು) ಹೊಂದಿದ್ದೀರಿ. ನೀವು {{canUpload}} ಹೆಚ್ಚಿನ ಫೈಲ್(ಗಳನ್ನು) ಅಪ್ಲೋಡ್ ಮಾಡಬಹುದು.",
+  "max_files_per_request_error": "ಪ್ರತಿ ವಿನಂತಿಗೆ ಗರಿಷ್ಠ {{maxFiles}} ಫೈಲ್ಗಳನ್ನು ಮಾತ್ರ ಅನುಮತಿಸಲಾಗಿದೆ. ದಯವಿಟ್ಟು ಕೆಲವು ಫೈಲ್ಗಳನ್ನು ತೆಗೆದುಹಾಕಿ ಮತ್ತು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
     "modal": {
       "select_address_title": "ವಿತರಣಾ ವಿಳಾಸವನ್ನು ಆಯ್ಕೆಮಾಡಿ",
       "add_new_address_title": "ಹೊಸ ವಿಳಾಸ ಸೇರಿಸಿ",
@@ -328,7 +334,10 @@
     "past_requests_fetch_failed": "ಹಿಂದಿನ ವಿನಂತಿಗಳನ್ನು ಪಡೆಯಲು ವಿಫಲವಾಗಿದೆ",
     "past_requests_error": "ಹಿಂದಿನ ವಿನಂತಿಗಳನ್ನು ಪಡೆಯುವಲ್ಲಿ ತಪ್ಪು:",
     "past_requests_load_error": "ಹಿಂದಿನ ವಿನಂತಿಗಳನ್ನು ಲೋಡ್ ಮಾಡಲು ವಿಫಲವಾಗಿದೆ",
-    "no_past_requests": "ಹಿಂದಿನ ವಿನಂತಿಗಳು ಕಂಡುಬಂದಿಲ್ಲ"
+    "no_past_requests": "ಹಿಂದಿನ ವಿನಂತಿಗಳು ಕಂಡುಬಂದಿಲ್ಲ",
+     "prescription_files": "ಪ್ರಿಸ್ಕ್ರಿಪ್ಷನ್ ಫೈಲ್ಗಳು",
+  "file_number": "ಫೈಲ್ {{number}}",
+  "no_prescription": "ಪ್ರಿಸ್ಕ್ರಿಪ್ಷನ್ ಲಭ್ಯವಿಲ್ಲ"
   },
   "view_pdf": "PDF ವೀಕ್ಷಿಸಿ",
   "referral_document": "ರೆಫರಲ್ ಡಾಕ್ಯುಮೆಂಟ್",
@@ -381,7 +390,9 @@
     "delivery_info": "ವಿತರಣಾ ಮಾಹಿತಿ",
     "approved_at": "ಅನುಮೋದಿಸಿದ ಸಮಯ",
     "tracking_id": "ಟ್ರ್ಯಾಕಿಂಗ್ ID",
-    "no_prescription": "ಪ್ರಿಸ್ಕ್ರಿಪ್ಷನ್ ಲಭ್ಯವಿಲ್ಲ"
+    "no_prescription": "ಪ್ರಿಸ್ಕ್ರಿಪ್ಷನ್ ಲಭ್ಯವಿಲ್ಲ",
+     "file_name": "ಪಿಡಿಎಫ್ {{number}}",
+  "file_number": "ಫೈಲ್ {{number}}"
   },
   "referral_details": {
     "title": "ರೆಫರಲ್ ವಿವರಗಳು",

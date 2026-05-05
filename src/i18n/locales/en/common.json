@@ -162,7 +162,13 @@
     "no_saved_addresses": "No saved addresses found",
     "address_saved": "Address saved successfully",
     "address_save_failed": "Failed to save address",
-   
+   "multiple_files_support": "Supports multiple files (JPG, PNG, PDF, Max 20MB each)",
+  "selected_files": "Selected Files",
+  "add_more_files": "Add More Files",
+  "remove_file_confirm": "Are you sure you want to remove this file?",
+  "remove": "Remove",
+  "max_active_requests_error": "You can have a maximum of {{maxLimit}} active medicine requests at a time. You currently have {{currentActive}} active request(s). You can upload up to {{canUpload}} more file(s).",
+  "max_files_per_request_error": "Maximum {{maxFiles}} files are allowed per request. Please remove some files and try again.",
     "modal": {
       "select_address_title": "Select Delivery Address",
       "add_new_address_title": "Add New Address",
@@ -329,7 +335,10 @@
     "past_requests_fetch_failed": "Failed to fetch past requests",
     "past_requests_error": "Error fetching past requests:",
     "past_requests_load_error": "Failed to load past requests",
-    "no_past_requests": "No past requests found"
+    "no_past_requests": "No past requests found",
+      "prescription_files": "Prescription Files",
+  "file_number": "File {{number}}",
+  "no_prescription": "No prescription available"
   },
    "view_pdf": "View PDF",
     "referral_document": "Referral Document",
@@ -382,7 +391,9 @@
     "delivery_info": "Delivery Information",
     "approved_at": "Approved At",
     "tracking_id": "Tracking ID",
-    "no_prescription": "No prescription available"
+    "no_prescription": "No prescription available",
+      "file_name": "PDF {{number}}",
+  "file_number": "File {{number}}"
   },
     "referral_details": {
     "title": "Referral Details",

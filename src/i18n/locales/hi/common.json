@@ -163,6 +163,13 @@
     "no_saved_addresses": "कोई सहेजे गए पते नहीं मिले",
     "address_saved": "पता सफलतापूर्वक सहेजा गया",
     "address_save_failed": "पता सहेजने में विफल",
+     "multiple_files_support": "एकाधिक फ़ाइलें जोड़ सकते हैं (JPG, PNG, PDF, प्रत्येक फ़ाइल अधिकतम 20MB)",
+  "selected_files": "चयनित फ़ाइलें",
+  "add_more_files": " और फ़ाइलें जोड़ें",
+  "remove_file_confirm": "क्या आप यह फ़ाइल हटाना चाहते हैं?",
+  "remove": "हटाएं",
+    "max_active_requests_error": "आप एक समय में अधिकतम {{maxLimit}} सक्रिय दवा अनुरोध कर सकते हैं। आपके पास वर्तमान में {{currentActive}} सक्रिय अनुरोध हैं। आप {{canUpload}} और फ़ाइल(एं) अपलोड कर सकते हैं।",
+  "max_files_per_request_error": "प्रति अनुरोध अधिकतम {{maxFiles}} फ़ाइलों की अनुमति है। कृपया कुछ फ़ाइलें हटाएं और पुनः प्रयास करें।",
     "modal": {
       "select_address_title": "वितरण पता चुनें",
       "add_new_address_title": "नया पता जोड़ें",
@@ -338,7 +345,10 @@
     "past_requests_fetch_failed": "पिछले अनुरोध प्राप्त करने में विफल",
     "past_requests_error": "पिछले अनुरोध प्राप्त करने में त्रुटि:",
     "past_requests_load_error": "पिछले अनुरोध लोड करने में विफल",
-    "no_past_requests": "कोई पिछला अनुरोध नहीं मिला"
+    "no_past_requests": "कोई पिछला अनुरोध नहीं मिला",
+     "prescription_files": "प्रिस्क्रिप्शन फ़ाइलें",
+  "file_number": "फ़ाइल {{number}}",
+  "no_prescription": "कोई प्रिस्क्रिप्शन उपलब्ध नहीं है"
   },
      "view_pdf": "पीडीएफ देखें",
     "referral_document": "रेफ़रल दस्तावेज़",
@@ -391,7 +401,9 @@
   "delivery_info": "डिलीवरी जानकारी",
   "approved_at": "मंज़ूर की तिथि",
   "tracking_id": "ट्रैकिंग आईडी",
-  "no_prescription": "कोई पर्ची उपलब्ध नहीं"
+  "no_prescription": "कोई पर्ची उपलब्ध नहीं",
+   "file_name": "पीडीएफ {{number}}",
+  "file_number": "फ़ाइल {{number}}"
 },
 "referral_details": {
     "title": "रेफ़रल विवरण",

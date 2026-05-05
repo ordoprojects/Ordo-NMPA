@@ -1,5 +1,5 @@
-import React, { useState ,useEffect} from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, ImageBackground, TextInput, Modal, ActivityIndicator, Alert , Modal as RNModal} from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, ImageBackground, TextInput, Modal, ActivityIndicator, Alert, Modal as RNModal, FlatList } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Colors from '../../constants/Colors';
 import moment from 'moment';
@@ -25,27 +25,27 @@ const MedicineReview = ({ navigation, route }) => {
   const [loading, setLoading] = useState(false);
   const [pastRequests, setPastRequests] = useState([]);
   const [loadingPastRequests, setLoadingPastRequests] = useState(true);
-  const [isPdf, setIsPdf] = useState(false);
+  const [fileUrls, setFileUrls] = useState([]);
+  const [currentFileIndex, setCurrentFileIndex] = useState(0);
   const [isImageViewVisible, setIsImageViewVisible] = useState(false);
-  const [fileUrl, setFileUrl] = useState('');
   const [visibleCount, setVisibleCount] = useState(4);
   const { role } = useRole();
 
+  console.log("request", request);
+  console.log("past requests", JSON.stringify(pastRequests, null, 2));
 
-console.log("request",request)
-console.log("past requests",JSON.stringify(pastRequests,null,2))
-
+  // Process file_urls from response
   useEffect(() => {
-    if (request.file_url) {
-      let formattedUrl = request.file_url.startsWith('/api') 
-        ? request.file_url.substring(4) 
-        : request.file_url;
-      formattedUrl = `${BASE_URL}${formattedUrl}`;
-      
-      setFileUrl(formattedUrl);
-      setIsPdf(formattedUrl.toLowerCase().endsWith('.pdf'));
+    if (request.file_urls && request.file_urls.length > 0) {
+      const formattedUrls = request.file_urls.map(fileUrl => {
+        let formattedUrl = fileUrl.startsWith('/api') 
+          ? fileUrl.substring(4) 
+          : fileUrl;
+        return `${BASE_URL}${formattedUrl}`;
+      });
+      setFileUrls(formattedUrls);
     }
-  }, [request.file_url]);
+  }, [request.file_urls]);
 
   useEffect(() => {
     const fetchPastRequests = async () => {
@@ -63,12 +63,9 @@ console.log("past requests",JSON.stringify(pastRequests,null,2))
           },
         });
 
-
-        console.log("token",token);
-
         const responseData = await response.json();
 
-        console.log("Response data",JSON.stringify(responseData,null,2))
+        console.log("Response data", JSON.stringify(responseData, null, 2));
 
         if (!response.ok) {
           throw new Error(responseData.message || t('medicine_review.past_requests_fetch_failed'));
@@ -89,13 +86,95 @@ console.log("past requests",JSON.stringify(pastRequests,null,2))
     fetchPastRequests();
   }, [request.id, request.user_id]);
 
-    const formatDuration = (duration) => {
+  const formatDuration = (duration) => {
     if (!duration) return t('medicine_request_list.not_available');
     if (duration.days) return t('medicine_request_list.days', { count: duration.days });
     if (duration.months) return t('medicine_request_list.months', { count: duration.months });
     return t('medicine_request_list.not_available');
   };
 
+  // Check if file is PDF
+  const isPdf = (url) => {
+    return url.toLowerCase().endsWith('.pdf');
+  };
+
+  // Render single file item in carousel
+  const renderFileItem = ({ item, index }) => {
+    const isPdfFile = isPdf(item);
+    
+    return (
+      <TouchableOpacity
+        activeOpacity={0.8}
+        onPress={() => {
+          setCurrentFileIndex(index);
+          if (!isPdfFile) {
+            setIsImageViewVisible(true);
+          }
+        }}
+        style={styles.fileCard}
+      >
+        {isPdfFile ? (
+          <View style={styles.pdfCard}>
+            <Ionicons name="document-text" size={50} color={Colors.darkBlue} />
+            <Text style={styles.pdfFileName}>PDF Document {index + 1}</Text>
+            <Text style={styles.viewText}>{t('view_pdf')}</Text>
+          </View>
+        ) : (
+          <Image
+            source={{ uri: item }}
+            style={styles.fileThumbnail}
+            resizeMode="cover"
+          />
+        )}
+        <Text style={styles.fileIndex}>{t('medicine_review.file_number', { number: index + 1 })}</Text>
+      </TouchableOpacity>
+    );
+  };
+
+  // Render PDF viewer for current file
+  const renderFileViewer = () => {
+    const currentUrl = fileUrls[currentFileIndex];
+    const isPdfFile = isPdf(currentUrl);
+
+    if (isPdfFile) {
+      return (
+        <View style={styles.pdfViewerContainer}>
+          <WebView
+            source={{ uri: `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(currentUrl)}` }}
+            style={styles.pdfViewer}
+            scalesPageToFit={true}
+          />
+        </View>
+      );
+    } else {
+      return (
+        <RNModal visible={isImageViewVisible} transparent={true}>
+          <ImageViewer
+            imageUrls={fileUrls.map(url => ({ url }))}
+            index={currentFileIndex}
+            enableSwipeDown={true}
+            onSwipeDown={() => setIsImageViewVisible(false)}
+            enableImageZoom={true}
+            renderHeader={() => (
+              <TouchableOpacity 
+                style={styles.closeButton}
+                onPress={() => setIsImageViewVisible(false)}
+              >
+                <Ionicons name="close" size={30} color="white" />
+              </TouchableOpacity>
+            )}
+            renderFooter={() => (
+              <View style={styles.imageFooter}>
+                <Text style={styles.imageCounter}>
+                  {currentFileIndex + 1} / {fileUrls.length}
+                </Text>
+              </View>
+            )}
+          />
+        </RNModal>
+      );
+    }
+  };
 
   const renderPastRequests = () => {
     if (loadingPastRequests) {
@@ -112,92 +191,78 @@ console.log("past requests",JSON.stringify(pastRequests,null,2))
       );
     }
 
-    // utils/durationFormatter.js
-  const formatDuration = (duration) => {
-    if (!duration) return t('medicine_request_list.not_available');
-    if (duration.days) return t('medicine_request_list.days', { count: duration.days });
-    if (duration.months) return t('medicine_request_list.months', { count: duration.months });
-    return t('medicine_request_list.not_available');
-  };
-
     return (
       <View style={styles.pastRequestsContainer}>
-   {pastRequests.slice(0, visibleCount).map((req, index) => {
+        {pastRequests.slice(0, visibleCount).map((req, index) => {
+          const duration = formatDuration(req.medicine_duration);
 
-  const duration = formatDuration(req.medicine_duration);
+          const statusMap = {
+            approved: {
+              text: t('medicine_review.status_approved'),
+              color: 'green',
+            },
+            rejected: {
+              text: t('medicine_review.status_rejected'),
+              color: 'red',
+            },
+            pending: {
+              text: t('medicine_review.status_pending'),
+              color: '#FFA500',
+            },
+            assigned_to_doctor: {
+              text: t('medicine_review.status_assigned_to_you'),
+              color: '#FFA500',
+            },
+            completed: {
+              text: t('medicine_review.status_completed'),
+              color: 'green',
+            },
+            dispatched: {
+              text: t('medicine_review.status_dispatched'),
+              color: 'blue',
+            }
+          };
 
-const statusMap = {
-  approved: {
-    text: t('medicine_review.status_approved'),
-    color: 'green',
-  },
-  rejected: {
-    text: t('medicine_review.status_rejected'),
-    color: 'red',
-  },
-  pending: {
-    text: t('medicine_review.status_pending'),
-    color: '#FFA500', // orange
-  },
-  assigned_to_doctor: {
-    text: t('medicine_review.status_assigned_to_you'),
-    color: '#FFA500', // orange
-  },
-  completed: {
-    text: t('medicine_review.status_completed'),
-    color: 'green',
-  },
-  dispatched: {
-    text: t('medicine_review.status_dispatched'),
-    color: 'blue',
-  }
-};
+          const currentStatus = statusMap[req.status] || {
+            text: t('medicine_review.status_unknown'),
+            color: 'gray',
+          };
 
+          const status = currentStatus.text;
+          const statusColor = currentStatus.color;
 
-const currentStatus = statusMap[req.status] || {
-  text: t('medicine_review.status_unknown'),
-  color: 'gray',
-};
+          return (
+            <View key={`past-req-${index}`} style={styles.pastRequestItem}>
+              <View style={styles.pastRequestRow}>
+                <Text style={styles.pastRequestLabel}>
+                  {t('medicine_review.issued_date')}:
+                </Text>
+                <Text style={styles.pastRequestValue}>
+                  {req?.requested_at
+                    ? moment(req?.requested_at).format('MMM D, YYYY')
+                    : t('medicine_review.not_available')}
+                </Text>
+              </View>
 
-const status = currentStatus.text;
-const statusColor = currentStatus.color;
+              <View style={styles.pastRequestRow}>
+                <Text style={styles.pastRequestLabel}>{t('medicine_review.duration')}:</Text>
+                <Text style={styles.pastRequestValue}>{duration}</Text>
+              </View>
 
+              <View style={styles.pastRequestRow}>
+                <Text style={styles.pastRequestLabel}>{t('status')}:</Text>
+                <Text style={[styles.pastRequestValue, { color: statusColor }]}>{status}</Text>
+              </View>
 
-  return (
-    <View key={`past-req-${index}`} style={styles.pastRequestItem}>
-    <View style={styles.pastRequestRow}>
-  <Text style={styles.pastRequestLabel}>
-    {t('medicine_review.issued_date')}:
-  </Text>
-  <Text style={styles.pastRequestValue}>
-    { moment(req?.requested_at).format('MMM D, YYYY')
-      ?    moment(req?.requested_at).format('MMM D, YYYY')
-      : t('medicine_review.not_available')}
-  </Text>
-</View>
-
-
-      <View style={styles.pastRequestRow}>
-        <Text style={styles.pastRequestLabel}>{t('medicine_review.duration')}:</Text>
-        <Text style={styles.pastRequestValue}>{duration}</Text>
-      </View>
-
-      <View style={styles.pastRequestRow}>
-        <Text style={styles.pastRequestLabel}>{t('status')}:</Text>
-        <Text style={[styles.pastRequestValue, { color: statusColor }]}>{status}</Text>
-      </View>
-
-      <View style={styles.pastRequestRow}>
-        <Text style={styles.pastRequestLabel}>{t('medicine_review.doctor')}:</Text>
-        <Text style={styles.pastRequestValue}>
-          {req.doctor_name || t('medicine_review.not_available')}
-        </Text>
-      </View>
-      
-    </View>
-  );
-})}
-
+              <View style={styles.pastRequestRow}>
+                <Text style={styles.pastRequestLabel}>{t('medicine_review.doctor')}:</Text>
+                <Text style={styles.pastRequestValue}>
+                  {req.doctor_name || t('medicine_review.not_available')}
+                </Text>
+              </View>
+            </View>
+          );
+        })}
       </View>
     );
   };
@@ -274,7 +339,7 @@ const statusColor = currentStatus.color;
         rejection_reason: rejectionNote
       };
 
-      console.log("payload",payload)
+      console.log("payload", payload);
 
       const response = await fetch(`${BASE_URL}/medicine-requests/reject/`, {
         method: 'POST',
@@ -315,88 +380,59 @@ const statusColor = currentStatus.color;
   return (
     <View style={styles.container}>
       {/* Header */}
-    {/* Header */}
-<SafeAreaView edges={['top']} style={{ backgroundColor: '#f8fafc' }}>
-  <View style={styles.header}>
-    <TouchableOpacity onPress={() => navigation.goBack()}>
-      <Ionicons name="arrow-back" size={24} color="#0d141c" />
-    </TouchableOpacity>
-    <Text style={styles.headerTitle}>{t('medicine_review.title')}</Text>
-    <View style={{ width: 24 }} />
-  </View>
-</SafeAreaView>
-
+      <SafeAreaView edges={['top']} style={{ backgroundColor: '#f8fafc' }}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Ionicons name="arrow-back" size={24} color="#0d141c" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>{t('medicine_review.title')}</Text>
+          <View style={{ width: 24 }} />
+        </View>
+      </SafeAreaView>
 
       <ScrollView contentContainerStyle={styles.content}>
         {/* Patient Information */}
         <Text style={styles.sectionTitle}>{t('medicine_review.patient_info')}</Text>
         <View style={styles.patientInfoContainer}>
-{request?.photo_url ? (
-  <ImageBackground
-    source={{ 
-      uri: `${BASE_URL}${request?.photo_url.replace(/^\/api/, '')}`
-    }} 
-    resizeMode='contain'
-    style={styles.patientImage}
-    imageStyle={{ borderRadius: 28 }}
-  />
-) : (
-  <ImageBackground
-    source={require('../../assets/images/profile.png')}
-    resizeMode='contain'
-    style={styles.patientImage}
-    imageStyle={{ borderRadius: 28 }}
-  />
-)}
+          {request?.photo_url ? (
+            <ImageBackground
+              source={{ 
+                uri: `${BASE_URL}${request?.photo_url.replace(/^\/api/, '')}`
+              }} 
+              resizeMode='contain'
+              style={styles.patientImage}
+              imageStyle={{ borderRadius: 28 }}
+            />
+          ) : (
+            <ImageBackground
+              source={require('../../assets/images/profile.png')}
+              resizeMode='contain'
+              style={styles.patientImage}
+              imageStyle={{ borderRadius: 28 }}
+            />
+          )}
           <View style={styles.patientTextContainer}>
             <Text style={styles.patientName}>{request.user_name}</Text>
             <Text style={styles.patientAge}>{t('medicine_review.age', { years: 35 })}</Text>
           </View>
         </View>
-        {/* <View style={styles.ecNumberContainer}>
-          <Text style={styles.ecNumber}>{t('medicine_review.ec_number', { number: '1234567890' })}</Text>
-        </View> */}
 
-        {/* Prescription */}
-        <Text style={styles.sectionTitle}>{t('medicine_review.prescription')}</Text>
-        {isPdf ? (
-          <View style={styles.pdfContainer}>
-            <WebView
-              source={{ uri: `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(fileUrl)}` }}
-              style={styles.pdfView}
-              scalesPageToFit={true}
-            />
-          </View>
-        ) : (
+        {/* Prescription Files Section */}
+        <Text style={styles.sectionTitle}>{t('medicine_review.prescription_files')}</Text>
+        {fileUrls.length > 0 ? (
           <>
-            <TouchableOpacity 
-              activeOpacity={0.8}
-              onPress={() => setIsImageViewVisible(true)}
-            >
-              <ImageBackground
-                source={{ uri: fileUrl }}
-                style={styles.prescriptionImage}
-                resizeMode="contain"
-              />
-            </TouchableOpacity>
-
-            <RNModal visible={isImageViewVisible} transparent={true}>
-              <ImageViewer
-                imageUrls={[{ url: fileUrl }]}
-                enableSwipeDown={true}
-                onSwipeDown={() => setIsImageViewVisible(false)}
-                enableImageZoom={true}
-                renderHeader={() => (
-                  <TouchableOpacity 
-                    style={styles.closeButton}
-                    onPress={() => setIsImageViewVisible(false)}
-                  >
-                    <Ionicons name="close" size={30} color="white" />
-                  </TouchableOpacity>
-                )}
-              />
-            </RNModal>
+            <FlatList
+              data={fileUrls}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              renderItem={renderFileItem}
+              keyExtractor={(item, index) => `file-${index}`}
+              contentContainerStyle={styles.filesList}
+            />
+            {renderFileViewer()}
           </>
+        ) : (
+          <Text style={styles.noFilesText}>{t('medicine_review.no_prescription')}</Text>
         )}
 
         {/* Prescription Details */}
@@ -408,7 +444,7 @@ const statusColor = currentStatus.color;
           </View>
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>{t('medicine_review.requested_duration')}</Text>
-            <Text style={styles.detailValue}> {formatDuration(request.medicine_duration)}</Text>
+            <Text style={styles.detailValue}>{formatDuration(request.medicine_duration)}</Text>
           </View>
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>{t('medicine_review.delivery_address')}</Text>
@@ -419,33 +455,35 @@ const statusColor = currentStatus.color;
         {/* Past Requests */}
         <Text style={styles.sectionTitle}>{t('medicine_review.past_requests')}</Text>
         {renderPastRequests()}
-            {visibleCount < pastRequests.length && (
-  <TouchableOpacity 
-    style={{ padding: 4, alignItems: 'center' }} 
-    onPress={() => setVisibleCount(prev => prev + 4)}
-  >
-    <Text style={{ color: Colors.darkBlue, fontWeight: '600' }}>
-      {t('medicine_review.load_more')}
-    </Text>
-  </TouchableOpacity>
-)}
+        {visibleCount < pastRequests.length && (
+          <TouchableOpacity 
+            style={{ padding: 4, alignItems: 'center' }} 
+            onPress={() => setVisibleCount(prev => prev + 4)}
+          >
+            <Text style={{ color: Colors.darkBlue, fontWeight: '600' }}>
+              {t('medicine_review.load_more')}
+            </Text>
+          </TouchableOpacity>
+        )}
       </ScrollView>
-{request?.status==="assigned_to_doctor" && (
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity 
-          style={[styles.button, styles.rejectButton, isRejected && styles.activeButton]}
-          onPress={handleReject}
-        >
-          <Text style={[styles.buttonText, styles.rejectButtonText]}>{t('medicine_review.reject')}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-          style={[styles.button, styles.approveButton, isApproved && styles.activeButton]}
-          onPress={handleApprove}
-        >
-          <Text style={[styles.buttonText, styles.approveButtonText]}>{t('medicine_review.approve')}</Text>
-        </TouchableOpacity>
-      </View>
-)}
+
+      {request?.status === "assigned_to_doctor" && (
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity 
+            style={[styles.button, styles.rejectButton, isRejected && styles.activeButton]}
+            onPress={handleReject}
+          >
+            <Text style={[styles.buttonText, styles.rejectButtonText]}>{t('medicine_review.reject')}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={[styles.button, styles.approveButton, isApproved && styles.activeButton]}
+            onPress={handleApprove}
+          >
+            <Text style={[styles.buttonText, styles.approveButtonText]}>{t('medicine_review.approve')}</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
       {/* Approval Modal */}
       <Modal
         visible={showApproveModal}
@@ -594,19 +632,75 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#49739c',
   },
-  ecNumberContainer: {
+  filesList: {
     paddingHorizontal: 16,
     paddingVertical: 8,
-    backgroundColor: '#f8fafc',
   },
-  ecNumber: {
-    fontSize: 16,
+  fileCard: {
+    width: 150,
+    marginRight: 12,
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+  },
+  fileThumbnail: {
+    width: 120,
+    height: 120,
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  pdfCard: {
+    width: 120,
+    height: 120,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#f1f5f9',
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  pdfFileName: {
+    fontSize: 12,
     color: '#0d141c',
+    marginTop: 8,
+    textAlign: 'center',
   },
-  prescriptionImage: {
+  viewText: {
+    fontSize: 12,
+    color: Colors.darkBlue,
+    marginTop: 4,
+    textDecorationLine: 'underline',
+  },
+  fileIndex: {
+    fontSize: 11,
+    color: '#666',
+    marginTop: 4,
+  },
+  pdfViewerContainer: {
+    height: 500,
     width: '100%',
-    aspectRatio: 3/2,
     marginVertical: 8,
+  },
+  pdfViewer: {
+    flex: 1,
+  },
+  imageFooter: {
+    position: 'absolute',
+    bottom: 20,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+  },
+  imageCounter: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
   },
   detailsContainer: {
     paddingHorizontal: 16,
@@ -629,26 +723,43 @@ const styles = StyleSheet.create({
     width: '60%',
   },
   pastRequestsContainer: {
-    flexDirection: 'row',
     paddingHorizontal: 16,
-  },
-  pastRequestColumn: {
-    flex: 1,
   },
   pastRequestItem: {
     borderTopWidth: 1,
     borderTopColor: '#cedbe8',
-    paddingVertical: 16,
-    paddingRight: 8,
+    paddingVertical: 12,
+    marginBottom: 8,
+  },
+  pastRequestRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 4,
   },
   pastRequestLabel: {
     fontSize: 14,
     color: '#49739c',
-    marginBottom: 4,
+    width: '30%',
   },
   pastRequestValue: {
     fontSize: 14,
     color: '#0d141c',
+    width: '70%',
+    textAlign: 'right',
+  },
+  noPastRequestsText: {
+    textAlign: 'center',
+    padding: 16,
+    color: '#666',
+  },
+  noFilesText: {
+    textAlign: 'center',
+    padding: 16,
+    color: '#666',
+  },
+  loadingContainer: {
+    padding: 16,
+    alignItems: 'center',
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -714,33 +825,33 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
     marginBottom: 15,
   },
-    modalButtonContainer: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-    },
-    modalButton: {
-      flex: 1,
-      padding: 12,
-      borderRadius: 8,
-      alignItems: 'center',
-      marginHorizontal: 5,
-    },
-    cancelButton: {
-      backgroundColor: '#e7edf4',
-    },
-    confirmButton: {
-      backgroundColor: Colors.darkBlue,
-    },
-    modalButtonText: {
-      fontWeight: 'bold',
-    },
-    modalCloseButton: {
+  modalButtonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  modalButton: {
+    flex: 1,
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginHorizontal: 5,
+  },
+  cancelButton: {
+    backgroundColor: '#e7edf4',
+  },
+  confirmButton: {
+    backgroundColor: Colors.darkBlue,
+  },
+  modalButtonText: {
+    fontWeight: 'bold',
+  },
+  modalCloseButton: {
     position: 'absolute',
     top: 10,
     right: 10,
     zIndex: 1,
   },
- closeButton: {
+  closeButton: {
     position: 'absolute',
     top: 40,
     right: 20,
@@ -749,70 +860,6 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     padding: 5,
   },
-pastRequestsContainer: {
-  paddingHorizontal: 16,
-},
-pastRequestItem: {
-  borderTopWidth: 1,
-  borderTopColor: '#cedbe8',
-  paddingVertical: 12,
-  marginBottom: 8,
-},
-pastRequestRow: {
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-  marginBottom: 4,
-},
-pastRequestLabel: {
-  fontSize: 14,
-  color: '#49739c',
-  width: '30%', // Fixed width for labels
-},
-pastRequestValue: {
-  fontSize: 14,
-  color: '#0d141c',
-  width: '70%', // Fixed width for values
-  textAlign: 'right',
-},
-noPastRequestsText: {
-  textAlign: 'center',
-  padding: 16,
-  color: '#666',
-},
-loadingContainer: {
-  padding: 16,
-  alignItems: 'center',
-},
-statusApproved: {
-  color: Colors.darkBlue,
-  fontWeight: '500',
-},
-statusPending: {
-  color: '#FFA500', // Orange color for pending status
-  fontWeight: '500',
-},
-  
-  pdfContainer: {
-    flex: 1,
-    height: 500, // Fixed height or use Dimensions to calculate
-    width: '100%',
-    marginVertical: 8,
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
-  },
-  pdfView: {
-    flex: 1,
-  },
-  loadingIndicator: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-
 });
 
 export default MedicineReview;

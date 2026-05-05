@@ -10,7 +10,8 @@ import {
   Platform,
   ActivityIndicator,
   Modal,
-  FlatList
+  FlatList,
+  Image
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -28,8 +29,8 @@ const MedicineRequestScreen = () => {
   const { t } = useTranslation();
   const navigation = useNavigation();
   
-  // Prescription states
-  const [selectedFile, setSelectedFile] = useState(null);
+  // Prescription states - Updated for multiple files
+  const [selectedFiles, setSelectedFiles] = useState([]);
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [duration, setDuration] = useState('');
@@ -143,71 +144,71 @@ const MedicineRequestScreen = () => {
   };
 
   // ✅ Add new address
-const handleAddAddress = async () => {
-  try {
-    const token = await getToken();
-    const addressData = {
-      ...newAddress,
-      full_name: newAddress.full_name || user?.full_name || '',
-      phone_number: newAddress.phone_number || user?.phone_number || '',
-    };
+  const handleAddAddress = async () => {
+    try {
+      const token = await getToken();
+      const addressData = {
+        ...newAddress,
+        full_name: newAddress.full_name || user?.full_name || '',
+        phone_number: newAddress.phone_number || user?.phone_number || '',
+      };
 
-    const response = await fetch(`${BASE_URL}/medicine-requests/delivery-address`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(addressData),
-    });
+      const response = await fetch(`${BASE_URL}/medicine-requests/delivery-address`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(addressData),
+      });
 
-    const data = await response.json();
+      const data = await response.json();
 
-    if (!response.ok) {
-      throw new Error(data.message || 'Address save failed');
+      if (!response.ok) {
+        throw new Error(data.message || 'Address save failed');
+      }
+
+      // ✅ Fetch the updated address list
+      const updatedAddressesResponse = await fetch(`${BASE_URL}/medicine-requests/delivery-address`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      const updatedData = await updatedAddressesResponse.json();
+      const updatedAddresses = updatedData.addresses || [];
+      setAddresses(updatedAddresses);
+
+      // ✅ Select the newly added address
+      const newlyAdded = updatedAddresses.find(addr =>
+        addr.address_line1 === addressData.address_line1 &&
+        addr.postal_code === addressData.postal_code
+      );
+      if (newlyAdded) {
+        handleAddressSelect(newlyAdded);
+      }
+
+      setNewAddressModalVisible(false);
+      setNewAddress({
+        full_name: '',
+        phone_number: '',
+        address_line1: '',
+        address_line2: '',
+        city: '',
+        state: '',
+        postal_code: '',
+        country: '',
+      });
+
+      Alert.alert(t('success'), t('medicine_request.address_saved'));
+
+    } catch (err) {
+      console.error('Error adding address:', err);
+      Alert.alert(t('error'), t('medicine_request.address_save_failed'));
     }
+  };
 
-    // ✅ Fetch the updated address list
-    const updatedAddressesResponse = await fetch(`${BASE_URL}/medicine-requests/delivery-address`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-    });
-
-    const updatedData = await updatedAddressesResponse.json();
-    const updatedAddresses = updatedData.addresses || [];
-    setAddresses(updatedAddresses);
-
-    // ✅ Select the newly added address
-    const newlyAdded = updatedAddresses.find(addr =>
-      addr.address_line1 === addressData.address_line1 &&
-      addr.postal_code === addressData.postal_code
-    );
-    if (newlyAdded) {
-      handleAddressSelect(newlyAdded);
-    }
-
-    setNewAddressModalVisible(false);
-    setNewAddress({
-      full_name: '',
-      phone_number: '',
-      address_line1: '',
-      address_line2: '',
-      city: '',
-      state: '',
-      postal_code: '',
-      country: '',
-    });
-
-    Alert.alert(t('success'), t('medicine_request.address_saved'));
-
-  } catch (err) {
-    console.error('Error adding address:', err);
-    Alert.alert(t('error'), t('medicine_request.address_save_failed'));
-  }
-};
-
-
+  // Updated pickDocument to handle multiple files
   const pickDocument = async () => {
     try {
       const result = await DocumentPicker.pick({
@@ -215,31 +216,65 @@ const handleAddAddress = async () => {
           DocumentPicker.types.images,
           DocumentPicker.types.pdf,
         ],
+        allowMultiSelection: true, // Enable multiple file selection
       });
       
       if (result && result.length > 0) {
-        const file = result[0];
+        const validFiles = [];
+        const invalidFiles = [];
         
-        // Validate file type
-        const validTypes = ['image/jpeg', 'image/png', 'application/pdf'];
-        if (!validTypes.includes(file.type)) {
-          Alert.alert(t('error'), 'Only JPG, PNG, or PDF files are allowed');
-          return;
+        for (const file of result) {
+          // Validate file type
+          const validTypes = ['image/jpeg', 'image/png', 'application/pdf'];
+          if (!validTypes.includes(file.type)) {
+            invalidFiles.push(`${file.name} (Invalid type)`);
+            continue;
+          }
+          
+          // Validate file size (20MB max per file)
+          if (file.size > 20 * 1024 * 1024) {
+            invalidFiles.push(`${file.name} (Size > 20MB)`);
+            continue;
+          }
+          
+          validFiles.push(file);
         }
         
-        // Validate file size (20MB max)
-        if (file.size > 20 * 1024 * 1024) {
-          Alert.alert(t('error'), 'File size must be less than 20MB');
-          return;
+        if (invalidFiles.length > 0) {
+          Alert.alert(
+            t('error'), 
+            `Some files were not added:\n${invalidFiles.join('\n')}`
+          );
         }
         
-        setSelectedFile(file);
+        if (validFiles.length > 0) {
+          setSelectedFiles(prev => [...prev, ...validFiles]);
+          Alert.alert(t('success'), `${validFiles.length} file(s) added successfully`);
+        }
       }
     } catch (err) {
       if (!DocumentPicker.isCancel(err)) {
-        Alert.alert(t('error'), 'Failed to pick document');
+        Alert.alert(t('error'), 'Failed to pick documents');
       }
     }
+  };
+
+  // Remove a file from the list
+  const removeFile = (index) => {
+    Alert.alert(
+      t('confirm'),
+      t('medicine_request.remove_file_confirm'),
+      [
+        { text: t('cancel'), style: 'cancel' },
+        { 
+          text: t('remove'), 
+          style: 'destructive',
+          onPress: () => {
+            setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+          }
+        }
+      ]
+    );
   };
 
   const handleDragEnter = () => setIsDragging(true);
@@ -279,11 +314,9 @@ const handleAddAddress = async () => {
     return true;
   };
 
-    console.log('==============5678987=================',selectedAddress?.id);
-
-
-  const handleSubmit = async () => {
-  if (!selectedFile) {
+  // Updated handleSubmit for multiple files
+const handleSubmit = async () => {
+  if (selectedFiles.length === 0) {
     Alert.alert(t('error'), t('medicine_request.no_file_error'));
     return;
   }
@@ -318,40 +351,40 @@ const handleAddAddress = async () => {
     return;
   }
 
-  const validTypes = ['image/jpeg', 'image/png', 'application/pdf'];
-  if (!validTypes.includes(selectedFile.type)) {
-    Alert.alert(t('error'), t('medicine_request.invalid_file_type_error'));
-    return;
-  }
-
-  if (selectedFile.size > 20 * 1024 * 1024) {
-    Alert.alert(t('error'), t('medicine_request.large_file_error'));
-    return;
-  }
-
   try {
     setIsSubmitting(true);
 
-    const fileContent = await RNFS.readFile(selectedFile.uri, 'base64');
-    const base64String = `data:${selectedFile.type};base64,${fileContent}`;
+    // Convert all files to base64
+    const fileBase64Array = [];
+    const fileNameArray = [];
+    const fileTypeArray = [];
 
-    // Combine medicine request + delivery address
+    for (const file of selectedFiles) {
+      const fileContent = await RNFS.readFile(file.uri, 'base64');
+      fileBase64Array.push(`data:${file.type};base64,${fileContent}`);
+      fileNameArray.push(file.name || `prescription_${Date.now()}_${Math.random()}.${getFileExtension(file.type)}`);
+      fileTypeArray.push(file.type || 'application/octet-stream');
+    }
+
+    // Create request body with the expected payload format
     const medicineRequestBody = {
-      file_base64: base64String,
-      file_name: selectedFile.name || `prescription_${Date.now()}.${getFileExtension(selectedFile.type)}`,
-      file_type: selectedFile.type || 'application/octet-stream',
-      issue_date: moment(date).format('YYYY-MM-DD HH:mm:ss'),
+      file_base64: fileBase64Array,
+      file_name: fileNameArray,
+      file_type: fileTypeArray,
+      issue_date: moment(date).format('YYYY-MM-DD'),
       duration: duration.toLowerCase(),
-     delivery_address_id: selectedAddress.id
+      delivery_address_id: selectedAddress?.id
     };
 
     console.log('=== MEDICINE REQUEST PAYLOAD ===');
     console.log('URL:', `${BASE_URL}/medicine-requests`);
+    console.log('Number of files:', selectedFiles.length);
     console.log('Payload:', {
       ...medicineRequestBody,
-      file_base64: `${medicineRequestBody.file_base64.substring(0, 100)}...`
+      file_base64: medicineRequestBody.file_base64.map(f => f.substring(0, 100) + '...')
     });
-    console.log('===============================',selectedAddress.id);
+    console.log('Delivery Address ID:', selectedAddress?.id);
+    console.log('===============================');
 
     const token = await getToken();
 
@@ -371,12 +404,54 @@ const handleAddAddress = async () => {
     console.log('Response:', medicineResponseData);
     console.log('===============================');
 
-    if (!medicineResponse.ok) {
-      throw new Error(medicineResponseData.message || t('medicine_request.submission_failed'));
+if (!medicineResponse.ok) {
+  // ✅ Show the error immediately instead of throwing
+  console.log('=== ERROR RESPONSE ===');
+  console.log('Error Code:', medicineResponseData.error_code);
+  console.log('Message:', medicineResponseData.message);
+  
+  // Handle specific error codes
+  if (medicineResponseData.error_code === 'MAX_ACTIVE_REQUESTS_EXCEEDED') {
+    const numbers = medicineResponseData.message.match(/\d+/g);
+    if (numbers && numbers.length >= 3) {
+      Alert.alert(
+        t('error'), 
+        t('medicine_request.max_active_requests_error', {
+          maxLimit: numbers[0],
+          currentActive: numbers[1],
+          canUpload: numbers[2]
+        })
+      );
+    } else {
+      Alert.alert(t('error'), medicineResponseData.message);
     }
+    setIsSubmitting(false);
+    return;
+  }
+  
+  if (medicineResponseData.error_code === 'MAX_FILES_PER_REQUEST_EXCEEDED') {
+    const numbers = medicineResponseData.message.match(/\d+/g);
+    const maxFiles = numbers && numbers[0] ? numbers[0] : 4;
+    Alert.alert(
+      t('error'), 
+      t('medicine_request.max_files_per_request_error', { maxFiles: maxFiles })
+    );
+    setIsSubmitting(false);
+    return;
+  }
+  
+  // ✅ For other errors (like 500), show the actual server message
+  Alert.alert(
+    t('error'), 
+    medicineResponseData.message || t('medicine_request.submission_failed')
+  );
+  setIsSubmitting(false);
+  return; // Don't continue to success
+}
 
-    Alert.alert(t('success'), t('prescription_upload_success'));
-    navigation.goBack();
+// ✅ Success case
+Alert.alert(t('success'), t('prescription_upload_success'));
+navigation.goBack();
 
   } catch (error) {
     console.error('Submission error:', error);
@@ -396,13 +471,19 @@ const handleAddAddress = async () => {
   }
 };
 
-
   const getFileExtension = (mimeType) => {
     if (!mimeType) return 'pdf';
     if (mimeType.includes('jpeg')) return 'jpg';
     if (mimeType.includes('png')) return 'png';
     if (mimeType.includes('pdf')) return 'pdf';
     return mimeType.split('/')[1] || 'pdf';
+  };
+
+  // Get file icon based on type
+  const getFileIcon = (fileType) => {
+    if (fileType.includes('pdf')) return 'picture-as-pdf';
+    if (fileType.includes('image')) return 'image';
+    return 'insert-drive-file';
   };
 
   // ✅ Render address card for modal
@@ -481,8 +562,10 @@ const handleAddAddress = async () => {
           onPressOut={handleDragLeave}
         >
           <View style={styles.uploadContent}>
+            <Icon name="cloud-upload" size={48} color={Colors.darkBlue} />
             <Text style={styles.uploadTitle}>{t('medicine_request.drag_drop')}</Text>
             <Text style={styles.uploadSubtitle}>{t('medicine_request.file_types')}</Text>
+            <Text style={styles.uploadSubtitle}>{t('medicine_request.multiple_files_support')}</Text>
           </View>
           <TouchableOpacity 
             style={styles.browseButton}
@@ -492,12 +575,40 @@ const handleAddAddress = async () => {
           </TouchableOpacity>
         </TouchableOpacity>
 
-        {selectedFile && (
-          <View style={styles.selectedFileContainer}>
-            <Text style={styles.selectedFileText}>
-              {t('medicine_request.selected_file')}: {selectedFile.name}
-              {selectedFile.size && ` (${Math.round(selectedFile.size / 1024)} KB)`}
+        {/* Selected Files List */}
+        {selectedFiles.length > 0 && (
+          <View style={styles.selectedFilesContainer}>
+            <Text style={styles.selectedFilesTitle}>
+              {t('medicine_request.selected_files')} ({selectedFiles.length})
             </Text>
+            {selectedFiles.map((file, index) => (
+              <View key={index} style={styles.fileItem}>
+                <View style={styles.fileInfo}>
+                  <Icon name={getFileIcon(file.type)} size={24} color={Colors.darkBlue} />
+                  <View style={styles.fileDetails}>
+                    <Text style={styles.fileName} numberOfLines={1}>
+                      {file.name}
+                    </Text>
+                    <Text style={styles.fileSize}>
+                      {Math.round(file.size / 1024)} KB
+                    </Text>
+                  </View>
+                </View>
+                <TouchableOpacity 
+                  onPress={() => removeFile(index)}
+                  style={styles.removeFileButton}
+                >
+                  <Icon name="close" size={20} color="#ff4444" />
+                </TouchableOpacity>
+              </View>
+            ))}
+            <TouchableOpacity 
+              style={styles.addMoreButton}
+              onPress={pickDocument}
+            >
+              <Icon name="add-circle" size={20} color={Colors.darkBlue} />
+              <Text style={styles.addMoreText}>{t('medicine_request.add_more_files')}</Text>
+            </TouchableOpacity>
           </View>
         )}
 
@@ -542,42 +653,40 @@ const handleAddAddress = async () => {
         <Text style={styles.sectionTitle}>{t('medicine_request.delivery_address')}</Text>
 
         {/* Address Selection Options */}
-     <View style={styles.addressOptionsContainer}>
-  <TouchableOpacity 
-    style={styles.addressOptionButton}
-    onPress={() => setAddressModalVisible(true)}
-  >
-    <Icon name="location-on" size={20} color={Colors.darkBlue} />
-    <Text style={styles.addressOptionText}>{t('medicine_request.choose_address')}</Text>
-  </TouchableOpacity>
+        <View style={styles.addressOptionsContainer}>
+          <TouchableOpacity 
+            style={styles.addressOptionButton}
+            onPress={() => setAddressModalVisible(true)}
+          >
+            <Icon name="location-on" size={20} color={Colors.darkBlue} />
+            <Text style={styles.addressOptionText}>{t('medicine_request.choose_address')}</Text>
+          </TouchableOpacity>
 
-  <TouchableOpacity 
-    style={styles.addressOptionButton}
-    onPress={() => setNewAddressModalVisible(true)}
-  >
-    <Icon name="add-location" size={20} color={Colors.darkBlue} />
-    <Text style={styles.addressOptionText}>{t('medicine_request.add_new_address')}</Text>
-  </TouchableOpacity>
-</View>
+          <TouchableOpacity 
+            style={styles.addressOptionButton}
+            onPress={() => setNewAddressModalVisible(true)}
+          >
+            <Icon name="add-location" size={20} color={Colors.darkBlue} />
+            <Text style={styles.addressOptionText}>{t('medicine_request.add_new_address')}</Text>
+          </TouchableOpacity>
+        </View>
 
-{/* Selected Address Display */}
-{selectedAddress && (
-  <View style={styles.selectedAddressContainer}>
-    <Text style={styles.selectedAddressTitle}>{t('medicine_request.selected_address')}:</Text>
-    <Text style={styles.selectedAddressText}>{selectedAddress.full_name}</Text>
-    <Text style={styles.selectedAddressText}>{selectedAddress.phone_number}</Text>
-    <Text style={styles.selectedAddressText}>
-      {selectedAddress.address_line1}
-      {selectedAddress.address_line2 ? `, ${selectedAddress.address_line2}` : ''}
-    </Text>
-    <Text style={styles.selectedAddressText}>
-      {selectedAddress.city}, {selectedAddress.state} - {selectedAddress.postal_code}
-    </Text>
-    <Text style={styles.selectedAddressText}>{selectedAddress.country}</Text>
-  </View>
-)}
-
-  
+        {/* Selected Address Display */}
+        {selectedAddress && (
+          <View style={styles.selectedAddressContainer}>
+            <Text style={styles.selectedAddressTitle}>{t('medicine_request.selected_address')}:</Text>
+            <Text style={styles.selectedAddressText}>{selectedAddress.full_name}</Text>
+            <Text style={styles.selectedAddressText}>{selectedAddress.phone_number}</Text>
+            <Text style={styles.selectedAddressText}>
+              {selectedAddress.address_line1}
+              {selectedAddress.address_line2 ? `, ${selectedAddress.address_line2}` : ''}
+            </Text>
+            <Text style={styles.selectedAddressText}>
+              {selectedAddress.city}, {selectedAddress.state} - {selectedAddress.postal_code}
+            </Text>
+            <Text style={styles.selectedAddressText}>{selectedAddress.country}</Text>
+          </View>
+        )}
       </ScrollView>
 
       {/* Submit Button */}
@@ -590,135 +699,138 @@ const handleAddAddress = async () => {
           {isSubmitting ? (
             <ActivityIndicator color="#ffffff" />
           ) : (
-            <Text style={styles.submitButtonText}>{t('medicine_request.submit_request')}</Text>
+            <Text style={styles.submitButtonText}>
+              {t('medicine_request.submit_request')} {selectedFiles.length > 0 && `(${selectedFiles.length} files)`}
+            </Text>
           )}
         </TouchableOpacity>
       </View>
 
       {/* ✅ Address Selection Modal */}
       <Modal visible={addressModalVisible} animationType="slide">
-          <SafeAreaView style={{ flex: 1,paddingTop:'10%' }}>
+        <SafeAreaView style={{ flex: 1, paddingTop: '10%' }}>
+          <View style={{ flex: 1, padding: 16 }}>
+            <View style={styles.modalHeader}>
+              <TouchableOpacity onPress={() => setAddressModalVisible(false)}>
+                <Icon name="arrow-back" size={24} color="#0e161b" />
+              </TouchableOpacity>
+              <Text style={styles.modalTitle}>
+                {t('medicine_request.modal.select_address_title')}
+              </Text>
+              <View style={{ width: 24 }} />
+            </View>
 
-        <View style={{ flex: 1, padding: 16 }}>
-          <View style={styles.modalHeader}>
-            <TouchableOpacity onPress={() => setAddressModalVisible(false)}>
-              <Icon name="arrow-back" size={24} color="#0e161b" />
+            {addresses.length > 0 ? (
+              <FlatList
+                data={addresses}
+                keyExtractor={(item) => item.id.toString()}
+                renderItem={renderAddressItem}
+              />
+            ) : (
+              <Text style={styles.noAddressesText}>
+                {t('medicine_request.modal.no_addresses_text')}
+              </Text>
+            )}
+
+            <TouchableOpacity
+              style={styles.addNewAddressButton}
+              onPress={() => {
+                setAddressModalVisible(false);
+                setNewAddressModalVisible(true);
+              }}
+            >
+              <Text style={styles.addNewAddressText}>
+                {t('medicine_request.modal.add_new_address_button')}
+              </Text>
             </TouchableOpacity>
-            <Text style={styles.modalTitle}>
-  {t('medicine_request.modal.select_address_title')}
-</Text>
-            <View style={{ width: 24 }} />
           </View>
-
-          {addresses.length > 0 ? (
-            <FlatList
-              data={addresses}
-              keyExtractor={(item) => item.id.toString()}
-              renderItem={renderAddressItem}
-            />
-          ) : (
-           <Text style={styles.noAddressesText}>
-  {t('medicine_request.modal.no_addresses_text')}
-</Text>
-          )}
-
-          <TouchableOpacity
-            style={styles.addNewAddressButton}
-            onPress={() => {
-              setAddressModalVisible(false);
-              setNewAddressModalVisible(true);
-            }}
-          >
-          <Text style={styles.addNewAddressText}>
-  {t('medicine_request.modal.add_new_address_button')}
-</Text>
-          </TouchableOpacity>
-        </View>
         </SafeAreaView>
       </Modal>
 
       {/* ✅ Add New Address Modal */}
       <Modal visible={newAddressModalVisible} animationType="slide">
-          <SafeAreaView style={{ flex: 1 ,paddingTop:'10%'}}>
-        <View style={{ flex: 1, padding: 16 }}>
-          <View style={styles.modalHeader}>
-            <TouchableOpacity onPress={() => setNewAddressModalVisible(false)}>
-              <Icon name="arrow-back" size={24} color="#0e161b" />
-            </TouchableOpacity>
-           <Text style={styles.modalTitle}>
-  {t('medicine_request.modal.add_new_address_title')}
-</Text>
-            <View style={{ width: 24 }} />
-          </View>
+        <SafeAreaView style={{ flex: 1, paddingTop: '10%' }}>
+          <View style={{ flex: 1, padding: 16 }}>
+            <View style={styles.modalHeader}>
+              <TouchableOpacity onPress={() => setNewAddressModalVisible(false)}>
+                <Icon name="arrow-back" size={24} color="#0e161b" />
+              </TouchableOpacity>
+              <Text style={styles.modalTitle}>
+                {t('medicine_request.modal.add_new_address_title')}
+              </Text>
+              <View style={{ width: 24 }} />
+            </View>
 
-          <TextInput
-            style={styles.modalInput}
-            placeholder="Full Name"
-            value={newAddress.full_name || user?.full_name || ''}
-            onChangeText={(text) => setNewAddress({ ...newAddress, full_name: text })}
-          />
-          <TextInput
-            style={styles.modalInput}
-            placeholder="Phone Number"
-            value={newAddress.phone_number || user?.phone_number || ''}
-            onChangeText={(text) => setNewAddress({ ...newAddress, phone_number: text })}
-          />
-          <TextInput
-            style={styles.modalInput}
-            placeholder="Address Line 1"
-            value={newAddress.address_line1}
-            onChangeText={(text) => setNewAddress({ ...newAddress, address_line1: text })}
-          />
-          <TextInput
-            style={styles.modalInput}
-            placeholder="Address Line 2"
-            value={newAddress.address_line2}
-            onChangeText={(text) => setNewAddress({ ...newAddress, address_line2: text })}
-          />
-          <TextInput
-            style={styles.modalInput}
-            placeholder="City"
-            value={newAddress.city}
-            onChangeText={(text) => setNewAddress({ ...newAddress, city: text })}
-          />
-          <TextInput
-            style={styles.modalInput}
-            placeholder="State"
-            value={newAddress.state}
-            onChangeText={(text) => setNewAddress({ ...newAddress, state: text })}
-          />
-          <TextInput
-            style={styles.modalInput}
-            placeholder="Postal Code"
-            value={newAddress.postal_code}
-            onChangeText={(text) => setNewAddress({ ...newAddress, postal_code: text })}
-          />
-          <TextInput
-            style={styles.modalInput}
-            placeholder="Country"
-            value={newAddress.country}
-            onChangeText={(text) => setNewAddress({ ...newAddress, country: text })}
-          />
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <TextInput
+                style={styles.modalInput}
+                placeholder="Full Name"
+                value={newAddress.full_name || user?.full_name || ''}
+                onChangeText={(text) => setNewAddress({ ...newAddress, full_name: text })}
+              />
+              <TextInput
+                style={styles.modalInput}
+                placeholder="Phone Number"
+                value={newAddress.phone_number || user?.phone_number || ''}
+                onChangeText={(text) => setNewAddress({ ...newAddress, phone_number: text })}
+              />
+              <TextInput
+                style={styles.modalInput}
+                placeholder="Address Line 1"
+                value={newAddress.address_line1}
+                onChangeText={(text) => setNewAddress({ ...newAddress, address_line1: text })}
+              />
+              <TextInput
+                style={styles.modalInput}
+                placeholder="Address Line 2"
+                value={newAddress.address_line2}
+                onChangeText={(text) => setNewAddress({ ...newAddress, address_line2: text })}
+              />
+              <TextInput
+                style={styles.modalInput}
+                placeholder="City"
+                value={newAddress.city}
+                onChangeText={(text) => setNewAddress({ ...newAddress, city: text })}
+              />
+              <TextInput
+                style={styles.modalInput}
+                placeholder="State"
+                value={newAddress.state}
+                onChangeText={(text) => setNewAddress({ ...newAddress, state: text })}
+              />
+              <TextInput
+                style={styles.modalInput}
+                placeholder="Postal Code"
+                value={newAddress.postal_code}
+                onChangeText={(text) => setNewAddress({ ...newAddress, postal_code: text })}
+              />
+              <TextInput
+                style={styles.modalInput}
+                placeholder="Country"
+                value={newAddress.country}
+                onChangeText={(text) => setNewAddress({ ...newAddress, country: text })}
+              />
 
-          <View style={{ flexDirection: 'row', marginTop: 16, gap: 12 }}>
-            <TouchableOpacity
-              style={[styles.modalButton, { backgroundColor: '#ccc', flex: 1 }]}
-              onPress={() => setNewAddressModalVisible(false)}
-            >
-             <Text style={{ color: '#000' }}>
-    {t('medicine_request.modal.cancel_button')}
-  </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.modalButton, { backgroundColor: Colors.darkBlue, flex: 1 }]}
-              onPress={handleAddAddress}
-            >
-              <Text style={{ color: '#fff' }}>
-    {t('medicine_request.modal.save_address_button')}
-  </Text>
-            </TouchableOpacity>
+              <View style={{ flexDirection: 'row', marginTop: 16, gap: 12 }}>
+                <TouchableOpacity
+                  style={[styles.modalButton, { backgroundColor: '#ccc', flex: 1 }]}
+                  onPress={() => setNewAddressModalVisible(false)}
+                >
+                  <Text style={{ color: '#000' }}>
+                    {t('medicine_request.modal.cancel_button')}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.modalButton, { backgroundColor: Colors.darkBlue, flex: 1 }]}
+                  onPress={handleAddAddress}
+                >
+                  <Text style={{ color: '#fff' }}>
+                    {t('medicine_request.modal.save_address_button')}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
           </View>
-        </View>
         </SafeAreaView>
       </Modal>
     </SafeAreaView>
@@ -822,13 +934,64 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     letterSpacing: 0.015,
   },
-  selectedFileContainer: {
+  selectedFilesContainer: {
     paddingHorizontal: 16,
     marginBottom: 16,
   },
-  selectedFileText: {
+  selectedFilesTitle: {
+    fontSize: 16,
+    fontWeight: '600',
     color: '#0e161b',
+    marginBottom: 12,
+  },
+  fileItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#f8fafc',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: '#e0e7ed',
+  },
+  fileInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  fileDetails: {
+    marginLeft: 12,
+    flex: 1,
+  },
+  fileName: {
     fontSize: 14,
+    color: '#0e161b',
+    fontWeight: '500',
+  },
+  fileSize: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: 2,
+  },
+  removeFileButton: {
+    padding: 8,
+  },
+  addMoreButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 12,
+    marginTop: 8,
+    borderWidth: 1,
+    borderColor: Colors.darkBlue,
+    borderRadius: 8,
+    borderStyle: 'dashed',
+  },
+  addMoreText: {
+    color: Colors.darkBlue,
+    marginLeft: 8,
+    fontWeight: '500',
   },
   inputContainer: {
     paddingHorizontal: 16,
