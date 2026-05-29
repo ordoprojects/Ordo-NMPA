@@ -128,20 +128,89 @@ const MedicineRequestScreen = () => {
 
   // Populate address fields when selecting from saved addresses
   const populateAddressFields = (address) => {
-    setAddressLine1(address.address_line1);
-    setAddressLine2(address.address_line2 || '');
-    setCity(address.city);
-    setState(address.state);
-    setPostalCode(address.postal_code);
-    setCountry(address.country);
-  };
+  console.log('=== POPULATING ADDRESS FIELDS ===');
+  console.log('Selected address object:', address);
+  console.log('Address Line 1:', address.address_line1);
+  console.log('Address Line 2:', address.address_line2);
+  console.log('City:', address.city);
+  console.log('State:', address.state);
+  console.log('Postal Code:', address.postal_code);
+  console.log('Country:', address.country);
+  
+  setAddressLine1(address.address_line1);
+  setAddressLine2(address.address_line2 || '');
+  setCity(address.city);
+  setState(address.state);
+  setPostalCode(address.postal_code);
+  setCountry(address.country);
+  
+  // Log after setting state (note: state updates are async)
+  console.log('After setState calls - values should be updated in next render');
+};
 
-  // ✅ Handle address selection
-  const handleAddressSelect = (address) => {
-    setSelectedAddress(address);
-    populateAddressFields(address);
-    setAddressModalVisible(false);
-  };
+// Update your handleAddressSelect function
+const handleAddressSelect = (address) => {
+  console.log('=== HANDLE ADDRESS SELECT ===');
+  console.log('Address received:', address);
+  setSelectedAddress(address);
+  populateAddressFields(address);
+  setAddressModalVisible(false);
+  
+  // Add a small timeout to check if state updated
+  setTimeout(() => {
+    console.log('After selection - addressLine1:', addressLine1);
+    console.log('After selection - city:', city);
+  }, 100);
+};
+
+// Update your validateAddressFields function with console logs
+const validateAddressFields = () => {
+  console.log('=== VALIDATE ADDRESS FIELDS ===');
+  console.log('selectedAddress:', selectedAddress);
+  console.log('addressLine1:', addressLine1);
+  console.log('addressLine2:', addressLine2);
+  console.log('city:', city);
+  console.log('state:', state);
+  console.log('postalCode:', postalCode);
+  console.log('country:', country);
+  
+  // If a saved address is selected, we don't need to validate individual fields
+  if (selectedAddress && selectedAddress.id) {
+    console.log('Using saved address - skipping validation');
+    return true;
+  }
+  
+  console.log('No saved address - validating manual fields');
+  
+  if (!addressLine1.trim()) {
+    console.log('Address Line 1 validation failed');
+    Alert.alert(t('error'), t('medicine_request.address_line1_required'));
+    return false;
+  }
+  if (!city.trim()) {
+    console.log('City validation failed - city value:', city);
+    Alert.alert(t('error'), t('medicine_request.city_required'));
+    return false;
+  }
+  if (!state.trim()) {
+    console.log('State validation failed');
+    Alert.alert(t('error'), t('medicine_request.state_required'));
+    return false;
+  }
+  if (!postalCode.trim()) {
+    console.log('Postal code validation failed');
+    Alert.alert(t('error'), t('medicine_request.postal_code_required'));
+    return false;
+  }
+  if (!country.trim()) {
+    console.log('Country validation failed');
+    Alert.alert(t('error'), t('medicine_request.country_required'));
+    return false;
+  }
+  return true;
+};
+
+ 
 
   // ✅ Add new address
   const handleAddAddress = async () => {
@@ -290,29 +359,7 @@ const MedicineRequestScreen = () => {
     setDuration(text);
   };
 
-  const validateAddressFields = () => {
-    if (!addressLine1.trim()) {
-      Alert.alert(t('error'), t('medicine_request.address_line1_required'));
-      return false;
-    }
-    if (!city.trim()) {
-      Alert.alert(t('error'), t('medicine_request.city_required'));
-      return false;
-    }
-    if (!state.trim()) {
-      Alert.alert(t('error'), t('medicine_request.state_required'));
-      return false;
-    }
-    if (!postalCode.trim()) {
-      Alert.alert(t('error'), t('medicine_request.postal_code_required'));
-      return false;
-    }
-    if (!country.trim()) {
-      Alert.alert(t('error'), t('medicine_request.country_required'));
-      return false;
-    }
-    return true;
-  };
+ 
 
   // Updated handleSubmit for multiple files
 const handleSubmit = async () => {
@@ -1051,6 +1098,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     backgroundColor: '#f8fafc',
+    marginBottom:'5%'
   },
   submitButton: {
     height: 48,
